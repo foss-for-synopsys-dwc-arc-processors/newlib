@@ -28,9 +28,11 @@
 #define ld_l	ld
 #define mov_l	mov
 #define or_l	or
+#define st_l	st
 #define stb_l	stb
 #define sub_l	sub
 #define tst_l	tst
+#define extb_l	extb
 
 #define bcc_s	bhs_s
 

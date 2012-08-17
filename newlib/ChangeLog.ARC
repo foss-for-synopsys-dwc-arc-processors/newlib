@@ -1,3 +1,78 @@
+2012-01-03  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* libc/machine/arc/memset-601.S: Use store / load sequence
+	to spead a byte across a word.
+
+2012-01-01  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* libc/machine/arc/memcmp-601.S: Remove misplaced _s mnemonic suffixes.
+	* libc/machine/arc/strncpy-601.S: Likewise.
+	* libc/machine/arc/strlen-601.S: Likewise.
+	* libc/machine/arc/memset-601.S: Replace shift loops with addN insns.
+	Strength reduce main loop.
+	* libc/machine/arc/strchr-601.S: Replace shifts with arithmetic.
+	Strength reduce main loop.
+	* libc/machine/arc/strcpy-601.S: Fix tst_s syntax.
+	* libc/machine/arc/memset.S (__strncpy_bzero): Fix clear range for
+	sizes of 9..17 .
+	* libc/machine/arc/memcpy-601.S:  Replace shifts with arithmetic.
+	Strength reduce main loop.
+	* libc/machine/arc/asm.h (st_l, extb_l): Define.
+
+	* libc/machine/arc/Makefile.am (lib_a_SOURCES) : Remove memset-a4.c,
+	strcmp-a4.c, strchr-a4.c and strlen-a4.c .
+	* libc/machine/arc/Makefile.in: Regenerate.
+	* libc/machine/arc/strlen-a4.c: Fix include guard.
+
+	* libc/machine/arc/strlen-601.S [LITTLE_ENDIAN]: Fix start mask
+	generation.
+	[BIG_ENDIAN]: Fix .Learly_end handling of start mask.
+
+	* libc/machine/arc/memset-601.S: Fix end test.
+
+	* libc/machine/arc/strncpy-601.S: Replace .Lastword test.
+	Fix end tests.
+
+	* libc/machine/arc/memcpy-601.S [BIG_ENDIAN]: Restore test to
+	check if last word is to be stored unchanged.
+
+2011-12-31  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* libc/machine/arc/memcmp-601.S (memcmp): Strength reduce main loop.
+	[BIG ENNDIAN] (.Last_cmp): Use bclr instead of shift loop.
+	* libc/machine/arc/strncpy-601.S (strncpy): Strength reduce main loop.
+	(.Lastword): Use character-at-a-time loop instead of multi-bit shift
+	loops.
+
+2011-12-21  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* libc/machine/arc/strcpy-601.S: New file.
+	* libc/machine/arc/Makefile.am (lib_a_SOURCES): Add strcpy-601.S.
+	* libc/machine/arc/Makefile.in: Regenerate.
+	* libc/machine/arc/strcmp.S [!__LITTLE_ENDIAN__] (found0) [__ARC601__]:
+	Use charloop.
+	* libc/machine/arc/strcpy-600.S: Likewise.
+	* libc/machine/arc/memset.S: Fix preprocessor guard condition.
+	* libc/machine/arc/strlen-601.S: Replace multi-bit-shift-count shifts.
+
+2010-12-29  Michael Eager  <eager@eagercon.com>
+
+	* libc/machine/arc(memcmp-601.S, memcpy-601.S, memset-601.S,
+	strncpy-601.S, strchr-601.S, strlen-601.S): NEW: support ARC601
+	without barrel shifter.
+	* libc/machine/arc/(Makefile.am,Makefile.in): Add new ARC601 files.
+	* libc/machine/arc/(memcmp.S,memset.S,memcpy-700.S,strncpy.S,
+	strchr.S): Don't build for ARC601.
+	* libc/machine/arc/(strcpy-600.S,strcmp.S,strlen-600.S): Add
+	support for ARC601.
+	* libc/sys/arc/crt0.S: Add support for ARC601.
+
+2010-09-06  Brendan Kehoe  <brendan@zen.org>
+
+	* configure.host (arc-*-*, arc*): Add
+	   default_newlib_io_long_long="yes"
+	to fix printing of long long values.
+
 2009-09-10  J"orn Rennecke  <joern.rennecke@arc.com>
 
 	* libc/machine/configure: Regenerate.

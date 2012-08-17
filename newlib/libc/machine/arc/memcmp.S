@@ -4,6 +4,7 @@
 
 #include "asm.h"
 
+#ifndef __ARC601__
 #ifdef __LITTLE_ENDIAN__
 #define WORD2 r2
 #define SHIFT r3
@@ -153,3 +154,4 @@ ENTRY(memcmp)
 	j_s.d	[blink]
 	mov_l	r0,0
 ENDFUNC(memcmp)
+#endif /* __ARC601__ */

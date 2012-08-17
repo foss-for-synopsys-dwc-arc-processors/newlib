@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: features.h,v 1.15 2008/12/04 13:58:11 corinna Exp $
+ *  $Id: features.h,v 1.16 2008/12/12 17:16:03 jjohnstn Exp $
  */
 
 #ifndef _SYS_FEATURES_H

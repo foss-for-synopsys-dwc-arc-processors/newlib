@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#if !defined (__ARC700__) && !defined (__A4__)
+#if defined (__ARC600__) || defined (__A5__)
 /* This code is optimized for the ARC600 pipeline.  */
 
 ENTRY(strlen)
@@ -85,4 +85,4 @@ ENTRY(strlen)
 	b.d	.Lend
 	sub_s.ne r1,r1,r1
 ENDFUNC(strlen)
-#endif /* !ARC700 */
+#endif /* defined (__ARC600__) || defined (__A5__) */

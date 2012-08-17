@@ -1,3 +1,3 @@
-#ifndef __A4__
+#ifdef __A4__
 #include "../../string/strlen.c"
 #endif

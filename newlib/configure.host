@@ -556,6 +556,9 @@ case "${host}" in
   arc-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
+	# START ARC LOCAL
+	default_newlib_io_long_long="yes"
+	# END ARC LOCAL
 	;;
   arm-*-pe)
 	syscall_dir=syscalls
@@ -577,6 +580,7 @@ case "${host}" in
 	;;
   arc*)
 	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
+	default_newlib_io_long_long="yes"
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"

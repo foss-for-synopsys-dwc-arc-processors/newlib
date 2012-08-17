@@ -6,10 +6,29 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = setjmp.S memcpy.S memcpy-700.S strcpy.c strcpy-600.S \
-  strcpy-700.S strcmp-a4.c strcmp.S strchr-a4.c strchr.S strchr-700.S \
-  memset-a4.c memset.S strlen-a4.c strlen.S strlen-600.S memcmp.S \
-  strncpy.S
+lib_a_SOURCES = 	\
+	memcmp.S	\
+	memcmp-601.S	\
+	memcpy.S 	\
+	memcpy-601.S 	\
+	memcpy-700.S 	\
+	memset-601.S 	\
+	memset.S 	\
+	setjmp.S 	\
+	strcmp.S 	\
+	strchr.S 	\
+	strchr-601.S	\
+	strchr-700.S	\
+	strcpy.c 	\
+	strcpy-600.S 	\
+	strcpy-601.S 	\
+	strcpy-700.S 	\
+	strlen.S 	\
+	strlen-600.S 	\
+	strlen-601.S 	\
+	strncpy.S	\
+	strncpy-601.S
+
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 

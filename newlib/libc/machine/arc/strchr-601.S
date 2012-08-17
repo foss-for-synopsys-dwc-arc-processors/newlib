@@ -18,24 +18,33 @@
      Each byte in Y is 0x80 if the the corresponding byte in
      W is zero, otherwise that byte of Y is 0.  */
 
-#if defined(__ARC600__) || defined(__A5__)
+#ifdef __ARC601__
 ENTRY(strchr)
 	bmsk.f	r2,r0,1
 	mov_s	r3,0x01010101
 	extb_s	r1,r1
-	asl	r5,r1,8
-	or	r5,r5,r1
+	mov	r8,0
+	add3	r5,r8,r1
+	add3	r5,r8,r5
+	add2	r5,r1,r5
+	add3	r4,r8,r5
+	add3	r4,r8,r4
+	add3	r4,r8,r4
+	add3	r4,r8,r4
 	beq.d	.Laligned
-	asl	r4,r5,16
+	add3	r4,r8,r4
         sub_s   r0,r0,r2
-        asl_s   r2,r2,3
 #ifdef	__LITTLE_ENDIAN__
-        asl     r7,r3,r2
+	add3.f	r2,-1,r2
+	bmsk	r7,r3,r2
+	rsub.pl	r7,r7,r3
 #else
-        lsr     r7,r3,r2
+	mov_s	r12,31
+	sub3	r2,r12,r2
+	bmsk	r7,r3,r2
 #endif
 	ld_s	r2,[r0]
-	or	r5,r5,r4
+	add1	r5,r5,r4
 	ror	r4,r3
 	sub	r12,r2,r7
 	bic_s	r12,r12,r2
@@ -55,13 +64,13 @@ ENTRY(strchr)
 #ifdef __LITTLE_ENDIAN__
 	btst	r7,7
 #else
-	asl	r6,r6,7
+	and	r2,r6,r3
 #endif
 
 	.balign	4
 .Laligned:
 	ld_s	r2,[r0]
-	or	r5,r5,r4
+	add1	r5,r5,r4
 	ror	r4,r3
 	sub	r12,r2,r3
 	bic_s	r12,r12,r2
@@ -104,23 +113,21 @@ ENTRY(strchr)
 	or	r3,r12,r2
 	sub_s	r12,r3,1
 	xor_s	r3,r3,r12
+	cmp	0xffff,r3
+	; cmp uses limm ; ARC600 would do: asl.f 0,r3,9
 	tst_s	r2,r3
-	lsr	r2,r3,31
-	lsr	r12,r3,16
-	jeq.d	[blink]
 	mov.eq	r0,0
-	lsr	r3,r3,8
-	sub_s	r2,r2,r12
-	sub_s	r2,r2,r3
-	bmsk_s	r2,r2,1
+	add.mi	r0,r0,1
+	btst.ne	r3,15
 	j_s.d	[blink]
-	add_s	r0,r0,r2
+	adc.ne	r0,r0,1
 #else /* BIG ENDIAN */
 .Lfound_char:
-	asl	r6,r6,7
+	and	r2,r6,r3
 .Lfound_char_ua:
+	sub1	r2,r3,r2
 	sub_s	r0,r0,4
-	bic.f	r2,r7,r6
+	bic.f	r2,r7,r2
 	add.pl	r0,r0,1
 	jmi.d	[blink]
 	btst_s	r2,23
@@ -136,13 +143,14 @@ ENTRY(strchr)
 .Lfound0_ua:
 	mov_s	r3,r7
 .Lfound0:
-	asl_s	r2,r2,7
+	and_s	r2,r2,r3
+	sub1	r2,r3,r2
 	or	r7,r6,r4
 	bic_s	r12,r12,r2
 	sub	r2,r7,r3
 	or	r2,r2,r6
 	bic	r2,r4,r2
-	cmp	r12,r2
+	cmp_s	r12,r2
 	mov.hi	r0,0
 	btst.ls	r2,31
 	jhi.d	[blink]
@@ -154,4 +162,4 @@ ENTRY(strchr)
 	add.eq	r0,r0,1
 #endif /* ENDIAN */
 ENDFUNC(strchr)
-#endif /* __ARC600__ || __A5__ */
+#endif /* !__ARC_601__ */

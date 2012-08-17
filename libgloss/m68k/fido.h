@@ -11,9 +11,9 @@
  *    Wed, 1 June 2005 David L. Deis [DD]
  *
  *  @par CVS-Info:
- *    $Revision$
- *    $Author$
- *    $Date$
+ *    $Revision: 1.2 $
+ *    $Author: jjohnstn $
+ *    $Date: 2006/12/18 21:48:18 $
  *
  *  @par Description:
  *  Contains board-specific and onchip memory-mapped register and internal

@@ -44,7 +44,31 @@ __zbss1:
 	blo	@__zbss1		; branch if below
 
 ;; ifdef __A4__	
-#else			
+#elif __ARC601__
+
+;; Startup code for the ARC601 processor
+__start:
+	mov gp, @__SDATA_BEGIN__
+	mov	sp, @__stack_top	; Point to top of stack
+	mov	r5, 0			; Zero value
+	mov_s %r2, @__sbss_start	; r2 = start of the bss section
+	sub r3, @_end, %r2		; r3 = size of the bss section in bytes
+
+	asr_s	r3, r3
+	asr_s	r3, r3			; r3 = size of bss in words
+
+.Lbss_loop:
+	cmp	r3, 0xff		; Check for max lp_count
+	mov.le	lp_count, r3
+	mov.gt	lp_count, 0xff
+	lpnz	2f			; Loop to zero bss
+	st.ab	r5,[%r2, 4] 		; Write word of zeros
+	nop
+2:
+	sub.f	r3, r3, 0xff		; Decrement word count
+	jp	.Lbss_loop
+
+#else	/* __ARC601__ */		
 
 ;; Startup code for the A5, ARC600 and ARC700 processors
 ;; -----------------------------------------------------
@@ -78,6 +102,7 @@ __start:
 	mov_s r3,0
 	lpnz @.Lend_zbss		; loop to zero out the bss. Enter loop only if lp_count != 0
 	st.ab r3,[%r2, 4]		; zero out the word
+	nop
 .Lend_zbss:
 #endif	
 
