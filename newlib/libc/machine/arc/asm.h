@@ -10,7 +10,7 @@
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
 #define FUNC(name)         .type name,@function
-#define ENDFUNC0(name) .Lfe_##X: .size name,.Lfe_##name-name
+#define ENDFUNC0(name) .Lfe_##name: .size name,.Lfe_##name-name
 #define ENDFUNC(name) ENDFUNC0(name)
 #define ENTRY(name) _ENTRY(name) ` FUNC(name)
 

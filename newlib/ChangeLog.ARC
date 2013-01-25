@@ -1,3 +1,7 @@
+2013-01-25  Simon Cook  <simon.cook@embecosm.com>
+
+	* libc/machine/arc/asm.h (ENDFUNC0): Replace X with name.
+
 2012-01-03  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* libc/machine/arc/memset-601.S: Use store / load sequence
