@@ -1,3 +1,113 @@
+2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Joseph S. Myers <joseph@codesourcery.com>
+
+	* libc/include/sys/_types.h (_ssize_t): Define as signed equivalent of
+	size_t with GCC.
+
+2013-02-19  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/memcpy.S: Fix USE_PREFETCH check.
+
+2013-02-01  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/sysnecv850/crt0.S: Add recognition of the e3v5
+	architecture variant.
+
+2013-01-22  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/include/pthread.h: Add PTHREAD_RWLOCK_INITIALIZER.
+	Fix typo on PTHREAD_COJND_INITIALIZER.
+
+2013-01-17  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/strncmp.S: Correct arithmetic for
+	argument N values close to the maximum representable
+	value in an unsigned 64 bit value.
+
+2013-01-17  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/strnlen.S: Correct arithmetic for
+	argument N values close to the maximum representable
+	value in an unsigned 64 bit value.
+
+2013-01-15  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/sysnecv850/crt0.S (_start): Enable FPU for the
+	V850e2v3.
+
+2013-01-12  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/string.h: Fix preprocessor expressions using
+	_XOPEN_SOURCE.
+
+2013-01-11  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Add code to correctly handle
+	's' format specifier on not _MB_CAPABLE targets.  Fix a formatting
+	glitch in _MB_CAPABLE enabled code.  Add a missing 'L' specifier.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	memcmp-stub.c and memcmp.S
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/memcmp-stub.c: New file.
+	* libc/machine/aarch64/memcmp.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	strnlen-stub.c and strnlen.S
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/strnlen-stub.c: New file.
+	* libc/machine/aarch64/strnlen.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES):
+	Add strlen.S and strlen-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/strlen-stub.c: New file.
+	* libc/machine/aarch64/strlen.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES):
+	Add memmove.S and memmove-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/memmove-stub.c: New file.
+	* libc/machine/aarch64/memmove.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Re-ordered.
+	Add strncmp.S and strncmp-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/strncmp-stub.c: New file.
+	* libc/machine/aarch64/strncmp.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	memcpy.c memcpy-stub.c memset.S memset-stub.c strcmp.S
+	strcmp-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/memcpy-stub.c: New file.
+	* libc/machine/aarch64/memcpy.S: New file.
+	* libc/machine/aarch64/memset-stub.c: New file.
+	* libc/machine/aarch64/memset.S: New file.
+	* libc/machine/aarch64/strcmp.S: New file.
+	* libc/machine/aarch64/strcmp-stub.c: New file.
+
+2013-01-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* MAINTAINERS: Add Richard Earnshaw as Arm co-maintainer
+	and add Richard and Marcus Shawcroft as aarch64 maintainers.
+
+2013-01-07  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/memcpy.S (memcpy): Check if _MIPS_SIM is set.
+
 2012-12-20  Jeff Johnston  <jjohnstn@redhat.com>
 
         * NEWS: Update with 2.0.0 info.
