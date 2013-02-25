@@ -131,7 +131,7 @@ typedef	char *	caddr_t;
 
 #ifndef __CYGWIN__
 #if defined(__MS_types__) || defined(__rtems__) || \
-    defined(__sparc__) || defined(__SPU__)
+    defined(__sparc__) || defined(__SPU__) || defined(__arc__)
 typedef	unsigned long	ino_t;
 #else
 typedef	unsigned short	ino_t;
@@ -195,6 +195,8 @@ typedef unsigned long mode_t;
 #else
 typedef unsigned short mode_t;
 #endif
+#elif defined (__arc__)
+typedef unsigned short mode_t;
 #else
 typedef unsigned int mode_t _ST_INT32;
 #endif
