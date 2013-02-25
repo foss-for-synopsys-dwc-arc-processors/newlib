@@ -1,3 +1,7 @@
+2013-02-25  Simon Cook  <simon.cook@embecosm.com>
+
+	* configure.host: Make arceb a valid CPU.
+
 2013-01-25  Simon Cook  <simon.cook@embecosm.com>
 
 	* libc/machine/arc/asm.h (ENDFUNC0): Replace X with name.

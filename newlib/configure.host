@@ -100,7 +100,7 @@ case "${host_cpu}" in
 	machine_dir=aarch64
 	libm_machine_dir=aarch64
 	;;
-  arc)
+  arc | arceb)
 	machine_dir=arc
 	;;
   arm*)
@@ -394,7 +394,7 @@ case "${host}" in
 	sys_dir=a29khif
 	signal_dir=
 	;;
-  arc-*-*)
+  arc*-*-*)
 	sys_dir=arc
 	;;
   arm*-*-*)
@@ -607,7 +607,7 @@ case "${host}" in
 	default_newlib_io_long_long="yes"
 	syscall_dir=syscalls
 	;;
-  arc-*-*)
+  arc*-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
 	# START ARC LOCAL
