@@ -34,3 +34,6 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
+
+pdf:
+install-pdf:

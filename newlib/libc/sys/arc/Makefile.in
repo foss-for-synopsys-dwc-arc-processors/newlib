@@ -116,12 +116,14 @@ MAKEINFO = @MAKEINFO@
 MAY_SUPPLY_SYSCALLS_FALSE = @MAY_SUPPLY_SYSCALLS_FALSE@
 MAY_SUPPLY_SYSCALLS_TRUE = @MAY_SUPPLY_SYSCALLS_TRUE@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -410,8 +412,6 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-pdf: pdf-am
-
 pdf-am:
 
 ps: ps-am
@@ -435,6 +435,9 @@ uninstall-am:
 	$(CCASCOMPILE) -c $<
 
 all: crt0.o
+
+pdf:
+install-pdf:
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
