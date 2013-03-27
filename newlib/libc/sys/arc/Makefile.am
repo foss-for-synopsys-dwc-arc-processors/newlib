@@ -20,3 +20,6 @@ all: crt0.o
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
+
+pdf:
+install-pdf:

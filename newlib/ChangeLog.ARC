@@ -1,3 +1,11 @@
+2013-03-27  Simon Cook  <simon.cook@embecosm.com>
+
+	* newlib/libc/sys/arc/Makefile.am: Add empty pdf and install-pdf
+	targets.
+	* newlib/libc/machine/arc/Makefile.am: Likewise.
+	* newlib/libc/sys/arc/Makefile.in: Regenerate.
+	* newlib/libc/machine/arc/Makefile.in: Likewise.
+
 2013-02-25  Simon Cook  <simon.cook@embecosm.com>
 
 	* configure.host: Make arceb a valid CPU.
