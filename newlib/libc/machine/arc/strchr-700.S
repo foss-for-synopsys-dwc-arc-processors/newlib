@@ -8,7 +8,7 @@
    words branch-free.  */
 #include "asm.h"
 
-#ifdef __ARC700__
+#if defined(__ARC700__) || defined (__EM__)
 
 ENTRY(strchr)
 	extb_s	r1,r1

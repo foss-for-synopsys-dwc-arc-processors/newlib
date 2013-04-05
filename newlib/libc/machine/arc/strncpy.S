@@ -15,7 +15,7 @@
    would also be likey to cost an unaligned mispredict at the next call.  */
    
 #ifndef __ARC601__
-#ifdef __ARC700__
+#if defined(__ARC700___) || defined (__EM__)
 #define BRand(a,b,l)	tst	a,b ` bne_l l
 #else
 #define BRand(a,b,l)	and	a,a,b ` brne_s a,0,l
@@ -80,7 +80,7 @@ ENTRY(strncpy)
 .Lr4z:
 	mov_l	r3,r4
 .Lr3z:
-#ifdef __ARC700__
+#if defined(__ARC700__) || defined (__EM__)
 #ifdef __LITTLE_ENDIAN__
 	bmsk.f	r1,r3,7
 	lsr_s	r3,r3,8
