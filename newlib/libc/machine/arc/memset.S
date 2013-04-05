@@ -20,7 +20,7 @@
   and length alignment for the zeroing randomly distributed.  */
 
 ENTRY(memset)
-#ifndef	__ARC700__
+#if !defined(__ARC700__) && !defined (__EM__)
 #undef SMALL
 #define SMALL 8 /* Even faster if aligned.  */
 	brls.d	r2,SMALL,.Ltiny
@@ -32,7 +32,7 @@ ENTRY(memset)
 	asl	r12,r1,8
 	beq.d	.Laligned
 	or_s	r1,r1,r12
-#ifdef __ARC700__
+#if defined(__ARC700__) || defined(__EM__)
 	brls	r2,SMALL,.Ltiny
 #endif
 .Lnot_tiny:
@@ -48,7 +48,7 @@ ENTRY(memset)
 	stw.ab	r1,[r3,2]
 	bclr_s	r3,r3,1
 .Laligned:	; This code address should be aligned for speed.
-#ifdef __ARC700__
+#if defined(__ARC700__) || defined(__EM__)
 	asl	r12,r1,16
 	lsr.f	lp_count,r2,2
 	or_s	r1,r1,r12
@@ -69,7 +69,7 @@ ENTRY(memset)
 	st_s	r1,[r3]
 #endif /* !__ARC700 */
 
-#ifdef __ARC700__
+#if defined(__ARC700__) || defined(__EM__)
 	.balign	4
 __strncpy_bzero:
 	brhi.d	r2,17,.Lnot_tiny
