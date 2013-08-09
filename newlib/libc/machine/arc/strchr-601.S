@@ -55,16 +55,26 @@ ENTRY(strchr)
 	ld.a	r2,[r0,4]
 	sub	r12,r6,r7
 	bic	r12,r12,r6
+#ifdef __LITTLE_ENDIAN__
 	and.f	r7,r12,r4
 	sub	r12,r2,r3
 	bic_s	r12,r12,r2
 	beq.d	.Loop
 	and	r12,r12,r4
 	b.d	.Lfound_char_ua
-#ifdef __LITTLE_ENDIAN__
 	btst	r7,7
 #else
-	and	r2,r6,r3
+	and.f	r8,r12,r4
+	sub	r12,r2,r3
+	bic_s	r12,r12,r2
+	beq.d	.Loop
+	and	r12,r12,r4
+	bic	r12,r7,r6
+	bic	r2,r3,r12
+	sub1	r2,r3,r2
+	sub_s	r0,r0,4
+	b.d	.Lfound_char_ua
+	bic.f	r2,r8,r2
 #endif
 
 	.balign	4
@@ -124,10 +134,10 @@ ENTRY(strchr)
 #else /* BIG ENDIAN */
 .Lfound_char:
 	and	r2,r6,r3
-.Lfound_char_ua:
 	sub1	r2,r3,r2
 	sub_s	r0,r0,4
 	bic.f	r2,r7,r2
+.Lfound_char_ua:
 	add.pl	r0,r0,1
 	jmi.d	[blink]
 	btst_s	r2,23
