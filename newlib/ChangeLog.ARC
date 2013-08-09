@@ -1,3 +1,10 @@
+2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* libc/machine/arc/strchr-700.S (strchr) [!__LITTLE_ENDIAN__]:
+	Compensate for carry effects on byte selection in first word.
+	* libc/machine/arc/strchr-601.S(strchr) [!__LITTLE_ENDIAN__]: Likewise.
+	* libc/machine/arc/strchr.S(strchr) [!__LITTLE_ENDIAN__]: Likewise.
+
 2013-04-05 Claudiu Zissulescu <claziss@synopsys.com>
 	*   newlib/libc/machine/arc/memcmp.S: Enable function for EM
 	*   newlib/libc/machine/arc/memset.S: Likewise
