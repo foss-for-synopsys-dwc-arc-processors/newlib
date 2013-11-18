@@ -1,3 +1,8 @@
+2013-11-12  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* newlib/libc/machine/arc/memcmp.S (memcmp): Add workaround
+	for __EM__ ZOL issue.
+
 2013-08-09  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* libc/machine/arc/strchr-700.S (strchr) [!__LITTLE_ENDIAN__]:

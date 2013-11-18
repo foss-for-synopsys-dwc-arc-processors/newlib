@@ -1,4 +1,4 @@
-/* Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+/* Copyright (C) 2007, 2008, 2013 Free Software Foundation, Inc.
    This file is free software; you can redistribute it and/or modify
    it under the same terms as newlib/libc/string/memcmp.c .  */
 
@@ -26,14 +26,31 @@ ENTRY(memcmp)
 	ld	r4,[r0,0]
 	ld	r5,[r1,0]
 	lsr.f	lp_count,r3,3
+#ifdef __EM__
+	/* Contrary to the Programmer's Manual, a branch can't be the last
+	   instruction in a zero overhead loop.
+	   So we move the branch to the start of the loop, duplicate it
+	   after the end, and set up r12 so that the branch isn't taken
+	   initially.  */
+	mov_s	r12,WORD2
+	lpne	.Loop_end
+	brne	WORD2,r12,.Lodd
+	ld	WORD2,[r0,4]
+#else
 	lpne	.Loop_end
 	ld_s	WORD2,[r0,4]
+#endif
 	ld_s	r12,[r1,4]
 	brne	r4,r5,.Leven
 	ld.a	r4,[r0,8]
 	ld.a	r5,[r1,8]
+#ifdef __EM__
+.Loop_end:
+	brne	WORD2,r12,.Lodd
+#else
 	brne	WORD2,r12,.Lodd
 .Loop_end:
+#endif
 	asl_s	SHIFT,SHIFT,3
 	bcc_s	.Last_cmp
 	brne	r4,r5,.Leven
@@ -132,14 +149,25 @@ ENTRY(memcmp)
 	ldb	r4,[r0,0]
 	ldb	r5,[r1,0]
 	lsr.f	lp_count,r3
+#ifdef __EM__
+	mov	r12,r3
 	lpne	.Lbyte_end
+	brne	r3,r12,.Lbyte_odd
+#else
+	lpne	.Lbyte_end
+#endif
 	ldb_s	r3,[r0,1]
 	ldb_l	r12,[r1,1]
 	brne	r4,r5,.Lbyte_even
 	ldb.a	r4,[r0,2]
 	ldb.a	r5,[r1,2]
+#ifdef __EM__
+.Lbyte_end:
+	brne	r3,r12,.Lbyte_odd
+#else
 	brne	r3,r12,.Lbyte_odd
 .Lbyte_end:
+#endif
 	bcc_l	.Lbyte_even
 	brne	r4,r5,.Lbyte_even
 	ldb_s	r3,[r0,1]
