@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#if defined(__ARC700__) || defined (__EM__)
+#if defined(__ARC700__) || defined (__EM__) || defined (__HS__)
 /* If dst and src are 4 byte aligned, copy 8 bytes at a time.
    If the src is 4, but not 8 byte aligned, we first read 4 bytes to get
    it 8 byte aligned.  Thus, we can do a little read-ahead, without
@@ -14,7 +14,7 @@
    The beq_s to r3z could be made unaligned & long to avoid a stall
    there, but the it is not likely to be taken often, and it
    would also be likey to cost an unaligned mispredict at the next call.  */
-   
+
 ENTRY(strcpy)
 	or	r2,r0,r1
 	bmsk_s	r2,r2,1
@@ -55,7 +55,7 @@ r3z:	lsr.f	r1,r3,24
 	bne.d	r3z
 	stb.ab	r1,[r10,1]
 	j_s	[blink]
-	
+
 	.balign	4
 charloop:
 	ldb.ab	r3,[r1,1]

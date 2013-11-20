@@ -16,7 +16,7 @@
 ENTRY(memcmp)
 	or	r12,r0,r1
 	asl_s	r12,r12,30
-#if defined(__ARC700__) || defined(__EM__)
+#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
 	sub_l	r3,r2,1
 	brls	r2,r12,.Lbytewise
 #else
@@ -49,6 +49,9 @@ ENTRY(memcmp)
 	brne	WORD2,r12,.Lodd
 #else
 	brne	WORD2,r12,.Lodd
+#ifdef __HS__
+	nop
+#endif
 .Loop_end:
 #endif
 	asl_s	SHIFT,SHIFT,3
@@ -57,7 +60,7 @@ ENTRY(memcmp)
 	ld	r4,[r0,4]
 	ld	r5,[r1,4]
 #ifdef __LITTLE_ENDIAN__
-#if defined(__ARC700__) || defined(__EM__)
+#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
 	nop_s
 	; one more load latency cycle
 .Last_cmp:
@@ -134,7 +137,7 @@ ENTRY(memcmp)
 	bset.cs	r0,r0,31
 .Lodd:
 	cmp_s	WORD2,r12
-#if defined(__ARC700__) || defined(__EM__)
+#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
 	mov_s	r0,1
 	j_s.d	[blink]
 	bset.cs	r0,r0,31
@@ -166,6 +169,9 @@ ENTRY(memcmp)
 	brne	r3,r12,.Lbyte_odd
 #else
 	brne	r3,r12,.Lbyte_odd
+#ifdef __HS__
+	nop
+#endif
 .Lbyte_end:
 #endif
 	bcc_l	.Lbyte_even

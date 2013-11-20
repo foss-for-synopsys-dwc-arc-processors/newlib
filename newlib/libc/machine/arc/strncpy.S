@@ -13,9 +13,9 @@
    The beq_s to r3z could be made unaligned & long to avoid a stall
    there, but the it is not likely to be taken often, and it
    would also be likey to cost an unaligned mispredict at the next call.  */
-   
+
 #ifndef __ARC601__
-#if defined(__ARC700___) || defined (__EM__)
+#if defined(__ARC700___) || defined (__EM__) || defined (__HS__)
 #define BRand(a,b,l)	tst	a,b ` bne_l l
 #else
 #define BRand(a,b,l)	and	a,a,b ` brne_s a,0,l
@@ -80,7 +80,7 @@ ENTRY(strncpy)
 .Lr4z:
 	mov_l	r3,r4
 .Lr3z:
-#if defined(__ARC700__) || defined (__EM__)
+#if defined(__ARC700__) || defined (__EM__) || defined (__HS__)
 #ifdef __LITTLE_ENDIAN__
 	bmsk.f	r1,r3,7
 	lsr_s	r3,r3,8
@@ -109,14 +109,14 @@ ENTRY(strncpy)
 #endif /* ! __ARC700__ */
 .Lzero_rest:
 	; __strncpy_bzero requires:
-        ; return value in r0
-        ; zeroing length in r2
-        ; zeroing start address in r3
+	; return value in r0
+	; zeroing length in r2
+	; zeroing start address in r3
 	mov_s	r3,r10
 	add_s	r2,r2,r0
-        b.d	__strncpy_bzero
+	b.d	__strncpy_bzero
 	sub_s	r2,r2,r3
-	
+
 	.balign	4
 .Lbytewise:
 	sub.f	r2,r2,1
@@ -128,7 +128,7 @@ ENTRY(strncpy)
 	sub.f	r2,r2,1
 	brne.d	r12,0,.Lcharloop
 	stb.ab	r12,[r3,1]
-        b.d	__strncpy_bzero
+	b.d	__strncpy_bzero
 	stb.ab	r12,[r3,1]
 .Last_byte:
 	j_s.d	[blink]

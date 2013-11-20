@@ -1,3 +1,12 @@
+2013-11-20 Claudiu Zissulescu <claziss@synopsys.com>
+	*   newlib/libc/machine/arc/memcmp.S: Enable function for HS
+	*   newlib/libc/machine/arc/memset.S: Likewise
+	*   newlib/libc/machine/arc/setjmp.S: Likewise
+	*   newlib/libc/machine/arc/strchr-700.S: Likewise
+	*   newlib/libc/machine/arc/strcpy-700.S: Likewise
+	*   newlib/libc/machine/arc/strlen.S: Likewise
+	*   newlib/libc/machine/arc/strncpy.S: Likewise
+
 2013-11-20  Simon Cook  <simon.cook@embecosm.com>
 
 	* doc/makedoc.c (WORD(bulletsize)): Cause a smallexample to be
