@@ -1,5 +1,5 @@
 /* ABI interface file
-   these are the stack mappings for the registers 
+   these are the stack mappings for the registers
    as stored in the ABI for ARC
    Copyright 1999 Free Software Foundation, Inc.
    This file is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ setjmp:
 	st	r3, [r0, ABIlpe]
 
 //#ifndef __A4__
-#if (!defined __A4__ && !defined __A7__ && !defined __EM__)
+#if (!defined (__A4__) && !defined (__A7__) && !defined (__EM__) && !defined (__HS__))
 ;; Till the configury changes are decided, and implemented, the code working on
 ;; mlo/mhi and using mul64 should be disabled.
 ;; 	st	mlo, [r0, ABImlo]
@@ -123,14 +123,14 @@ longjmp:
 	sr	r3, [lp_end]
 
 //#ifndef __A4__
-#if (!defined __A4__ && !defined __A7__ && !defined __EM__)
+#if (!defined (__A4__) && !defined (__A7__) && !defined (__EM__) && !defined (__HS__))
 	ld	r2, [r0, ABImlo]
 	ld	r3, [r0, ABImhi]
 ;;; We donot support restoring of mulhi and mlo registers, yet.
- 
+
 ;	mulu64	0,r2,1			; restores mlo
 ;	mov	0,mlo			; force multiply to finish
-;	sr	r3, [mulhi]	
+;	sr	r3, [mulhi]
 	ld	r2, [r0, ABIflg]
 	flag	r2			; restore "status32" register
 #endif
