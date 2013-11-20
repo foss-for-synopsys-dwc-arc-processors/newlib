@@ -1,3 +1,8 @@
+2013-11-20  Simon Cook  <simon.cook@embecosm.com>
+
+	* doc/makedoc.c (WORD(bulletsize)): Cause a smallexample to be
+	generated after a table finishes.
+
 2013-11-12  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* newlib/libc/machine/arc/memcmp.S (memcmp): Add workaround

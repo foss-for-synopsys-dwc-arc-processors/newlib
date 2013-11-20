@@ -672,7 +672,7 @@ WORD(bulletize)
 	     idx+=3;
 	   }
 	 else if (at(tos,idx+2) == '-') {
-	     cattext(&out,"\n@end table\n");
+	     cattext(&out,"\n@end table\n.\n");
 	     idx+=3;
 	   }
 	 else if (isspace(at(tos,idx+2))) {
