@@ -1,11 +1,19 @@
+2014-08-12 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* newlib/libc/machine/arc/memcpy-archs.S: New file.
+	* newlib/libc/machine/arc/memcpy-700.S: Don't use it for HS.
+	* newlib/libc/machine/arc/Makefile.am: Add memcpy-archs.S
+	* newlib/libc/machine/arc/Makefile.in: Regenerated.
+
 2013-11-20 Claudiu Zissulescu <claziss@synopsys.com>
-	*   newlib/libc/machine/arc/memcmp.S: Enable function for HS
-	*   newlib/libc/machine/arc/memset.S: Likewise
-	*   newlib/libc/machine/arc/setjmp.S: Likewise
-	*   newlib/libc/machine/arc/strchr-700.S: Likewise
-	*   newlib/libc/machine/arc/strcpy-700.S: Likewise
-	*   newlib/libc/machine/arc/strlen.S: Likewise
-	*   newlib/libc/machine/arc/strncpy.S: Likewise
+
+	* newlib/libc/machine/arc/memcmp.S: Enable function for HS
+	* newlib/libc/machine/arc/memset.S: Likewise
+	* newlib/libc/machine/arc/setjmp.S: Likewise
+	* newlib/libc/machine/arc/strchr-700.S: Likewise
+	* newlib/libc/machine/arc/strcpy-700.S: Likewise
+	* newlib/libc/machine/arc/strlen.S: Likewise
+	* newlib/libc/machine/arc/strncpy.S: Likewise
 
 2013-11-20  Simon Cook  <simon.cook@embecosm.com>
 

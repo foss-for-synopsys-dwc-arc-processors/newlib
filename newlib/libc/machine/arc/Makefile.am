@@ -12,6 +12,7 @@ lib_a_SOURCES = 	\
 	memcpy.S 	\
 	memcpy-601.S 	\
 	memcpy-700.S 	\
+	memcpy-archs.S	\
 	memset-601.S 	\
 	memset.S 	\
 	setjmp.S 	\

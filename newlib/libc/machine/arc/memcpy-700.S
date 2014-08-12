@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#if !defined (__A4__) && !defined(__ARC601__)
+#if !defined (__A4__) && !defined(__ARC601__) && !defined (__HS__)
 /* Mostly optimized for ARC700, but not bad for ARC600 either.  */
 /* This memcpy implementation does not support objects of 1GB or larger -
    the check for alignment does not work then.  */
