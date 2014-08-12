@@ -57,15 +57,15 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcmp-601.$(OBJEXT) \
 	lib_a-memcpy.$(OBJEXT) lib_a-memcpy-601.$(OBJEXT) \
-	lib_a-memcpy-700.$(OBJEXT) lib_a-memset-601.$(OBJEXT) \
-	lib_a-memset.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
-	lib_a-strchr-601.$(OBJEXT) lib_a-strchr-700.$(OBJEXT) \
-	lib_a-strcpy.$(OBJEXT) lib_a-strcpy-600.$(OBJEXT) \
-	lib_a-strcpy-601.$(OBJEXT) lib_a-strcpy-700.$(OBJEXT) \
-	lib_a-strlen.$(OBJEXT) lib_a-strlen-600.$(OBJEXT) \
-	lib_a-strlen-601.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
-	lib_a-strncpy-601.$(OBJEXT)
+	lib_a-memcpy-700.$(OBJEXT) lib_a-memcpy-archs.$(OBJEXT) \
+	lib_a-memset-601.$(OBJEXT) lib_a-memset.$(OBJEXT) \
+	lib_a-setjmp.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-strchr.$(OBJEXT) lib_a-strchr-601.$(OBJEXT) \
+	lib_a-strchr-700.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
+	lib_a-strcpy-600.$(OBJEXT) lib_a-strcpy-601.$(OBJEXT) \
+	lib_a-strcpy-700.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+	lib_a-strlen-600.$(OBJEXT) lib_a-strlen-601.$(OBJEXT) \
+	lib_a-strncpy.$(OBJEXT) lib_a-strncpy-601.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -199,6 +199,7 @@ lib_a_SOURCES = \
 	memcpy.S 	\
 	memcpy-601.S 	\
 	memcpy-700.S 	\
+	memcpy-archs.S	\
 	memset-601.S 	\
 	memset.S 	\
 	setjmp.S 	\
@@ -306,6 +307,12 @@ lib_a-memcpy-700.o: memcpy-700.S
 
 lib_a-memcpy-700.obj: memcpy-700.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy-700.obj `if test -f 'memcpy-700.S'; then $(CYGPATH_W) 'memcpy-700.S'; else $(CYGPATH_W) '$(srcdir)/memcpy-700.S'; fi`
+
+lib_a-memcpy-archs.o: memcpy-archs.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy-archs.o `test -f 'memcpy-archs.S' || echo '$(srcdir)/'`memcpy-archs.S
+
+lib_a-memcpy-archs.obj: memcpy-archs.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy-archs.obj `if test -f 'memcpy-archs.S'; then $(CYGPATH_W) 'memcpy-archs.S'; else $(CYGPATH_W) '$(srcdir)/memcpy-archs.S'; fi`
 
 lib_a-memset-601.o: memset-601.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset-601.o `test -f 'memset-601.S' || echo '$(srcdir)/'`memset-601.S
