@@ -1,3 +1,10 @@
+2014-08-15 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* newlib/libc/machine/arc/strcmp.S: Don't use it for HS.
+	* newlib/libc/machine/arc/strcmp-archs.S: New file.
+	* newlib/libc/machine/arc/Makefile.am: Add strcmp-archs.S
+	* newlib/libc/machine/arc/Makefile.in: Regenerated.
+
 2014-08-12 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* newlib/libc/machine/arc/memcpy-archs.S: New file.
