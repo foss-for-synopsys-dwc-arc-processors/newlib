@@ -60,12 +60,13 @@ am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcmp-601.$(OBJEXT) \
 	lib_a-memcpy-700.$(OBJEXT) lib_a-memcpy-archs.$(OBJEXT) \
 	lib_a-memset-601.$(OBJEXT) lib_a-memset.$(OBJEXT) \
 	lib_a-setjmp.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
-	lib_a-strchr.$(OBJEXT) lib_a-strchr-601.$(OBJEXT) \
-	lib_a-strchr-700.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-strcpy-600.$(OBJEXT) lib_a-strcpy-601.$(OBJEXT) \
-	lib_a-strcpy-700.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
-	lib_a-strlen-600.$(OBJEXT) lib_a-strlen-601.$(OBJEXT) \
-	lib_a-strncpy.$(OBJEXT) lib_a-strncpy-601.$(OBJEXT)
+	lib_a-strcmp-archs.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
+	lib_a-strchr-601.$(OBJEXT) lib_a-strchr-700.$(OBJEXT) \
+	lib_a-strcpy.$(OBJEXT) lib_a-strcpy-600.$(OBJEXT) \
+	lib_a-strcpy-601.$(OBJEXT) lib_a-strcpy-700.$(OBJEXT) \
+	lib_a-strlen.$(OBJEXT) lib_a-strlen-600.$(OBJEXT) \
+	lib_a-strlen-601.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
+	lib_a-strncpy-601.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -204,6 +205,7 @@ lib_a_SOURCES = \
 	memset.S 	\
 	setjmp.S 	\
 	strcmp.S 	\
+	strcmp-archs.S	\
 	strchr.S 	\
 	strchr-601.S	\
 	strchr-700.S	\
@@ -337,6 +339,12 @@ lib_a-strcmp.o: strcmp.S
 
 lib_a-strcmp.obj: strcmp.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
+
+lib_a-strcmp-archs.o: strcmp-archs.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp-archs.o `test -f 'strcmp-archs.S' || echo '$(srcdir)/'`strcmp-archs.S
+
+lib_a-strcmp-archs.obj: strcmp-archs.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp-archs.obj `if test -f 'strcmp-archs.S'; then $(CYGPATH_W) 'strcmp-archs.S'; else $(CYGPATH_W) '$(srcdir)/strcmp-archs.S'; fi`
 
 lib_a-strchr.o: strchr.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strchr.o `test -f 'strchr.S' || echo '$(srcdir)/'`strchr.S

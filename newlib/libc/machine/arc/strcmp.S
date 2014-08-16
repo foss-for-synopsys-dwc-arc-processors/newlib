@@ -10,7 +10,7 @@
    by a factor of two, and speculatively loading the second word / byte of
    source 1; however, that would increase the overhead for loop setup / finish,
    and strcmp might often terminate early.  */
-#ifndef __A4__
+#ifndef __HS__
 
 ENTRY(strcmp)
 	or	r2,r0,r1
