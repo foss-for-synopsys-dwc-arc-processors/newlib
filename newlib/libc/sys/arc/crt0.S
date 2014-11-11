@@ -43,7 +43,7 @@ __zbss1:
 	nop			; clear pipeline
 	blo	@__zbss1		; branch if below
 
-;; ifdef __A4__	
+;; ifdef __A4__
 #elif __ARC601__
 
 ;; Startup code for the ARC601 processor
@@ -68,7 +68,7 @@ __start:
 	sub.f	r3, r3, 0xff		; Decrement word count
 	jp	.Lbss_loop
 
-#else	/* __ARC601__ */		
+#else	/* __ARC601__ */
 
 ;; Startup code for the A5, ARC600 and ARC700 processors
 ;; -----------------------------------------------------
@@ -76,6 +76,12 @@ __start:
 ;;	  -  loop end should be 4 instruction words away from the lp_count setting instruction
 ;;	  -  loop body should have at least two instruction words
 __start:
+#if defined(__HS__)
+	;; Allow unaligned accesses.
+	lr    	%r2, [0xA]
+	bset	%r2, %r2, 19
+	flag	%r2
+#endif
 	mov gp, @__SDATA_BEGIN__
 	mov_s %r2, @__sbss_start		; r2 = start of the bss section
 #if 1
@@ -104,7 +110,7 @@ __start:
 	st.ab r3,[%r2, 4]		; zero out the word
 	nop
 .Lend_zbss:
-#endif	
+#endif
 
 ;; ifdef __A4__
 #endif
@@ -115,20 +121,20 @@ __start:
    to create constructors and destructors, and for these
    targets we need to call the _init function and arrange
    for _fini to be called at program exit.  */
- 	mov_s	r13, r0 
- 	mov_s	r14, r1 
+	mov_s	r13, r0
+	mov_s	r14, r1
 #if defined (_REENT_SMALL) || defined (__A4__)
 #ifdef __A4__
- 	mov	r0, %st(@_fini)
-#else 
- 	mov_s	r0, @_fini 
-#endif	
- 	bl	@atexit
+	mov	r0, %st(@_fini)
+#else
+	mov_s	r0, @_fini
+#endif
+	bl	@atexit
 #else
 	; calling atexit drags in malloc, so instead poke the function
 	; address directly into the reent structure
 	ld	r1,[gp,@_impure_ptr@sda]
- 	mov_s	r0, @_fini 
+	mov_s	r0, @_fini
 	add	r1,r1,0x14c	; &_GLOBAL_REENT->atexit0
 	st	r1, [r1,-4]	; _GLOBAL_REENT->atexit
 	st_s	r0, [r1,8]	; _GLOBAL_REENT->atexit0._fns[0]
