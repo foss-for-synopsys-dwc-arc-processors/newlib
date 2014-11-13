@@ -1,3 +1,14 @@
+2014-11-13 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* libc/machine/arc/memset-a4.c: Deleted.
+	* libc/machine/arc/strchr-a4.c: Likewise.
+	* libc/machine/arc/strcmp-a4.c: Likewise.
+	* libc/machine/arc/strlen-a4.c: Likewise.
+	* libc/machine/arc/memset-archs.S: New file.
+	* libc/machine/arc/Makefile.am: Add HS' memset.
+	* libc/machine/arc/Makefile.in: Likewise
+	* libc/machine/arc/memset.S: Likewise.
+
 2014-11-11 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* libc/sys/arc/crt0.S: Allow unaligned access for ARC HS.

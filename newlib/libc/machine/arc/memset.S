@@ -19,7 +19,11 @@
   cases, because the copying of a string presumably leaves start address
   and length alignment for the zeroing randomly distributed.  */
 
+#ifdef __HS__
+ENTRY(dummy_memset)
+#else
 ENTRY(memset)
+#endif
 #if !defined (__ARC700__) && !defined (__EM__) && !defined (__HS__)
 #undef SMALL
 #define SMALL 8 /* Even faster if aligned.  */
@@ -102,5 +106,9 @@ __strncpy_bzero:
 	stb_s	r1,[r3]
 	j_s	[blink]
 #endif /* !__ARC700 */
+#ifdef __HS__
+ENDFUNC(dummy_memset)
+#else
 ENDFUNC(memset)
+#endif
 #endif /* !__A4__ */

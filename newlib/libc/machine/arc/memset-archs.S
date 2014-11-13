@@ -1,0 +1,79 @@
+#include "asm.h"
+
+#ifdef __HS__
+#define USE_PREFETCH
+#ifdef USE_PREFETCH
+#define PREWRITE(A,B)	ldb 0,[(A),(B)]
+#else
+#define PREWRITE(A,B)	prealloc [(A),(B)]
+#endif
+
+ENTRY(memset)
+	ldb	0, [r0]		; Prefetch the write location
+	mov.f	0, r2
+;;; if size is zero
+	jz.d	[blink]
+	mov	r3, r0		; don't clobber ret val
+
+;;; if length < 8
+	brls.d.nt	r2, 8, .Lsmallchunk
+	mov.f	lp_count,r2
+
+	and.f	r4, r0, 0x03
+	rsub	lp_count, r4, 4
+	lpnz	@.Laligndestination
+	;; LOOP BEGIN
+	stb.ab	r1, [r3,1]
+	sub	r2, r2, 1
+.Laligndestination:
+
+;;; Destination is aligned
+	and	r1, r1, 0xFF
+	asl	r4, r1, 8
+	or	r4, r4, r1
+	asl	r5, r4, 16
+	or	r5, r5, r4
+	mov	r4, r5
+
+	sub3	lp_count, r2, 8
+	cmp     r2, 64
+	bmsk.hi	r2, r2, 5
+	mov.ls	lp_count, 0
+	add3.hi	r2, r2, 8
+
+;;; Convert len to Dwords, unfold x8
+	lsr.f	lp_count, lp_count, 6
+	lpnz	@.Lset64bytes
+	;; LOOP START
+	PREWRITE(r3, 64)	;Prefetch the next write location
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+.Lset64bytes:
+
+	lsr.f	lp_count, r2, 5 ;Last remaining  max 124 bytes
+	lpnz	.Lset32bytes
+	;; LOOP START
+	ldb	0, [r3, 32]	;Prefetch the next write location
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+	std.ab	r4, [r3, 8]
+.Lset32bytes:
+
+	and.f	lp_count, r2, 0x1F ;Last remaining 31 bytes
+.Lsmallchunk:
+	lpnz	.Lcopy3bytes
+	;; LOOP START
+	stb.ab	r1, [r3, 1]
+.Lcopy3bytes:
+
+	j	[blink]
+
+ENDFUNC(memset)
+#endif
