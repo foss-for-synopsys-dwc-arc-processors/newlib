@@ -59,14 +59,14 @@ am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcmp-601.$(OBJEXT) \
 	lib_a-memcpy.$(OBJEXT) lib_a-memcpy-601.$(OBJEXT) \
 	lib_a-memcpy-700.$(OBJEXT) lib_a-memcpy-archs.$(OBJEXT) \
 	lib_a-memset-601.$(OBJEXT) lib_a-memset.$(OBJEXT) \
-	lib_a-setjmp.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
-	lib_a-strcmp-archs.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
-	lib_a-strchr-601.$(OBJEXT) lib_a-strchr-700.$(OBJEXT) \
-	lib_a-strcpy.$(OBJEXT) lib_a-strcpy-600.$(OBJEXT) \
-	lib_a-strcpy-601.$(OBJEXT) lib_a-strcpy-700.$(OBJEXT) \
-	lib_a-strlen.$(OBJEXT) lib_a-strlen-600.$(OBJEXT) \
-	lib_a-strlen-601.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
-	lib_a-strncpy-601.$(OBJEXT)
+	lib_a-memset-archs.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
+	lib_a-strcmp.$(OBJEXT) lib_a-strcmp-archs.$(OBJEXT) \
+	lib_a-strchr.$(OBJEXT) lib_a-strchr-601.$(OBJEXT) \
+	lib_a-strchr-700.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
+	lib_a-strcpy-600.$(OBJEXT) lib_a-strcpy-601.$(OBJEXT) \
+	lib_a-strcpy-700.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+	lib_a-strlen-600.$(OBJEXT) lib_a-strlen-601.$(OBJEXT) \
+	lib_a-strncpy.$(OBJEXT) lib_a-strncpy-601.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -203,6 +203,7 @@ lib_a_SOURCES = \
 	memcpy-archs.S	\
 	memset-601.S 	\
 	memset.S 	\
+	memset-archs.S 	\
 	setjmp.S 	\
 	strcmp.S 	\
 	strcmp-archs.S	\
@@ -327,6 +328,12 @@ lib_a-memset.o: memset.S
 
 lib_a-memset.obj: memset.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
+
+lib_a-memset-archs.o: memset-archs.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset-archs.o `test -f 'memset-archs.S' || echo '$(srcdir)/'`memset-archs.S
+
+lib_a-memset-archs.obj: memset-archs.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset-archs.obj `if test -f 'memset-archs.S'; then $(CYGPATH_W) 'memset-archs.S'; else $(CYGPATH_W) '$(srcdir)/memset-archs.S'; fi`
 
 lib_a-setjmp.o: setjmp.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S

@@ -15,6 +15,7 @@ lib_a_SOURCES = 	\
 	memcpy-archs.S	\
 	memset-601.S 	\
 	memset.S 	\
+	memset-archs.S 	\
 	setjmp.S 	\
 	strcmp.S 	\
 	strcmp-archs.S	\
