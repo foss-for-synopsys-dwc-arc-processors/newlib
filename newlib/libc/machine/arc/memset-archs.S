@@ -1,7 +1,6 @@
 #include "asm.h"
 
 #ifdef __HS__
-#define USE_PREFETCH
 #ifdef USE_PREFETCH
 #define PREWRITE(A,B)	ldb 0,[(A),(B)]
 #else
