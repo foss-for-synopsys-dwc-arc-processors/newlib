@@ -1,3 +1,8 @@
+2014-11-27 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* libc/sys/arc/crt0.S: Cleanup A4&co.; Prepare for the
+          posibility of having different memory sections.
+
 2014-11-13 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* libc/machine/arc/memset-a4.c: Deleted.
