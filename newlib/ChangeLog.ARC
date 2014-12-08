@@ -3,10 +3,6 @@
 	* libc/machine/arc/memcpy-archs.S: Use prefetch/prefetchw
 	* libc/machine/arc/memset-archs.S: Likewise.
 
-2014-12-03  Anton Kolesov  <Anton.Kolesov@synopsys.com
-
-	* libc/stdlib/__call_atexit.c: Make reference to free a long call.
-
 2014-11-13 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* libc/machine/arc/memset-a4.c: Deleted.

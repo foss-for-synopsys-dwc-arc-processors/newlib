@@ -9,7 +9,7 @@
 #include "atexit.h"
 
 /* Make this a weak reference to avoid pulling in free.  */
-void free(void *) _ATTRIBUTE((__weak__)) _ATTRIBUTE((long_call));
+void free(void *) _ATTRIBUTE((__weak__));
 
 #ifndef __SINGLE_THREAD__
 extern _LOCK_RECURSIVE_T __atexit_lock;
