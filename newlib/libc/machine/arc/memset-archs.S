@@ -2,7 +2,7 @@
 
 #ifdef __HS__
 #ifdef USE_PREFETCH
-#define PREWRITE(A,B)	ldb 0,[(A),(B)]
+#define PREWRITE(A,B)	prefetchw [(A),(B)]
 #else
 #define PREWRITE(A,B)	prealloc [(A),(B)]
 #endif
