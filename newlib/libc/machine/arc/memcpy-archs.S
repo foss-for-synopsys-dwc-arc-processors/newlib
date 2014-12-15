@@ -12,10 +12,10 @@
 #else
 # define SHIFT_1(RX,RY,IMM)	lsr	RX, RY, IMM	; >>
 # define SHIFT_2(RX,RY,IMM)	asl	RX, RY, IMM	; <<
-# define MERGE_1(RX,RY,IMM)
-# define MERGE_2(RX,RY,IMM)	asl	RX, RY, IMM
+# define MERGE_1(RX,RY,IMM)	asl	RX, RY, IMM	; <<
+# define MERGE_2(RX,RY,IMM)	asl	RX, RY, IMM	; <<
 # define EXTRACT_1(RX,RY,IMM)	lsr	RX, RY, IMM
-# define EXTRACT_2(RX,RY,IMM)	and	RX, RY, 0xFFFF
+# define EXTRACT_2(RX,RY,IMM)	lsr	RX, RY, 0x08
 #endif
 
 #ifdef __LL64__
@@ -35,8 +35,8 @@
 #endif
 
 ENTRY(memcpy)
-	ldb	0, [r1]		; Prefetch the read location
-	ldb	0, [r0]		; Prefetch the write location
+	prefetch  [r1]		; Prefetch the read location
+	prefetchw [r0]		; Prefetch the write location
 	mov.f	0, r2
 ;;; if size is zero
 	jz.d	[blink]
@@ -104,16 +104,16 @@ ENTRY(memcpy)
 	;; Convert to words, unfold x2
 	lsr.f	lp_count, r2, 3
 	MERGE_1 (r6, r6, 8)
-	MERGE_2 (r5, r5, 16)
+	MERGE_2 (r5, r5, 24)
 	or	r5, r5, r6
 
 	;; Both src and dst are aligned
 	lpnz	@.Lcopy8bytes_1
 	;; LOOP START
 	ld.ab	r6, [r1, 4]
-	ldb	0, [r1, 28]	;Prefetch the next read location
+	prefetch [r1, 28]	;Prefetch the next read location
 	ld.ab	r8, [r1,4]
-	ldb	0, [r3, 32]	;Prefetch the next write location
+	prefetchw [r3, 32]	;Prefetch the next write location
 
 	SHIFT_1	(r7, r6, 24)
 	or	r7, r7, r5
@@ -128,7 +128,7 @@ ENTRY(memcpy)
 .Lcopy8bytes_1:
 
 	;; Write back the remaining 16bits
-	EXTRACT_1 (r6, r5, 8)
+	EXTRACT_1 (r6, r5, 16)
 	sth.ab	r6, [r3, 2]
 	;; Write back the remaining 8bits
 	EXTRACT_2 (r5, r5, 16)
@@ -150,12 +150,15 @@ ENTRY(memcpy)
 	;; Both src and dst are aligned
 	;; Convert to words, unfold x2
 	lsr.f	lp_count, r2, 3
+#ifdef __BIG_ENDIAN__
+	asl.nz	r5, r5, 16
+#endif
 	lpnz	@.Lcopy8bytes_2
 	;; LOOP START
 	ld.ab	r6, [r1, 4]
-	ldb	0, [r1, 28]	;Prefetch the next read location
+	prefetch [r1, 28]	;Prefetch the next read location
 	ld.ab	r8, [r1,4]
-	ldb	0, [r3, 32]	;Prefetch the next write location
+	prefetchw [r3, 32]	;Prefetch the next write location
 
 	SHIFT_1	(r7, r6, 16)
 	or	r7, r7, r5
@@ -169,6 +172,9 @@ ENTRY(memcpy)
 	st.ab	r9, [r3, 4]
 .Lcopy8bytes_2:
 
+#ifdef __BIG_ENDIAN__
+	lsr.nz	r5, r5, 16
+#endif
 	sth.ab	r5, [r3, 2]
 
 	and.f	lp_count, r2, 0x07 ;Last 8bytes
@@ -186,12 +192,15 @@ ENTRY(memcpy)
 	;; Both src and dst are aligned
 	;; Convert to words, unfold x2
 	lsr.f	lp_count, r2, 3
+#ifdef __BIG_ENDIAN__
+	asl.ne	r5, r5, 24
+#endif
 	lpnz	@.Lcopy8bytes_3
 	;; LOOP START
 	ld.ab	r6, [r1, 4]
-	ldb	0, [r1, 28]	;Prefetch the next read location
+	prefetch [r1, 28]	;Prefetch the next read location
 	ld.ab	r8, [r1,4]
-	ldb	0, [r3, 32]	;Prefetch the next write location
+	prefetchw [r3, 32]	;Prefetch the next write location
 
 	SHIFT_1	(r7, r6, 8)
 	or	r7, r7, r5
@@ -205,6 +214,9 @@ ENTRY(memcpy)
 	st.ab	r9, [r3, 4]
 .Lcopy8bytes_3:
 
+#ifdef __BIG_ENDIAN__
+	lsr.nz	r5, r5, 24
+#endif
 	stb.ab	r5, [r3, 1]
 
 	and.f	lp_count, r2, 0x07 ;Last 8bytes

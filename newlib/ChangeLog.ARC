@@ -1,5 +1,9 @@
 2014-12-12 Claudiu Zissulescu <claziss@synopsys.com>
 
+	* libc/machine/arc/memcpy-archs.S: Fix for EB support.
+
+2014-12-12 Claudiu Zissulescu <claziss@synopsys.com>
+
 	* libc/machine/arc/memcpy-archs.S: Select between LL64 support
           or not.
 	* libc/machine/arc/memset-archs.S: Likewise.
