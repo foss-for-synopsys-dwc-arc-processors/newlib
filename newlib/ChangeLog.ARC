@@ -1,3 +1,7 @@
+2014-12-17 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* libc/sys/arc/crt0.S: Backwards compatibility.
+
 2014-12-08 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* libc/sys/arc/crt0.S: Make sure startup section is
