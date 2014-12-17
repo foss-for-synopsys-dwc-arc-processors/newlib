@@ -44,7 +44,7 @@
 .word   IRQ_20              ;   IRQ         20                      offset  0x50    80
 ;; *******************************************************************************************************************
 
-	.section .startup, "ax", @progbits ;
+	.section .text.__startup, "ax", @progbits ;
 #else
 	.text
 #endif
