@@ -1,9 +1,10 @@
+2014-12-17 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* libc/sys/arc/crt0.S: Backwards compatibility.
+
 2014-12-12 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* libc/machine/arc/memcpy-archs.S: Fix for EB support.
-
-2014-12-12 Claudiu Zissulescu <claziss@synopsys.com>
-
 	* libc/machine/arc/memcpy-archs.S: Select between LL64 support
           or not.
 	* libc/machine/arc/memset-archs.S: Likewise.
@@ -12,6 +13,13 @@
 
 	* libc/machine/arc/memcpy-archs.S: Use prefetch/prefetchw
 	* libc/machine/arc/memset-archs.S: Likewise.
+	* libc/sys/arc/crt0.S: Make sure startup section is
+          executable.
+
+2014-11-27 Claudiu Zissulescu <claziss@synopsys.com>
+
+	* libc/sys/arc/crt0.S: Cleanup A4&co.; Prepare for the
+          posibility of having different memory sections.
 
 2014-11-13 Claudiu Zissulescu <claziss@synopsys.com>
 
