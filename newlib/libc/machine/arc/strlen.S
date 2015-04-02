@@ -3,7 +3,7 @@
    it under the same terms as newlib/libc/string/strlen.c .  */
 
 #include "asm.h"
-#if defined(__ARC700__) || defined(__EM__) || defined (__HS__)
+#if (defined(__ARC700__) || defined(__EM__) || defined (__HS__)) && defined (__ARC_NORM__)
 
 ENTRY(strlen)
 	or	r3,r0,7

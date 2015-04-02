@@ -1,3 +1,14 @@
+2015-12-17 Claudiu Zissulescu <claziss@synopsys.com>
+	   Cupertino Miranda <cupertino.miranda@synopsys.com>
+
+	* libc/machine/arc/memcpy-601.S: Cleanup extra spaces.
+	* libc/machine/arc/strlen-601.S: Likewise.
+	* libc/machine/arc/strlen-600.S: Update selection when NORM is
+	present.
+	* libc/machine/arc/strlen.S: Likewise.
+	* libc/machine/arc/memcmp-601.S: Likewise.
+	* libc/machine/arc/memcmp.S: Likewise.
+
 2014-12-17 Claudiu Zissulescu <claziss@synopsys.com>
 
 	* libc/sys/arc/crt0.S: Backwards compatibility.
