@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#ifdef __ARC601__ 
+#ifdef __ARC601__
 /* This code is optimized for the ARC601 pipeline without barrel shifter.  */
 
 ENTRY(strlen)

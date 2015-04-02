@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#ifdef __ARC601__
+#if defined(__ARC601__) || !defined(__ARC_NORM__)
 
 /* Addresses are unsigned, and at 0 is the vector table, so it's OK to assume
   that we can subtract 8 from a source end address without underflow.  */

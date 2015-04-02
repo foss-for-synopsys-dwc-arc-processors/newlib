@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#ifdef __ARC601__ 
+#ifdef __ARC601__
 /* Adapted from memcpy-700.S.  */
 /* We assume that most sources and destinations are aligned, and
    that also lengths are mostly a multiple of four, although to a lesser

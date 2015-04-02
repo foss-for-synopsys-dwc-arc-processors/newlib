@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#ifndef __ARC601__
+#if !defined(__ARC601__) && defined(__ARC_NORM__)
 #ifdef __LITTLE_ENDIAN__
 #define WORD2 r2
 #define SHIFT r3
