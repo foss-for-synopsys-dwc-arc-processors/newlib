@@ -1,3 +1,10 @@
+2015-05-19 Yuriy Kolerov <yuriy.kolerov@synopsys.com>
+
+	* newlib/testsuite/newlib.stdlib/atexit.exp: Don't run
+	      this test for boards with GDB
+	* newlib/testsuite/newlib.locale/UTF-8.exp: Don't run this
+	      test if newlib is not built with multibyte support
+
 2015-12-17 Claudiu Zissulescu <claziss@synopsys.com>
 	   Cupertino Miranda <cupertino.miranda@synopsys.com>
 

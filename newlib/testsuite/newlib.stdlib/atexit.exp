@@ -6,6 +6,10 @@
 
 load_lib checkoutput.exp
 
+if { [board_info [target_info name] protocol] == "gdb_comm" } {
+    return
+}
+
 set output {
 "a0cba"
 }
