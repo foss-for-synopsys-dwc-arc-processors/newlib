@@ -1,11 +1,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/times.h>
 #include <_ansi.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #include <reent.h>
+#include <unistd.h>
 
 _syscall3 (_ssize_t,read, int,fd, void *,buf, size_t,nbytes)
 
@@ -34,6 +36,10 @@ _syscall2 (int,fstat, int,file, struct stat *,st)
 _syscall2 (int,gettimeofday, struct timeval *,tv, void *,tz)
 
 _syscall1 (void,exit, int,ret)
+
+_syscall1 (_CLOCK_T_,times, struct tms *,buf)
+
+_syscall2 (int,stat, const char *,file, struct stat *,st)
 
 time_t
 _time (time_t *timer)
