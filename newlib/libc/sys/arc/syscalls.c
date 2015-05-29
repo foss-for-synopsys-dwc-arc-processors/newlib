@@ -1,20 +1,22 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/times.h>
 #include <_ansi.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #include <reent.h>
+#include <unistd.h>
 
-_syscall3 (_ssize_t,read, int,fd, void *,buf, size_t,nbytes)
+_syscall3 (_ssize_t, read, int, fd, void *, buf, size_t, nbytes)
 
-_syscall3 (_ssize_t,write, int,fd, const void *,buf, size_t,nbytes)
+_syscall3 (_ssize_t, write, int, fd, const void *, buf, size_t, nbytes)
 
-/* FIXME: The prototype in <fcntl.h> for open() uses ...,
+/* FIXME: The prototype in <fcntl.h> for open () uses...,
    but reent.h uses int.  */
 
-_syscall3 (int,open, const char *,buf, int,flags, int,mode)
+_syscall3 (int, open, const char *, buf, int, flags, int, mode)
 #if 0
   /* Could put this into a variant of _syscall3:  */
   int mode;
@@ -25,15 +27,19 @@ _syscall3 (int,open, const char *,buf, int,flags, int,mode)
   va_end (ap);
 #endif
 
-_syscall1 (int,close, int,fd)
+_syscall1 (int, close, int, fd)
 
-_syscall3 (off_t,lseek, int,fd, off_t,offset, int,whence)
+_syscall3 (off_t, lseek, int, fd, off_t, offset, int, whence)
 
-_syscall2 (int,fstat, int,file, struct stat *,st)
+_syscall2 (int, fstat, int, file, struct stat *, st)
 
-_syscall2 (int,gettimeofday, struct timeval *,tv, void *,tz)
+_syscall2 (int, gettimeofday, struct timeval *, tv, void *, tz)
 
-_syscall1 (void,exit, int,ret)
+_syscall1 (void, exit, int, ret)
+
+_syscall1 (_CLOCK_T_, times, struct tms *, buf)
+
+_syscall2 (int, stat, const char *, file, struct stat *, st)
 
 time_t
 _time (time_t *timer)

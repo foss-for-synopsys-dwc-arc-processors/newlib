@@ -1,3 +1,12 @@
+2015-05-29  Yuriy Kolerov  <yuriy.kolerov@synopsys.com>
+
+	* newlib/libc/sys/arc/syscalls.c: Fix formatting.
+
+2015-05-28  Yuriy Kolerov  <yuriy.kolerov@synopsys.com>
+
+	* newlib/libc/sys/arc/syscalls.c: Add implementations
+	for ARC system calls stat and times.
+
 2015-05-19 Yuriy Kolerov <yuriy.kolerov@synopsys.com>
 
 	* newlib/testsuite/newlib.stdlib/atexit.exp: Don't run
