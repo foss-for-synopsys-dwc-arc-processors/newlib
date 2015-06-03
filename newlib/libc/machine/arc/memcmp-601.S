@@ -14,7 +14,17 @@ ENTRY(memcmp)
 	tst	r12,3
 	breq	r2,0,.Lnil
 	add_s	r3,r0,r2
+	
+/* This algorithm for big endian targets sometimes works incorrectly
+   when sources are aligned. To be precise the last step is omitted.
+   Just use a simple bytewise variant until the algorithm is reviewed
+   and fixed.  */
+   
+#ifdef __LITTLE_ENDIAN__
 	bne_s	.Lbytewise
+#else /* BIG ENDIAN */
+	b_s	.Lbytewise
+#endif /* ENDIAN */
 	sub	r6,r3,8
 	ld	r4,[r0,0]
 	ld	r5,[r1,0]

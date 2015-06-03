@@ -1,3 +1,9 @@
+2015-06-03  Yuriy Kolerov  <yuriy.kolerov@synopsys.com>
+
+	* newlib/libc/machine/arc/memcmp-601.S: Turn of
+	an optimization for aligned case for big endian
+	targets until an algorithm is fixed.
+
 2015-05-29  Yuriy Kolerov  <yuriy.kolerov@synopsys.com>
 
 	* newlib/libc/sys/arc/syscalls.c: Fix formatting.
