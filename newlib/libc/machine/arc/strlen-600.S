@@ -4,7 +4,7 @@
 
 #include "asm.h"
 
-#if defined (__ARC600__) || !defined(__ARC_NORM__)
+#if (defined (__ARC600__) || !defined(__ARC_NORM__)) && (!defined(__ARC601__))
 /* This code is optimized for the ARC600 pipeline.  */
 
 ENTRY(strlen)

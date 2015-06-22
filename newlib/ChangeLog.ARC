@@ -1,3 +1,8 @@
+2015-06-22  Claudiu Zissulescu  <claziss@synopsys.com>
+
+	* libc/machine/arc/strlen-600.S: Don't select this code when
+        compiling for ARC601.
+
 2015-06-03  Yuriy Kolerov  <yuriy.kolerov@synopsys.com>
 
 	* newlib/libc/machine/arc/memcmp-601.S: Turn of
