@@ -1,3 +1,9 @@
+2015-07-15  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* libc/machine/arc/machine/_types.h: New file for __dev_t.
+	* libc/include/sys/_types.h (__dev_t): Remove ARC-specific code from
+	generic file.
+
 2015-06-22  Claudiu Zissulescu  <claziss@synopsys.com>
 
 	* libc/machine/arc/strlen-600.S: Don't select this code when

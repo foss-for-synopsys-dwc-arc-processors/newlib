@@ -16,11 +16,6 @@
 typedef long _off_t;
 #endif
 
-#if defined(__arc__)
-typedef long __dev_t;
-#define __dev_t_defined 1
-#endif
-
 #ifndef __dev_t_defined
 typedef short __dev_t;
 #endif
