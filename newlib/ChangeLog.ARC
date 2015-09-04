@@ -1,3 +1,7 @@
+2015-09-04  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* libc/machine/arc/strcpy-600.S: Build only for ARC 600.
+
 2015-06-22  Claudiu Zissulescu  <claziss@synopsys.com>
 
 	* libc/machine/arc/strlen-600.S: Don't select this code when
