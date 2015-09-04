@@ -1,3 +1,7 @@
+2015-09-04  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* libc/machine/arc/strcpy-600.S: Build only for ARC 600.
+
 2015-07-15  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
 	* libc/machine/arc/machine/_types.h: New file for __dev_t.
