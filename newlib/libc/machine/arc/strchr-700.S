@@ -1,6 +1,11 @@
-/* Copyright (C) 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2007, 2015 Free Software Foundation, Inc.
    This file is free software; you can redistribute it and/or modify
    it under the same terms as newlib/libc/string/strchr.c .  */
+
+/* This implementation is optimized for performance.  For code size a generic
+   implementation of this function from newlib/libc/string/strchr.c will be
+   used.  */
+#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
 
 /* ARC700 has a relatively long pipeline and branch prediction, so we want
    to avoid branches that are hard to predict.  On the other hand, the
@@ -129,3 +134,5 @@ ENTRY(strchr)
 #endif /* ENDIAN */
 ENDFUNC(strchr)
 #endif /* __ARC700__ */
+
+#endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

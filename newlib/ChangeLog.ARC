@@ -1,3 +1,29 @@
+2015-09-07  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* libc/machine/arc/memcmp-601.S: Do not use when optimizing for size.
+	* libc/machine/arc/memcmp-601.S: Likewise.
+	* libc/machine/arc/memcmp.S: Likewise.
+	* libc/machine/arc/memcpy-601.S: Likewise.
+	* libc/machine/arc/memcpy-700.S: Likewise.
+	* libc/machine/arc/memcpy-archs.S: Likewise.
+	* libc/machine/arc/memcpy.S: Likewise.
+	* libc/machine/arc/memset-601.S: Likewise.
+	* libc/machine/arc/memset-archs.S: Likewise.
+	* libc/machine/arc/memset.S: Likewise.
+	* libc/machine/arc/strchr-601.S: Likewise.
+	* libc/machine/arc/strchr-700.S: Likewise.
+	* libc/machine/arc/strchr.S: Likewise.
+	* libc/machine/arc/strcmp-archs.S: Likewise.
+	* libc/machine/arc/strcmp.S: Likewise.
+	* libc/machine/arc/strcpy-600.S: Likewise.
+	* libc/machine/arc/strcpy-601.S: Likewise.
+	* libc/machine/arc/strcpy-700.S: Likewise.
+	* libc/machine/arc/strlen-600.S: Likewise.
+	* libc/machine/arc/strlen-601.S: Likewise.
+	* libc/machine/arc/strlen.S: Likewise.
+	* libc/machine/arc/strncpy-601.S: Likewise.
+	* libc/machine/arc/strncpy.S: Likewise.
+
 2015-09-04  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
 	* libc/machine/arc/strcpy-600.S: Build only for ARC 600.

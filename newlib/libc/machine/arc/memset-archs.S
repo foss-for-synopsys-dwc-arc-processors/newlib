@@ -1,3 +1,8 @@
+/* This implementation is optimized for performance.  For code size a generic
+   implementation of this function from newlib/libc/string/memset.c will be
+   used.  */
+#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
+
 #include "asm.h"
 
 #ifdef __HS__
@@ -107,3 +112,5 @@ ENTRY(memset)
 
 ENDFUNC(memset)
 #endif
+
+#endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

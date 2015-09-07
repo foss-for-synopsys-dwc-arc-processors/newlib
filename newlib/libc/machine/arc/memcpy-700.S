@@ -1,6 +1,11 @@
-/* Copyright (C) 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2007, 2015 Free Software Foundation, Inc.
    This file is free software; you can redistribute it and/or modify
    it under the same terms as newlib/libc/string/memcpy.c .  */
+
+/* This implementation is optimized for performance.  For code size a generic
+   implementation of this function from newlib/libc/string/memcpy.c will be
+   used.  */
+#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
 
 #include "asm.h"
 
@@ -68,3 +73,5 @@ ENTRY(memcpy)
 	stb	r12,[r5,0]
 ENDFUNC(memcpy)
 #endif /* !__ARC601__ || !__A4__ */
+
+#endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

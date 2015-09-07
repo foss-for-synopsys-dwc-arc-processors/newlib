@@ -1,3 +1,8 @@
+/* This implementation is optimized for performance.  For code size a generic
+   implementation of this function from newlib/libc/string/memcpy.c will be
+   used.  */
+#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
+
 #include "asm.h"
 
 #if defined (__HS__)
@@ -229,3 +234,5 @@ ENTRY(memcpy)
 
 ENDFUNC(memcpy)
 #endif /* ARCHS */
+
+#endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */
