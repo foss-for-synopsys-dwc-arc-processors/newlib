@@ -1,5 +1,13 @@
 2015-09-07  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
+	* libc/machine/arc/strcpy.c: Removed.
+	* libc/machine/arc/Makefile.am: Remove strcpy.c.
+	* libc/machine/arc/Makefile.in: Regenerated.
+	* libc/machine/arc/aclocal.m4: Likewise.
+	* libc/machine/arc/configure: Likewise.
+
+2015-09-07  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
 	* libc/machine/arc/memcmp-601.S: Do not use when optimizing for size.
 	* libc/machine/arc/memcmp-601.S: Likewise.
 	* libc/machine/arc/memcmp.S: Likewise.

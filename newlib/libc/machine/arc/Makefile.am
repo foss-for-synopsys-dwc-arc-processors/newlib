@@ -22,7 +22,6 @@ lib_a_SOURCES = 	\
 	strchr.S 	\
 	strchr-601.S	\
 	strchr-700.S	\
-	strcpy.c 	\
 	strcpy-600.S 	\
 	strcpy-601.S 	\
 	strcpy-700.S 	\
