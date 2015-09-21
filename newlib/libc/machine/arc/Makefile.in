@@ -53,17 +53,20 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcmp-601.$(OBJEXT) \
-	lib_a-memcpy.$(OBJEXT) lib_a-memcpy-601.$(OBJEXT) \
-	lib_a-memcpy-700.$(OBJEXT) lib_a-memcpy-archs.$(OBJEXT) \
+	lib_a-memcmp-stub.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-memcpy-601.$(OBJEXT) lib_a-memcpy-700.$(OBJEXT) \
+	lib_a-memcpy-archs.$(OBJEXT) lib_a-memcpy-stub.$(OBJEXT) \
 	lib_a-memset-601.$(OBJEXT) lib_a-memset.$(OBJEXT) \
-	lib_a-memset-archs.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strcmp-archs.$(OBJEXT) \
+	lib_a-memset-archs.$(OBJEXT) lib_a-memset-stub.$(OBJEXT) \
+	lib_a-setjmp.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-strcmp-archs.$(OBJEXT) lib_a-strcmp-stub.$(OBJEXT) \
 	lib_a-strchr.$(OBJEXT) lib_a-strchr-601.$(OBJEXT) \
-	lib_a-strchr-700.$(OBJEXT) lib_a-strcpy-600.$(OBJEXT) \
-	lib_a-strcpy-601.$(OBJEXT) lib_a-strcpy-700.$(OBJEXT) \
-	lib_a-strlen.$(OBJEXT) lib_a-strlen-600.$(OBJEXT) \
-	lib_a-strlen-601.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
-	lib_a-strncpy-601.$(OBJEXT)
+	lib_a-strchr-700.$(OBJEXT) lib_a-strchr-stub.$(OBJEXT) \
+	lib_a-strcpy-600.$(OBJEXT) lib_a-strcpy-601.$(OBJEXT) \
+	lib_a-strcpy-700.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+	lib_a-strlen-600.$(OBJEXT) lib_a-strlen-601.$(OBJEXT) \
+	lib_a-strlen-stub.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
+	lib_a-strncpy-stub.$(OBJEXT) lib_a-strncpy-601.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -186,26 +189,33 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = \
 	memcmp.S	\
 	memcmp-601.S	\
+	memcmp-stub.c	\
 	memcpy.S 	\
 	memcpy-601.S 	\
 	memcpy-700.S 	\
 	memcpy-archs.S	\
+	memcpy-stub.c	\
 	memset-601.S 	\
 	memset.S 	\
 	memset-archs.S 	\
+	memset-stub.c	\
 	setjmp.S 	\
 	strcmp.S 	\
 	strcmp-archs.S	\
+	strcmp-stub.c	\
 	strchr.S 	\
 	strchr-601.S	\
 	strchr-700.S	\
+	strchr-stub.c	\
 	strcpy-600.S 	\
 	strcpy-601.S 	\
 	strcpy-700.S 	\
 	strlen.S 	\
 	strlen-600.S 	\
 	strlen-601.S 	\
+	strlen-stub.c	\
 	strncpy.S	\
+	strncpy-stub.c	\
 	strncpy-601.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
@@ -215,7 +225,7 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .S .o .obj
+.SUFFIXES: .S .c .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -407,6 +417,54 @@ lib_a-strncpy-601.o: strncpy-601.S
 
 lib_a-strncpy-601.obj: strncpy-601.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strncpy-601.obj `if test -f 'strncpy-601.S'; then $(CYGPATH_W) 'strncpy-601.S'; else $(CYGPATH_W) '$(srcdir)/strncpy-601.S'; fi`
+
+.c.o:
+	$(COMPILE) -c $<
+
+.c.obj:
+	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-memcmp-stub.o: memcmp-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp-stub.o `test -f 'memcmp-stub.c' || echo '$(srcdir)/'`memcmp-stub.c
+
+lib_a-memcmp-stub.obj: memcmp-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp-stub.obj `if test -f 'memcmp-stub.c'; then $(CYGPATH_W) 'memcmp-stub.c'; else $(CYGPATH_W) '$(srcdir)/memcmp-stub.c'; fi`
+
+lib_a-memcpy-stub.o: memcpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.o `test -f 'memcpy-stub.c' || echo '$(srcdir)/'`memcpy-stub.c
+
+lib_a-memcpy-stub.obj: memcpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.obj `if test -f 'memcpy-stub.c'; then $(CYGPATH_W) 'memcpy-stub.c'; else $(CYGPATH_W) '$(srcdir)/memcpy-stub.c'; fi`
+
+lib_a-memset-stub.o: memset-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset-stub.o `test -f 'memset-stub.c' || echo '$(srcdir)/'`memset-stub.c
+
+lib_a-memset-stub.obj: memset-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset-stub.obj `if test -f 'memset-stub.c'; then $(CYGPATH_W) 'memset-stub.c'; else $(CYGPATH_W) '$(srcdir)/memset-stub.c'; fi`
+
+lib_a-strcmp-stub.o: strcmp-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcmp-stub.o `test -f 'strcmp-stub.c' || echo '$(srcdir)/'`strcmp-stub.c
+
+lib_a-strcmp-stub.obj: strcmp-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcmp-stub.obj `if test -f 'strcmp-stub.c'; then $(CYGPATH_W) 'strcmp-stub.c'; else $(CYGPATH_W) '$(srcdir)/strcmp-stub.c'; fi`
+
+lib_a-strchr-stub.o: strchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchr-stub.o `test -f 'strchr-stub.c' || echo '$(srcdir)/'`strchr-stub.c
+
+lib_a-strchr-stub.obj: strchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchr-stub.obj `if test -f 'strchr-stub.c'; then $(CYGPATH_W) 'strchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/strchr-stub.c'; fi`
+
+lib_a-strlen-stub.o: strlen-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strlen-stub.o `test -f 'strlen-stub.c' || echo '$(srcdir)/'`strlen-stub.c
+
+lib_a-strlen-stub.obj: strlen-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strlen-stub.obj `if test -f 'strlen-stub.c'; then $(CYGPATH_W) 'strlen-stub.c'; else $(CYGPATH_W) '$(srcdir)/strlen-stub.c'; fi`
+
+lib_a-strncpy-stub.o: strncpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy-stub.o `test -f 'strncpy-stub.c' || echo '$(srcdir)/'`strncpy-stub.c
+
+lib_a-strncpy-stub.obj: strncpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy-stub.obj `if test -f 'strncpy-stub.c'; then $(CYGPATH_W) 'strncpy-stub.c'; else $(CYGPATH_W) '$(srcdir)/strncpy-stub.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

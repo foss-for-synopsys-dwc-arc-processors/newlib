@@ -1,3 +1,15 @@
+2015-09-08  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* libc/machine/arc/memcmp-stub.c: New file.
+	* libc/machine/arc/memcpy-stub.c: New file.
+	* libc/machine/arc/memset-stub.c: New file.
+	* libc/machine/arc/strchr-stub.c: New file.
+	* libc/machine/arc/strcmp-stub.c: New file.
+	* libc/machine/arc/strlen-stub.c: New file.
+	* libc/machine/arc/strncpy-stub.c: New file.
+	* libc/machine/arc/Makefile.am: Add new *-stub.c files.
+	* libc/machine/arc/Makefile.in: Regenerate.
+
 2015-09-07  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
 	* libc/machine/arc/strcpy.c: Removed.
