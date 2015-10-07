@@ -13,7 +13,8 @@
    words branch-free.  */
 #include "asm.h"
 
-#if (defined(__ARC700__) || defined (__EM__) || defined (__HS__)) && defined(__NORM__)
+#if (defined(__ARC700__) || defined (__EM__) || defined (__HS__)) \
+    && defined(__ARC_NORM__) && defined(__Xbarrel_shifter)
 
 ENTRY(strchr)
 	extb_s	r1,r1
@@ -133,6 +134,6 @@ ENTRY(strchr)
 	mov.mi	r0,0
 #endif /* ENDIAN */
 ENDFUNC(strchr)
-#endif /* (__ARC700__ || __EM__ || __HS__) && __NORM__ */
+#endif /* (__ARC700__ || __EM__ || __HS__) && __ARC_NORM__ && __Xbarrel_shifter */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

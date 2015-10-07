@@ -23,7 +23,7 @@
      Each byte in Y is 0x80 if the the corresponding byte in
      W is zero, otherwise that byte of Y is 0.  */
 
-#ifdef __ARC601__
+#if defined(__ARC601__) || !defined(__Xbarrel_shifter)
 ENTRY(strchr)
 	bmsk.f	r2,r0,1
 	mov_s	r3,0x01010101
@@ -177,6 +177,6 @@ ENTRY(strchr)
 	add.eq	r0,r0,1
 #endif /* ENDIAN */
 ENDFUNC(strchr)
-#endif /* !__ARC_601__ */
+#endif /* __ARC601__ || !__Xbarrel_shifter */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */
