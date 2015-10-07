@@ -9,7 +9,7 @@
 
 #include "asm.h"
 
-#if !defined(__ARC601__) && defined(__ARC_NORM__)
+#if !defined(__ARC601__) && defined(__ARC_NORM__) && defined(__Xbarrel_shifter)
 #ifdef __LITTLE_ENDIAN__
 #define WORD2 r2
 #define SHIFT r3
@@ -193,6 +193,6 @@ ENTRY(memcmp)
 	j_s.d	[blink]
 	mov_l	r0,0
 ENDFUNC(memcmp)
-#endif /* __ARC601__ */
+#endif /* !__ARC601__ && __ARC_NORM__ && __Xbarrel_shifter */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

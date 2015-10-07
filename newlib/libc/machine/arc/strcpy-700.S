@@ -9,7 +9,9 @@
 
 #include "asm.h"
 
-#if defined(__ARC700__) || defined (__EM__) || defined (__HS__)
+#if (defined(__ARC700__) || defined (__EM__) || defined (__HS__)) \
+    && defined(__Xbarrel_shifter)
+
 /* If dst and src are 4 byte aligned, copy 8 bytes at a time.
    If the src is 4, but not 8 byte aligned, we first read 4 bytes to get
    it 8 byte aligned.  Thus, we can do a little read-ahead, without
@@ -70,6 +72,6 @@ charloop:
 	stb.ab	r3,[r10,1]
 	j	[blink]
 ENDFUNC(strcpy)
-#endif /* __ARC700__ */
+#endif /* (__ARC700__ || __EM__ || __HS__) && __Xbarrel_shifter */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

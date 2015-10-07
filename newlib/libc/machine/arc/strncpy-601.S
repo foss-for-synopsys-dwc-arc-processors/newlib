@@ -13,8 +13,9 @@
    If the src is 4, but not 8 byte aligned, we first read 4 bytes to get
    it 8 byte aligned.  Thus, we can do a little read-ahead, without
    dereferencing a cache line that we should not touch.  */
-   
-#ifdef __ARC601__
+
+#if defined(__ARC601__) || !defined(__Xbarrel_shifter)
+
 #define BRand(a,b,l)	and	a,a,b ` brne_s a,0,l
 
 ENTRY(strncpy)
@@ -102,6 +103,6 @@ ENTRY(strncpy)
 	j_s.d	[blink]
 	stb_s	r12,[r3]
 ENDFUNC(strncpy)
-#endif /* __ARC601__ */
+#endif /* __ARC601__ || !__Xbarrel_shifter */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

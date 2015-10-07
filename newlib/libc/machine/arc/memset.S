@@ -9,7 +9,7 @@
 
 #include "asm.h"
 
-#if !defined(__A4__) && !defined(__ARC601__)
+#if !defined(__ARC601__) && !defined(__HS__) && defined(__Xbarrel_shifter)
 
 /* To deal with alignment/loop issues, SMALL must be at least 2.  */
 #define SMALL	7
@@ -116,6 +116,6 @@ ENDFUNC(dummy_memset)
 #else
 ENDFUNC(memset)
 #endif
-#endif /* !__A4__ */
+#endif /* !__ARC601__ && !__HS__ && __Xbarrel_shifter */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */
