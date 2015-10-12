@@ -9,7 +9,14 @@
 
 #include "asm.h"
 
-#if !defined(__ARC601__) && !defined(__HS__) && defined(__Xbarrel_shifter)
+/* ARC HS has it's own implementation of memset, yet we want this function
+ * still to be compiled under "__dummy_memset" disguise, because strncpy
+ * function uses __strncpy_bzero as a second entry point into memset. Would be
+ * better to add __strncpy_bzero label to memset for ARC HS though, and even
+ * better would be to avoid the horror of second entry point into function
+ * though... ARC HS always has barrel-shifter, so this implementation will
+ * always used for this purpose.*/
+#if !defined(__ARC601__) && defined(__Xbarrel_shifter)
 
 /* To deal with alignment/loop issues, SMALL must be at least 2.  */
 #define SMALL	7
@@ -25,7 +32,7 @@
   and length alignment for the zeroing randomly distributed.  */
 
 #ifdef __HS__
-ENTRY(dummy_memset)
+ENTRY(__dummy_memset)
 #else
 ENTRY(memset)
 #endif
@@ -112,7 +119,7 @@ __strncpy_bzero:
 	j_s	[blink]
 #endif /* !__ARC700 */
 #ifdef __HS__
-ENDFUNC(dummy_memset)
+ENDFUNC(__dummy_memset)
 #else
 ENDFUNC(memset)
 #endif
