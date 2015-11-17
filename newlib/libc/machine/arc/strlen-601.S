@@ -9,7 +9,7 @@
 
 #include "asm.h"
 
-#ifdef __ARC601__ || !defined(__Xbarrel_shifter)
+#if defined(__ARC601__) || !defined(__Xbarrel_shifter)
 /* This code is optimized for the ARC601 pipeline without barrel shifter.  */
 
 ENTRY(strlen)
