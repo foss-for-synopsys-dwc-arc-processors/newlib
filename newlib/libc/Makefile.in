@@ -127,8 +127,8 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = libc.c $(libc_la_SOURCES)
 INFO_DEPS = $(srcdir)/libc.info
-TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
-am__TEXINFO_TEX_DIR = $(top_srcdir)/../texinfo
+TEXINFO_TEX = $(top_srcdir)/../../texinfo/texinfo.tex
+am__TEXINFO_TEX_DIR = $(top_srcdir)/../../texinfo
 DVIS = libc.dvi
 PDFS = libc.pdf
 PSS = libc.ps
