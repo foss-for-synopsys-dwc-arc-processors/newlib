@@ -99,6 +99,7 @@ float complex csqrtf(float complex);
 /* 7.3.9.1 The carg functions */ 
 double carg(double complex);
 float cargf(float complex);
+long double cargl(long double complex);
 
 /* 7.3.9.2 The cimag functions */
 double cimag(double complex);
@@ -140,7 +141,6 @@ long double complex cexpl(long double complex);
 long double complex clogl(long double complex);
 long double complex cpowl(long double complex, long double complex);
 long double complex csqrtl(long double complex);
-long double cargl(long double complex);
 long double complex conjl(long double complex);
 long double complex cprojl(long double complex);
 #if __GNU_VISIBLE
