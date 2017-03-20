@@ -37,9 +37,9 @@
 __mcount:
 	;; When a function is compiled for profiling, gcc will insert
 	;; a call to __mcount without checking for resources.  Hence,
-	;; we need save all of the argument registers, extract the
-	;; address of <func_name>, and call the _mcount_internal to do
-	;; the real work.  Finally, restore all the argument registers
+	;; we need save all of the argument registers and temp registers,
+	;; extract the address of <func_name>, and call the _mcount_internal
+	;; to do the real work.  Finally, restore all the argument registers
 	;; before returning.
 	push_s	blink
 	push_s	r0
@@ -50,8 +50,18 @@ __mcount:
 	push	r5
 	push	r6
 	push	r7
+	push	r8
+	push	r9
+	push	r10
+	push	r11
+	push	r12
 	mov	r0,blink
 	jl	@_mcount_internal
+	pop	r12
+	pop	r11
+	pop	r10
+	pop	r9
+	pop	r8
 	pop	r7
 	pop	r6
 	pop	r5
