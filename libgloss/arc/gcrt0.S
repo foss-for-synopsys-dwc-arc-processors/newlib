@@ -46,12 +46,14 @@ __mcount:
 	push_s	r1
 	push_s	r2
 	push_s	r3
+#ifndef __ARC_RF16__
 	push	r4
 	push	r5
 	push	r6
 	push	r7
 	push	r8
 	push	r9
+#endif
 	push	r10
 	push	r11
 	push	r12
@@ -60,12 +62,14 @@ __mcount:
 	pop	r12
 	pop	r11
 	pop	r10
+#ifndef __ARC_RF16__
 	pop	r9
 	pop	r8
 	pop	r7
 	pop	r6
 	pop	r5
 	pop	r4
+#endif
 	pop_s	r3
 	pop_s	r2
 	pop_s	r1
