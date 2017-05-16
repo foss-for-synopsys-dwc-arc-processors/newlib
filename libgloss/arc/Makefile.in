@@ -72,6 +72,12 @@ UART_OBJS = write.o \
 	    stub.o \
 	    sbrk.o
 UART_INSTALL = install-uart
+EMSK_SCRIPTS = emsk_em9d.specs \
+               emsk_em11d.specs
+
+MEMORY_MAPS = emsk_em9d.x \
+              emsk_em11d.x
+MEMORY_MAP_INSTALL = install-map
 
 UART_DIR = uart-dir
 
@@ -84,7 +90,7 @@ ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB)
 else
 ALL = $(CRT0) $(NSIM_BSP)
 endif
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL)
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -182,6 +188,15 @@ $(UART_INSTALL):
 	if [ "$(CPU_FAMILY)" == "em" ]; then \
 		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR} ; \
 		$(INSTALL_DATA) $(UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(UART_LIB) ; fi
+	for x in $(EMSK_SCRIPTS); do \
+		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(MEMORY_MAP_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	for x in $(basename $(MEMORY_MAPS)); do \
+		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
+		$(INSTALL_DATA) $(srcdir)/$$x.x \
+		    $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x/memory.x; done
 
 doc:
 info:
