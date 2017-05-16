@@ -68,7 +68,9 @@ NANO_INSTALL = install-nano
 
 UART_LIB = libdw_uart.a
 UART_OBJS = write.o \
-	    read.o
+	    read.o \
+	    stub.o \
+	    sbrk.o
 UART_INSTALL = install-uart
 
 UART_DIR = uart-dir
@@ -140,6 +142,7 @@ gcrt0.o: gcrt0.S crt0.S
 crt0.o: crt0.S
 write.o: write.c
 read.o: read.c
+stub.o: stub.c
 $(UART_OBJS):
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
 
