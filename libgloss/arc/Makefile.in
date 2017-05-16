@@ -1,0 +1,188 @@
+#
+#
+DESTDIR =
+VPATH = @srcdir@ @srcdir@/..
+srcdir = @srcdir@
+objdir = .
+srcroot = $(srcdir)/../..
+objroot = $(objdir)/../..
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+host_alias = @host_alias@
+target_alias = @target_alias@
+
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+
+objtype = @objtype@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+SUBDIRS = @subdirs@
+
+# Multilib support variables.
+# TOP is used instead of MULTI{BUILD,SRC}TOP.
+MULTIDIRS =
+MULTISUBDIR =
+MULTIDO = true
+MULTICLEAN = true
+
+SHELL =	/bin/sh
+
+CC = @CC@
+
+AS = @AS@
+AR = @AR@
+LD = @LD@
+RANLIB = @RANLIB@
+
+UART_CFLAGS = @UART_CFLAGS@
+
+OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
+	then echo ${objroot}/../binutils/objdump ; \
+	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
+OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
+	then echo ${objroot}/../binutils/objcopy ; \
+	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
+
+CRT0		= gcrt0.o crt0.o
+CRT0_INSTALL	= install-crt0
+
+NSIM_BSP = libnsim.a
+NSIM_OBJS = \
+	libcfunc.o \
+	nsim-syscalls.o \
+	sbrk.o \
+	mcount.o
+NSIM_INSTALL = install-nsim
+NSIM_SCRIPTS = nsim.specs
+
+NANO_SCRIPTS = nano.specs
+NANO_INSTALL = install-nano
+
+UART_LIB = libdw_uart.a
+UART_OBJS = write.o
+UART_INSTALL = install-uart
+
+UART_DIR = uart-dir
+
+CFLAGS = -g
+override CFLAGS += $(UART_CFLAGS)
+
+CPU_FAMILY = $(findstring em,${MULTISUBDIR})
+ifeq ($(CPU_FAMILY), em)
+ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB)
+else
+ALL = $(CRT0) $(NSIM_BSP)
+endif
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL)
+
+# These are roughly topologically sorted in order to make porting more
+# streamlined.
+FLAGS_TO_PASS = \
+        "CC=$(CC)" \
+        "CFLAGS=$(CFLAGS)" \
+        "CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)" \
+        "CCASFLAGS=$(CCASFLAGS)" \
+        "AR=$(AR)" \
+        "RANLIB=$(RANLIB)" \
+        "AR_FLAGS=$(AR_FLAGS)" \
+        "MAKEINFO=$(MAKEINFO)" \
+        "AS=$(AS)" \
+        "LD=$(LD)" \
+        "CROSS_CFLAGS=$(CROSS_CFLAGS)" \
+        "TARGET_CFLAGS=$(TARGET_CFLAGS)" \
+        "exec_prefix=$(exec_prefix)" \
+        "prefix=$(prefix)" \
+        "tooldir=$(tooldir)" \
+        "infodir=$(infodir)" \
+        "libdir=$(libdir)" \
+        "top_toollibdir=$(toollibdir)" \
+        "INSTALL=$(INSTALL)" \
+        "INSTALL_PROGRAM=$(INSTALL_PROGRAM)" \
+        "INSTALL_DATA=$(INSTALL_DATA)" \
+        "DESTDIR=$(DESTDIR)"
+
+# Host specific makefile fragment comes in here.
+@host_makefile_frag@
+
+all: $(ALL)
+
+$(NSIM_BSP): $(NSIM_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+$(UART_LIB): $(UART_OBJS) $(UART_DIR)
+	$(AR) $(ARFLAGS) $@ $(UART_OBJS) dw_uart/*.o
+	$(RANLIB) $@
+
+$(UART_DIR): dw_uart
+	for dir in .. ${SUBDIRS}; do \
+	  if [ x$$dir != x.. ]; then \
+	    if [ -d $$dir ]; then \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) all) || exit $$?; \
+	    else true; fi; \
+	  else true; fi; \
+	done
+
+libcfunc.o: libcfunc.c
+nsim-syscalls.o: nsim-syscalls.c
+sbrk.o: sbrk.c
+mcount.o: mcount.c
+gcrt0.o: gcrt0.S crt0.S
+crt0.o: crt0.S
+write.o: write.c
+$(UART_OBJS):
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
+
+clean mostlyclean:
+	rm -f *.o *.a
+
+distclean maintainer-clean realclean: clean
+	rm -f Makefile *~
+
+.PHONY: install info install-info clean-info doc dvi
+install: $(ALL_INSTALL)
+
+# multilibdir may not exist yet - libgcc for ARC depends on libc, hence
+# newlib/libgloss is built before libgcc. And in parallel build libgloss maybe
+# built and installed before newlib, therefore libgloss has to create target
+# directory.
+
+$(CRT0_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	for c in $(CRT0); do \
+	  b=`basename $$c`; \
+	  ${INSTALL_DATA} $$c $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$b ;\
+	done
+
+$(NSIM_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(NSIM_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(NSIM_BSP)
+	for x in $(NSIM_SCRIPTS); do \
+	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(NANO_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	for x in $(NANO_SCRIPTS); do \
+		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(UART_INSTALL):
+	if [ "$(CPU_FAMILY)" == "em" ]; then \
+		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR} ; \
+		$(INSTALL_DATA) $(UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(UART_LIB) ; fi
+
+doc:
+info:
+dvi:
+install-info:
+clean-info:
+
+Makefile: Makefile.in ../config.status
+	cd .. && $(SHELL) config.status
