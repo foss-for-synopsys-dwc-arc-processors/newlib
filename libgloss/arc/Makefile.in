@@ -24,6 +24,8 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 
+SUBDIRS = @subdirs@
+
 # Multilib support variables.
 # TOP is used instead of MULTI{BUILD,SRC}TOP.
 MULTIDIRS =
@@ -39,6 +41,8 @@ AS = @AS@
 AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
+
+UART_CFLAGS = @UART_CFLAGS@
 
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
 	then echo ${objroot}/../binutils/objdump ; \
@@ -62,16 +66,70 @@ NSIM_SCRIPTS = nsim.specs
 NANO_SCRIPTS = nano.specs
 NANO_INSTALL = install-nano
 
-CFLAGS		= -g
+UART_LIB = libdw_uart.a
+UART_OBJS = write.o
+UART_INSTALL = install-uart
+
+UART_DIR = uart-dir
+
+CFLAGS = -g
+override CFLAGS += $(UART_CFLAGS)
+
+CPU_FAMILY = $(findstring em,${MULTISUBDIR})
+ifeq ($(CPU_FAMILY), em)
+ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB)
+else
+ALL = $(CRT0) $(NSIM_BSP)
+endif
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL)
+
+# These are roughly topologically sorted in order to make porting more
+# streamlined.
+FLAGS_TO_PASS = \
+        "CC=$(CC)" \
+        "CFLAGS=$(CFLAGS)" \
+        "CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)" \
+        "CCASFLAGS=$(CCASFLAGS)" \
+        "AR=$(AR)" \
+        "RANLIB=$(RANLIB)" \
+        "AR_FLAGS=$(AR_FLAGS)" \
+        "MAKEINFO=$(MAKEINFO)" \
+        "AS=$(AS)" \
+        "LD=$(LD)" \
+        "CROSS_CFLAGS=$(CROSS_CFLAGS)" \
+        "TARGET_CFLAGS=$(TARGET_CFLAGS)" \
+        "exec_prefix=$(exec_prefix)" \
+        "prefix=$(prefix)" \
+        "tooldir=$(tooldir)" \
+        "infodir=$(infodir)" \
+        "libdir=$(libdir)" \
+        "top_toollibdir=$(toollibdir)" \
+        "INSTALL=$(INSTALL)" \
+        "INSTALL_PROGRAM=$(INSTALL_PROGRAM)" \
+        "INSTALL_DATA=$(INSTALL_DATA)" \
+        "DESTDIR=$(DESTDIR)"
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
-all: $(CRT0) $(NSIM_BSP)
+all: $(ALL)
 
 $(NSIM_BSP): $(NSIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
+
+$(UART_LIB): $(UART_OBJS) $(UART_DIR)
+	$(AR) $(ARFLAGS) $@ $(UART_OBJS) dw_uart/*.o
+	$(RANLIB) $@
+
+$(UART_DIR): dw_uart
+	for dir in .. ${SUBDIRS}; do \
+	  if [ x$$dir != x.. ]; then \
+	    if [ -d $$dir ]; then \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) all) || exit $$?; \
+	    else true; fi; \
+	  else true; fi; \
+	done
 
 libcfunc.o: libcfunc.c
 nsim-syscalls.o: nsim-syscalls.c
@@ -79,6 +137,9 @@ sbrk.o: sbrk.c
 mcount.o: mcount.c
 gcrt0.o: gcrt0.S crt0.S
 crt0.o: crt0.S
+write.o: write.c
+$(UART_OBJS):
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
 
 clean mostlyclean:
 	rm -f *.o *.a
@@ -87,7 +148,7 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile *~
 
 .PHONY: install info install-info clean-info doc dvi
-install: $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL)
+install: $(ALL_INSTALL)
 
 # multilibdir may not exist yet - libgcc for ARC depends on libc, hence
 # newlib/libgloss is built before libgcc. And in parallel build libgloss maybe
@@ -111,6 +172,11 @@ $(NANO_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
 	for x in $(NANO_SCRIPTS); do \
 		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(UART_INSTALL):
+	if [ "$(CPU_FAMILY)" == "em" ]; then \
+		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR} ; \
+		$(INSTALL_DATA) $(UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(UART_LIB) ; fi
 
 doc:
 info:
