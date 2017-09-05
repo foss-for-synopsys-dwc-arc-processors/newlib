@@ -100,7 +100,7 @@ _open (const char * pathname, int flags, int mode)
 }
 
 /* Should be provided by crt0.S.  */
-extern void __attribute__((noreturn)) _exit_halt ();
+extern void __attribute__((noreturn, long_call)) _exit_halt ();
 
 void
 __attribute__((noreturn))
