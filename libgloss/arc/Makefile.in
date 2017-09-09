@@ -66,6 +66,14 @@ NSIM_SCRIPTS = nsim.specs
 NANO_SCRIPTS = nano.specs
 NANO_INSTALL = install-nano
 
+QEMU_BSP = libqemu.a
+QEMU_OBJS = \
+	qemu-write.o \
+	qemu-stub.o \
+	sbrk.o
+QEMU_INSTALL = install-qemu
+QEMU_SCRIPTS = qemu.specs
+
 UART_LIB = libdw_uart.a
 UART_OBJS = write.o \
 	    read.o \
@@ -86,11 +94,11 @@ override CFLAGS += $(UART_CFLAGS)
 
 CPU_FAMILY = $(findstring em,${MULTISUBDIR})
 ifeq ($(CPU_FAMILY), em)
-ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB)
+ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB) $(QEMU_BSP)
 else
-ALL = $(CRT0) $(NSIM_BSP)
+ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP)
 endif
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL)
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -140,6 +148,10 @@ $(UART_DIR): dw_uart
 	  else true; fi; \
 	done
 
+$(QEMU_BSP): $(QEMU_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
 libcfunc.o: libcfunc.c
 nsim-syscalls.o: nsim-syscalls.c
 sbrk.o: sbrk.c
@@ -147,8 +159,10 @@ mcount.o: mcount.c
 gcrt0.o: gcrt0.S crt0.S
 crt0.o: crt0.S
 write.o: write.c
+qemu-write.o: qemu-write.c
 read.o: read.c
 stub.o: stub.c
+qemu-stub.o: qemu-stub.c
 $(UART_OBJS):
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
 
@@ -190,6 +204,13 @@ $(UART_INSTALL):
 		$(INSTALL_DATA) $(UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(UART_LIB) ; fi
 	for x in $(EMSK_SCRIPTS); do \
 		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(QEMU_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(QEMU_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(QEMU_BSP)
+	for x in $(QEMU_SCRIPTS); do \
+	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
 
 $(MEMORY_MAP_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
