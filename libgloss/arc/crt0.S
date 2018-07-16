@@ -186,10 +186,11 @@ __start:
 	mov_s	r14, r1
 	; calling atexit drags in malloc, so instead poke the function
 	; address directly into the reent structure
-	ld	r1, [gp, @_impure_ptr@sda]
-	mov_s	r1, @__atexit0
-	mov_s	r2, @__atexit
-	st_s	r1, [r2, 0]		; __atexit = &__atexit0
+	ld	r1, [@_impure_ptr]
+	mov_s	r0, @_fini
+	add	r1, r1, 0x14c		; &_GLOBAL_REENT->atexit0
+	st	r1, [r1, -4]		; _GLOBAL_REENT->atexit
+	st_s	r0, [r1, 8]		; _GLOBAL_REENT->atexit0._fns[0]
 	mov_s	r0, 1
 	st_s	r0, [r1, 4]		; __atexit0._ind = 1
 	mov_s	r0, @_fini
