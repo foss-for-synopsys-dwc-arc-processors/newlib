@@ -13,6 +13,8 @@
  * clearly indicated on the first page of each file where they apply.
  */
 #include <sys/stat.h>
+#include <errno.h>
+#include <sys/times.h>
 
 void
 __attribute__((noreturn))
@@ -73,5 +75,12 @@ _ssize_t _read(int fd, void *buffer, unsigned int count)
 
 int _open (char *file, int flags, int mode)
 {
+  return -1;
+}
+
+clock_t
+_times (struct tms *buf)
+{
+  errno = ENOSYS;
   return -1;
 }
