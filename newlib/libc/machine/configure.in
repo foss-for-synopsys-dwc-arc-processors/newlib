@@ -27,6 +27,7 @@ if test -n "${machine_dir}"; then
 	aarch64) AC_CONFIG_SUBDIRS(aarch64) ;;
 	amdgcn) AC_CONFIG_SUBDIRS(amdgcn) ;;
 	arc) AC_CONFIG_SUBDIRS(arc) ;;
+	arc64) AC_CONFIG_SUBDIRS(arc64) ;;
 	arm) AC_CONFIG_SUBDIRS(arm) ;;
 	bfin) AC_CONFIG_SUBDIRS(bfin) ;;
 	cr16) AC_CONFIG_SUBDIRS(cr16) ;;
