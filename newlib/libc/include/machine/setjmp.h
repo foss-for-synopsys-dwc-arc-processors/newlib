@@ -262,11 +262,16 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __mcore__
-#define _JBLEN 16
+#define _JBLEN 16x
 #endif
 
 #ifdef __arc__
 #define _JBLEN 25 /* r13-r30,blink,lp_count,lp_start,lp_end,mlo,mhi,status32 */
+#endif
+
+#ifdef __ARC64__
+/* r14-r27,sp,ilink,r30,blink,r58,status32.  */
+#define _JBLEN 20
 #endif
 
 #ifdef __MMIX__
