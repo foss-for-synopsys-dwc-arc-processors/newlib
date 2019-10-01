@@ -37,7 +37,7 @@
    flushed out.
 */
 
-#if !defined (__ARC64__)
+#if defined (__ARC64__)
 	.file	"crt0.S"
 	.extern main
 
@@ -46,14 +46,14 @@
 	.type	__start, @function
 	.align 4
 __start:
-	movhl_s	sp,@__stack_top@hi ; Stack address
-	orl_s	sp,sp,@__stack_top@lo
+	movhl_s	sp,@__stack_top		; Stack address
+	orl_s	sp,sp,@__stack_top
 
 ;;;  Clear the bss segment.
-	movhl_s	r0,@__sbss_start@hi	; r0 = start of the bss section
-	orl_s	r0,r0,@__sbss_start@lo
-	movhl_s	r2,@_end@hi
-	orl_s	r2,r2,@_end@lo
+	movhl_s	r0,@__sbss_start	; r0 = start of the bss section
+	orl_s	r0,r0,@__sbss_start
+	movhl_s	r2,@_end
+	orl_s	r2,r2,@_end
 	subl	r2,r2,r0		; r2 = size of the bss section in bytes
 	movl_s	r1,0
 	bl	@memset
@@ -61,8 +61,8 @@ __start:
 	movl_s	r0,0		;r0 = argc
 	movl_s	r1,0		;r1 = argv
 	movl_s	r2,0		;r2 = envp = NULL
-	movhl_s	blink,@main@hi
-	orl_s	blink,blink,@main@lo
+	movhl_s	blink,@main
+	orl_s	blink,blink,@main
 	jl	[blink]
 	j	@exit
 	.size	__start, .-__start
