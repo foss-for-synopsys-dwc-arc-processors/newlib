@@ -33,9 +33,13 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(aarch64)
 	config_testsuite=true
 	;;
-  arc*-*-*)
+  arc-*-* | arceb-*-*)
 	AC_CONFIG_FILES([arc/Makefile])
 	subdirs="$subdirs arc"
+	;;
+  arc64-*-*)
+	AC_CONFIG_FILES([arc64/Makefile])
+	subdirs="$subdirs arc64"
 	;;
   csky*-*-*)
 	AC_CONFIG_SUBDIRS(csky)
