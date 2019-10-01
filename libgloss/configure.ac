@@ -51,8 +51,12 @@ case "${target}" in
 	config_aarch64=true
 	config_testsuite=true
 	;;
-  arc*-*-*)
-	config_arc=true
+  arc-*-* | arceb-*-*)
+  	config_arc=true
+	;;
+  arc64-*-*)
+	AC_CONFIG_FILES([arc64/Makefile])
+	subdirs="$subdirs arc64"
 	;;
   csky*-*-*)
 	config_csky=true
