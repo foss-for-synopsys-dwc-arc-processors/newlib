@@ -47,6 +47,8 @@ case "${target}" in
 	;;
   arc-*-*)
 	;;
+  arc64-*-*)
+	;;
   arm*-*-*)
 	;;
   bfin-*-*)
