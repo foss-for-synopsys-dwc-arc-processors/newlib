@@ -52,10 +52,18 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 CRT0		= crt0.o
 CRT0_INSTALL	= install-crt0
 
+NSIM_BSP = libnsim.a
+NSIM_OBJS = \
+	libcfunc.o \
+	nsim-syscall.o \
+	sbrk.o
+NSIM_INSTALL = install-nsim
+NSIM_SCRIPTS = nsim.specs
+
 CFLAGS = -g
 
-ALL = $(CRT0)
-ALL_INSTALL = $(CRT0_INSTALL)
+ALL = $(CRT0) $(NSIM_BSP)
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -89,6 +97,13 @@ FLAGS_TO_PASS = \
 all: $(ALL)
 
 crt0.o: crt0.S
+libcfunc.o: libcfunc.c
+nsim-syscall.o: nsim-syscall.c
+sbrk.o: sbrk.c
+
+$(NSIM_BSP): $(NSIM_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
 
 clean mostlyclean:
 	rm -f *.o *.a
@@ -110,6 +125,12 @@ $(CRT0_INSTALL):
 	  b=`basename $$c`; \
 	  ${INSTALL_DATA} $$c $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$b ;\
 	done
+
+$(NSIM_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(NSIM_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(NSIM_BSP)
+	for x in $(NSIM_SCRIPTS); do \
+	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 doc:
 info:
