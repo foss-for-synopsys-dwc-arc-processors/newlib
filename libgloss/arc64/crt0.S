@@ -73,6 +73,7 @@ __start:
 	.align 4
 _exit_halt:
 	; r0 contains exit code
+	mov	r0,r0
 	flag	1
 	b	@_exit_halt
 	.size	_exit_halt, .-_exit_halt
