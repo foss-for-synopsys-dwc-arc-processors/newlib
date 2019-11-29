@@ -58,12 +58,69 @@ __start:
 	movl_s	r1,0
 	bl	@memset
 
-	movl_s	r0,0		;r0 = argc
-	movl_s	r1,0		;r1 = argv
-	movl_s	r2,0		;r2 = envp = NULL
+;;; Clear the registers.
+	movl_s	r0,0
+	movl_s	r1,0
+	movl_s	r2,0
+	movl_s	r3,0
+	movl_s	r4,0
+	movl_s	r5,0
+	movl_s	r6,0
+	movl_s	r7,0
+	movl_s	r8,0
+	movl_s	r9,0
+	movl_s	r10,0
+	movl_s	r11,0
+	movl_s	r12,0
+	movl_s	r13,0
+	movl_s	r14,0
+	movl_s	r15,0
+	movl_s	r16,0
+	movl_s	r17,0
+	movl_s	r18,0
+	movl_s	r19,0
+	movl_s	r20,0
+	movl_s	r21,0
+	movl_s	r22,0
+	movl_s	r23,0
+	movl_s	r24,0
+	movl_s	r25,0
+	movl_s	r26,0
+	movl_s	r27,0
+	;; SP (r28) is initialized
+	movl_s	ilink,0
+	movl_s	r30,0
+
+	;; Call constructors.
+	jl	@_init
+
+#if 0
+;;; Setup destuctors to be called from exit if main never returns
+	movhl_s	blink,@_impure_ptr
+	orl_s	blink,blink,@inpure_ptr
+	ldl	r1,[blink]
+	movhl_s	r0,@_fini
+	orl_s	r0,r0,@_fini
+	addl	r1,r1,need_find_out	; &_GLOBAL_REENT->atexit0
+	stl	r1,[r1,-8]		; _GLOBAL_REENT->atexit
+	stl	r0,[r1,16]		; _GLOBAL_REENT->atexit0._fns[0]
+	stl	1,[r1,8]		; _GLOBAL_REENT->atexit0._ind
+#else
+;;; Setup fini routines to be called from exit
+	movhl_s	r0,@_fini
+	orl_s	r0,r0,@_fini
+	jl	@atexit
+#endif
+
+;;; Call main() with empty argc/argv/envp
+	movl_s	r0,0
+	movl_s	r1,0
+	movl_s	r2,0
+	movl_s	r3,0
 	movhl_s	blink,@main
 	orl_s	blink,blink,@main
 	jl	[blink]
+
 	j	@exit
 	.size	__start, .-__start
 

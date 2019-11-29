@@ -49,8 +49,8 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-CRT0		= crt0.o
-CRT0_INSTALL	= install-crt0
+CRT		= crt0.o crtn.o crti.o
+CRT_INSTALL	= install-crt
 
 NSIM_BSP = libnsim.a
 NSIM_OBJS = \
@@ -62,8 +62,8 @@ NSIM_SCRIPTS = nsim.specs
 
 CFLAGS = -g
 
-ALL = $(CRT0) $(NSIM_BSP)
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL)
+ALL = $(CRT) $(NSIM_BSP)
+ALL_INSTALL = $(CRT_INSTALL) $(NSIM_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -96,7 +96,6 @@ FLAGS_TO_PASS = \
 
 all: $(ALL)
 
-crt0.o: crt0.S
 libcfunc.o: libcfunc.c
 nsim-syscall.o: nsim-syscall.c
 sbrk.o: sbrk.c
@@ -119,9 +118,9 @@ install: $(ALL_INSTALL)
 # built and installed before newlib, therefore libgloss has to create target
 # directory.
 
-$(CRT0_INSTALL):
+$(CRT_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
-	for c in $(CRT0); do \
+	set -e; for c in $(CRT); do \
 	  b=`basename $$c`; \
 	  ${INSTALL_DATA} $$c $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$b ;\
 	done
