@@ -89,7 +89,7 @@ __start:
 	movl_s	r27,0
 	;; SP (r28) is initialized
 	movl_s	ilink,0
-	movl_s	r30,0
+	movl	r30,0
 
 	;; Call constructors.
 	jl	@_init
