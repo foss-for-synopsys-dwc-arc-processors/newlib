@@ -60,10 +60,18 @@ NSIM_OBJS = \
 NSIM_INSTALL = install-nsim
 NSIM_SCRIPTS = nsim.specs
 
+QEMU_BSP = libqemu.a
+QEMU_OBJS = \
+	qemu-write.o \
+	qemu-stub.o \
+	sbrk.o
+QEMU_INSTALL = install-qemu
+QEMU_SCRIPTS = qemu.specs
+
 CFLAGS = -g
 
-ALL = $(CRT) $(NSIM_BSP)
-ALL_INSTALL = $(CRT_INSTALL) $(NSIM_INSTALL)
+ALL = $(CRT) $(NSIM_BSP) $(QEMU_BSP)
+ALL_INSTALL = $(CRT_INSTALL) $(NSIM_INSTALL) $(QEMU_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -104,6 +112,10 @@ $(NSIM_BSP): $(NSIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
+$(QEMU_BSP): $(QEMU_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
 clean mostlyclean:
 	rm -f *.o *.a
 
@@ -129,6 +141,12 @@ $(NSIM_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(NSIM_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(NSIM_BSP)
 	for x in $(NSIM_SCRIPTS); do \
+	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(QEMU_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(QEMU_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(QEMU_BSP)
+	for x in $(QEMU_SCRIPTS); do \
 	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 doc:
