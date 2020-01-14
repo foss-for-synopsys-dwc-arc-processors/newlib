@@ -179,11 +179,51 @@ __start:
 
 #endif /* !__ARC601__ */
 
+;;; Clear the registers.
+	mov_s	r0,0
+	mov_s	r1,0
+	mov_s	r2,0
+	mov_s	r3,0
+#ifndef __ARC_RF16__
+	mov	r4,0
+	mov	r5,0
+	mov	r6,0
+	mov	r7,0
+	mov	r8,0
+	mov	r9,0
+#endif
+	mov	r10,0
+	mov	r11,0
+	mov_s	r12,0
+	mov_s	r13,0
+	mov_s	r14,0
+	mov_s	r15,0
+#ifndef __ARC_RF16__
+	mov	r16,0
+	mov	r17,0
+	mov	r18,0
+	mov	r19,0
+	mov	r20,0
+	mov	r21,0
+	mov	r22,0
+	mov	r23,0
+	mov	r24,0
+	mov	r25,0
+#endif
+	mov	r26,0
+	mov	r27,0
+	;; SP (r28) is initialized
+#if defined (__ARCEM__) || defined (__ARCHS__)
+	mov	ilink,0
+	mov	r30,0
+#else
+	mov	ilink1,0
+	mov	ilink2,0
+#endif /* ARCv2 */
+
 ; Some  targets use the .init and .fini sections to create constructors and
 ; destructors, and for these targets we need to call the _init function and
 ; arrange for _fini to be called at program exit.
-	mov_s	r13, r0
-	mov_s	r14, r1
 	; calling atexit drags in malloc, so instead poke the function
 	; address directly into the reent structure
 	ld	r1, [@_impure_ptr]
@@ -206,9 +246,9 @@ __start:
 	jl	@_monstartup
 #endif /* PROFILE_SUPPORT */
 
-	mov_s	r0, r13
-	mov_s	r1, r14
-; branch to main
+; Call main with argc = 0 and *argv[] = 0
+	mov_s	r0,0
+	mov_s	r1,0
 #if defined (__ARCEM__) || defined (__ARCHS__)
 	mov	fp,0			; initialize frame pointer
 	jl	@main
