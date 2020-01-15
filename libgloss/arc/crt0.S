@@ -210,7 +210,6 @@ __start:
 	mov	r24,0
 	mov	r25,0
 #endif
-	mov	r26,0
 	mov	r27,0
 	;; SP (r28) is initialized
 #if defined (__ARCEM__) || defined (__ARCHS__)
