@@ -8,7 +8,7 @@
 -ldw_uart
 
 *emsk_libc:
--lc
+%{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
 
 *link_gcc_c_sequence:
 %(emsk_link_gcc_c_sequence) --start-group %G %(emsk_libc) %(emsk_libgloss) --end-group
