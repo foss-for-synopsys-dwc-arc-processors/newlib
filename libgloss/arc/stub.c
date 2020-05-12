@@ -33,3 +33,16 @@ _close (int fd)
 {
     return 0;
 }
+
+int
+_kill (int pid, int sig)
+{
+    _exit (sig);
+    return -1;
+}
+
+int
+_getpid (void)
+{
+    return 1;
+}
