@@ -15,10 +15,13 @@ if test "$srcdir" = "." ; then
 else
   libgloss_topdir="${srcdir}/../.."
 fi
-AC_CONFIG_AUX_DIR($libgloss_topdir)
+AC_CONFIG_AUX_DIR(${libgloss_topdir})
 AC_CONFIG_SUBDIRS(dw_uart)
 UART_CFLAGS="-I${libgloss_topdir}/libgloss/arc/dw_uart"
 AC_SUBST(UART_CFLAGS)
+
+HL_CFLAGS="-I${libgloss_topdir}/libgloss/arc/hl"
+AC_SUBST(HL_CFLAGS)
 
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
@@ -46,7 +49,7 @@ host_makefile_frag_path=$host_makefile_frag
 AC_SUBST(host_makefile_frag_path)
 AC_SUBST_FILE(host_makefile_frag)
 
-AC_CONFIG_FILES(Makefile,
+AC_CONFIG_FILES([Makefile hl/Makefile],
 . ${libgloss_topdir}/config-ml.in,
 srcdir=${srcdir}
 target=${target}
