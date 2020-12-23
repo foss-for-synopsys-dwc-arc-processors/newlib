@@ -49,6 +49,11 @@ __start:
 	movhl_s	sp,@__stack_top		; Stack address
 	orl_s	sp,sp,@__stack_top
 
+	; Allow unaligned accesses.
+	lr      r2, [0xA]
+	bset    r2, r2, 19
+	flag    r2
+
 ;;;  Clear the bss segment.
 	movhl_s	r0,@__sbss_start	; r0 = start of the bss section
 	orl_s	r0,r0,@__sbss_start
