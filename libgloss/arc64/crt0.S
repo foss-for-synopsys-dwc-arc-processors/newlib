@@ -117,17 +117,33 @@ __start:
 	jl	@atexit
 #endif
 
+	jl	@__setup_argv_and_call_main
+
+	j	@exit
+	.size	__start, .-__start
+
+;;; arc-main-helper.o object can be used to replace this function
+;;; and properly set up arguments and/or other low-level stuff.
+	.section .text.__setup_argv_and_call_main,"ax",@progbits
+	.weak	__setup_argv_and_call_main
+	.type	__setup_argv_and_call_main, @function
+	.align 4
+__setup_argv_and_call_main:
+	pushl_s	blink
 ;;; Call main() with empty argc/argv/envp
 	movl_s	r0,0
 	movl_s	r1,0
 	movl_s	r2,0
 	movl_s	r3,0
+
 	movhl_s	blink,@main
 	orl_s	blink,blink,@main
 	jl	[blink]
 
-	j	@exit
-	.size	__start, .-__start
+	popl_s	blink
+	j_s	[blink]
+
+	.size	__setup_argv_and_call_main, .-__setup_argv_and_call_main
 
 	.section .text._exit_halt,"ax",@progbits
 	.global	 _exit_halt
