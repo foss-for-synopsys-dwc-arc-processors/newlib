@@ -54,7 +54,7 @@ HL_OBJS = \
 	hl_argv.o \
 	hl_exit.o
 
-override CFLAGS += -I${srcdir}
+override CFLAGS += -I${srcdir} -mvolatile-di
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
