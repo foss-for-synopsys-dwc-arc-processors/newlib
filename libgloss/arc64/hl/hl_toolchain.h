@@ -18,8 +18,9 @@
 #ifndef _HL_TOOLCHAIN_H
 #define _HL_TOOLCHAIN_H
 
+/* TODO: No uncached for ARC64 yet.  */
 #ifndef __uncached
-  #define __uncached __attribute__((uncached))
+  #define __uncached
 #endif /* __uncached */
 
 #ifndef __aligned
@@ -42,8 +43,9 @@
   #define __noreturn __attribute__((noreturn))
 #endif /* __noreturn */
 
+/* TODO: No long_call for ARC64 yet.  */
 #ifndef __longcall
-  #define __longcall __attribute__((long_call))
+  #define __longcall
 #endif /* __longcall */
 
 #define HL_MAX_DCACHE_LINE 256
