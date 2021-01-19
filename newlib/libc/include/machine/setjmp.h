@@ -273,8 +273,9 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __ARC64__
-/* r14-r27,sp,ilink,r30,blink,r58,status32.  */
-#define _JBLEN 20
+/* r14-r27,sp,ilink,r30,blink  */
+#define _JBLEN 18
+#define _JBTYPE long long
 #endif
 
 #ifdef __MMIX__

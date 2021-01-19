@@ -34,8 +34,7 @@
 
        .file "setjmp.S"
 
-ABIr13	= 0
-ABIr14	= ABIr13 + 8
+ABIr14	= 0
 ABIr15	= ABIr14 + 8
 ABIr16	= ABIr15 + 8
 ABIr17	= ABIr16 + 8
@@ -53,15 +52,13 @@ ABIr28	= ABIr27 + 8
 ABIr29	= ABIr28 + 8
 ABIr30	= ABIr29 + 8
 ABIr31	= ABIr30 + 8
-ABIflg	= ABIr31 + 8
 
 
 	.text
 	.align 4
 	.global setjmp
-	.type setjmp,@function
+	.type   setjmp,@function
 setjmp:
-	stl	r13, [r0, ABIr13]
 	stl	r14, [r0, ABIr14]
 	stl	r15, [r0, ABIr15]
 	stl	r16, [r0, ABIr16]
@@ -81,20 +78,16 @@ setjmp:
 	stl	r30, [r0, ABIr30]
 	stl	blink, [r0, ABIr31]
 
-	lr	r2, [status32]
-	st	r2, [r0, ABIflg]
-
 	j.d	[blink]
 	mov	r0,0
 	.size	setjmp,.-setjmp
 
 	.align	4
 	.global longjmp
-	.type longjmp,@function
+	.type   longjmp,@function
 longjmp:
 
 	; load registers
-	ldl	r13, [r0, ABIr13]
 	ldl	r14, [r0, ABIr14]
 	ldl	r15, [r0, ABIr15]
 	ldl	r16, [r0, ABIr16]
@@ -110,17 +103,9 @@ longjmp:
 	ldl	r26, [r0, ABIr26]
 	ldl	r27, [r0, ABIr27]
 	ldl	r28, [r0, ABIr28]
-
-	ldl	r3, [r0, ABIr29]
-	mov	r29, r3
-
-	ldl	r3, [r0, ABIr30]
-	mov	r30, r3
-
+	ldl	r29, [r0, ABIr29]
+	ldl	r30, [r0, ABIr30]
 	ldl	blink, [r0, ABIr31]
-
-	ld	r2, [r0, ABIflg]
-	flag	r2			; restore "status32" register
 
 	mov.f	r1, r1			; to avoid return 0 from longjmp
 	mov.eq	r1, 1
