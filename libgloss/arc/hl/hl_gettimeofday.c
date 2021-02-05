@@ -17,6 +17,7 @@
 
 #include <errno.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/time.h>
 
 #include "hl_toolchain.h"
@@ -46,18 +47,15 @@ _hl_time (uint32_t *host_timer)
   return ret;
 }
 
-/* gettimeofday() implementation.  timezone and usec are not supported.  */
+/* gettimeofday() implementation.  Clears *tz if specified.  */
 int
 _gettimeofday (struct timeval *tv, struct timezone *tz)
 {
   int ret;
   uint32_t host_timer;
 
-  if (tz != NULL)
-    {
-      errno = ENOSYS;
-      return -1;
-    }
+  if (tz)
+    memset (tz, 0, sizeof (*tz));
 
   ret = _hl_time (&host_timer);
 
