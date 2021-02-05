@@ -42,7 +42,6 @@ AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
 
-UART_CFLAGS = @UART_CFLAGS@
 HL_CFLAGS = @HL_CFLAGS@
 
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
@@ -88,32 +87,13 @@ HL_OBJS = \
 HL_INSTALL = install-hl
 HL_SCRIPTS = hl.specs
 
-UART_LIB = libdw_uart.a
-UART_OBJS = write.o \
-	    read.o \
-	    stub.o \
-	    sbrk.o
-UART_INSTALL = install-uart
-EMSK_SCRIPTS = emsk_em9d.specs \
-               emsk_em11d.specs
-
-MEMORY_MAPS = emsk_em9d.x \
-              emsk_em11d.x
-MEMORY_MAP_INSTALL = install-map
-
-UART_DIR = uart-dir
 HL_DIR = hl-dir
 
 CFLAGS = -g
-override CFLAGS += $(UART_CFLAGS) $(HL_CFLAGS)
+override CFLAGS += $(HL_CFLAGS)
 
-CPU_FAMILY = $(findstring em,${MULTISUBDIR})
-ifeq ($(CPU_FAMILY), em)
-ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB) $(QEMU_BSP) $(HL_BSP)
-else
 ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP) $(HL_BSP)
-endif
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -150,14 +130,9 @@ $(NSIM_BSP): $(NSIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
-$(UART_LIB): $(UART_OBJS) $(UART_DIR)
-	$(AR) $(ARFLAGS) $@ $(UART_OBJS) dw_uart/*.o
-	$(RANLIB) $@
-
 $(HL_DIR): hl
-$(UART_DIR): dw_uart
 
-$(HL_DIR) $(UART_DIR):
+$(HL_DIR):
 	for dir in .. $^; do \
 	  if [ x$$dir != x.. ]; then \
 	    if [ -d $$dir ]; then \
@@ -180,18 +155,12 @@ sbrk.o: sbrk.c
 mcount.o: mcount.c
 gcrt0.o: gcrt0.S crt0.S
 crt0.o: crt0.S
-write.o: write.c
 qemu-write.o: qemu-write.c
-read.o: read.c
-stub.o: stub.c
 qemu-stub.o: qemu-stub.c
 hl-stub.o: hl-stub.c
 hl-setup.o: hl-setup.c
 arc-timer.o: arc-timer.c
 arc-main-helper.o: arc-main-helper.c
-
-$(UART_OBJS):
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
 
 clean mostlyclean:
 	rm -f *.o *.a
@@ -225,13 +194,6 @@ $(NANO_INSTALL):
 	for x in $(NANO_SCRIPTS); do \
 		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
-$(UART_INSTALL):
-	if [ "$(CPU_FAMILY)" == "em" ]; then \
-		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR} ; \
-		$(INSTALL_DATA) $(UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(UART_LIB) ; fi
-	for x in $(EMSK_SCRIPTS); do \
-		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
-
 $(QEMU_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(QEMU_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(QEMU_BSP)
@@ -243,13 +205,6 @@ $(HL_INSTALL):
 	$(INSTALL_DATA) $(HL_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(HL_BSP)
 	for x in $(HL_SCRIPTS); do \
 	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
-
-$(MEMORY_MAP_INSTALL):
-	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
-	for x in $(basename $(MEMORY_MAPS)); do \
-		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
-		$(INSTALL_DATA) $(srcdir)/$$x.x \
-		    $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x/memory.x; done
 
 doc:
 info:
