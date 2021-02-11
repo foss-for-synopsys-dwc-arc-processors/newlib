@@ -28,6 +28,8 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "asm.h"
+
 /* ABI interface file
    these are the stack mappings for the registers
    as stored in the ABI for ARC */
@@ -54,11 +56,7 @@ ABIr30	= ABIr29 + 8
 ABIr31	= ABIr30 + 8
 
 
-	.text
-	.align 4
-	.global setjmp
-	.type   setjmp,@function
-setjmp:
+ENTRY (setjmp)
 	stl	r14, [r0, ABIr14]
 	stl	r15, [r0, ABIr15]
 	stl	r16, [r0, ABIr16]
@@ -82,11 +80,7 @@ setjmp:
 	mov	r0,0
 	.size	setjmp,.-setjmp
 
-	.align	4
-	.global longjmp
-	.type   longjmp,@function
-longjmp:
-
+ENTRY (longjmp)
 	; load registers
 	ldl	r14, [r0, ABIr14]
 	ldl	r15, [r0, ABIr15]
