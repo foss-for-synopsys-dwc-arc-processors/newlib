@@ -1,10 +1,4 @@
 %rename link_gcc_c_sequence qemu_link_gcc_c_sequence
 
-*qemu_libgloss:
--lqemu
-
-*qemu_libc:
-%{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
-
 *link_gcc_c_sequence:
-%(qemu_link_gcc_c_sequence) --start-group %G %(qemu_libc) %(qemu_libgloss) --end-group
+%(qemu_link_gcc_c_sequence) --start-group %G -lc -lqemu --end-group
