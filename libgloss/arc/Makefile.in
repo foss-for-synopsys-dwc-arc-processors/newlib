@@ -65,9 +65,6 @@ NSIM_OBJS = \
 NSIM_INSTALL = install-nsim
 NSIM_SCRIPTS = nsim.specs
 
-NANO_SCRIPTS = nano.specs
-NANO_INSTALL = install-nano
-
 QEMU_BSP = libqemu.a
 QEMU_OBJS = \
 	qemu-write.o \
@@ -113,7 +110,7 @@ ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB) $(QEMU_BSP) $(HL_BSP)
 else
 ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP) $(HL_BSP)
 endif
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -219,11 +216,6 @@ $(NSIM_INSTALL):
 	$(INSTALL_DATA) $(NSIM_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(NSIM_BSP)
 	for x in $(NSIM_SCRIPTS); do \
 	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
-
-$(NANO_INSTALL):
-	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
-	for x in $(NANO_SCRIPTS); do \
-		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 $(UART_INSTALL):
 	if [ "$(CPU_FAMILY)" == "em" ]; then \
