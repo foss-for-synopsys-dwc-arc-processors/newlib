@@ -42,7 +42,7 @@ AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
 
-UART_CFLAGS = @UART_CFLAGS@
+DW_UART_CFLAGS = @DW_UART_CFLAGS@
 HL_CFLAGS = @HL_CFLAGS@
 
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
@@ -88,12 +88,13 @@ HL_OBJS = \
 HL_INSTALL = install-hl
 HL_SCRIPTS = hl.specs
 
-UART_LIB = libdw_uart.a
-UART_OBJS = write.o \
-	    read.o \
-	    stub.o \
-	    sbrk.o
-UART_INSTALL = install-uart
+DW_UART_LIB = libdw_uart.a
+DW_UART_OBJS = \
+	write.o \
+	read.o \
+	stub.o \
+	sbrk.o
+DW_UART_INSTALL = install-dw_uart
 EMSK_SCRIPTS = emsk_em9d.specs \
                emsk_em11d.specs
 
@@ -101,19 +102,19 @@ MEMORY_MAPS = emsk_em9d.x \
               emsk_em11d.x
 MEMORY_MAP_INSTALL = install-map
 
-UART_DIR = uart-dir
+DW_UART_DIR = dw_uart-dir
 HL_DIR = hl-dir
 
 CFLAGS = -g
-override CFLAGS += $(UART_CFLAGS) $(HL_CFLAGS)
+override CFLAGS += $(DW_UART_CFLAGS) $(HL_CFLAGS)
 
 CPU_FAMILY = $(findstring em,${MULTISUBDIR})
 ifeq ($(CPU_FAMILY), em)
-ALL = $(CRT0) $(NSIM_BSP) $(UART_LIB) $(QEMU_BSP) $(HL_BSP)
+ALL = $(CRT0) $(NSIM_BSP) $(DW_UART_LIB) $(QEMU_BSP) $(HL_BSP)
 else
 ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP) $(HL_BSP)
 endif
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
+ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(DW_UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -150,14 +151,14 @@ $(NSIM_BSP): $(NSIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
-$(UART_LIB): $(UART_OBJS) $(UART_DIR)
-	$(AR) $(ARFLAGS) $@ $(UART_OBJS) dw_uart/*.o
+$(DW_UART_LIB): $(DW_UART_OBJS) $(DW_UART_DIR)
+	$(AR) $(ARFLAGS) $@ $(DW_UART_OBJS) dw_uart/*.o
 	$(RANLIB) $@
 
 $(HL_DIR): hl
-$(UART_DIR): dw_uart
+$(DW_UART_DIR): dw_uart
 
-$(HL_DIR) $(UART_DIR):
+$(HL_DIR) $(DW_UART_DIR):
 	for dir in $^; do \
 	  if [ -d $$dir ]; then \
 	    (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) all) || exit $$?; \
@@ -188,7 +189,7 @@ hl-setup.o: hl-setup.c
 arc-timer.o: arc-timer.c
 arc-main-helper.o: arc-main-helper.c
 
-$(UART_OBJS):
+$(DW_UART_OBJS):
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
 
 clean mostlyclean:
@@ -223,10 +224,10 @@ $(NANO_INSTALL):
 	for x in $(NANO_SCRIPTS); do \
 		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
-$(UART_INSTALL):
+$(DW_UART_INSTALL):
 	if [ "$(CPU_FAMILY)" == "em" ]; then \
 		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR} ; \
-		$(INSTALL_DATA) $(UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(UART_LIB) ; fi
+		$(INSTALL_DATA) $(DW_UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(DW_UART_LIB) ; fi
 	for x in $(EMSK_SCRIPTS); do \
 		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
