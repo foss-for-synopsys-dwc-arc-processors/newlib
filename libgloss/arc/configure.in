@@ -17,8 +17,8 @@ else
 fi
 AC_CONFIG_AUX_DIR(${libgloss_topdir})
 AC_CONFIG_SUBDIRS(dw_uart)
-UART_CFLAGS="-I${libgloss_topdir}/libgloss/arc/dw_uart"
-AC_SUBST(UART_CFLAGS)
+DW_UART_CFLAGS="-I${libgloss_topdir}/libgloss/arc/dw_uart"
+AC_SUBST(DW_UART_CFLAGS)
 
 HL_CFLAGS="-I${libgloss_topdir}/libgloss/arc/hl"
 AC_SUBST(HL_CFLAGS)

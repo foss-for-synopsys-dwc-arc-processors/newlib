@@ -620,7 +620,7 @@ build_vendor
 build_cpu
 build
 HL_CFLAGS
-UART_CFLAGS
+DW_UART_CFLAGS
 subdirs
 target_alias
 host_alias
@@ -1824,7 +1824,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 subdirs="$subdirs dw_uart"
 
-UART_CFLAGS="-I${libgloss_topdir}/libgloss/arc/dw_uart"
+DW_UART_CFLAGS="-I${libgloss_topdir}/libgloss/arc/dw_uart"
 
 
 HL_CFLAGS="-I${libgloss_topdir}/libgloss/arc/hl"
