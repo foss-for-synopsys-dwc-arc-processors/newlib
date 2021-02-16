@@ -64,7 +64,8 @@ __setup_argv_and_call_main (void)
 	break;
     }
 
-  argv[i] = NULL;
+  if (argv)
+    argv[i] = NULL;
 
   _setup_low_level ();
 
