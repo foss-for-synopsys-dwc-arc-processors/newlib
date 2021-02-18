@@ -88,6 +88,24 @@ HL_OBJS = \
 HL_INSTALL = install-hl
 HL_SCRIPTS = hl.specs
 
+IOTDK_UART_LIB = libiotdk_uart.a
+IOTDK_UART_OBJS = iotdk-uart-setup.o
+
+HSDK_UART_LIB = libhsdk_uart.a
+HSDK_UART_OBJS = hsdk-uart-setup.o
+
+UART_8250_LIB = libuart_8250.a
+UART_8250_OBJS = \
+	uart-8250.o \
+	uart-8250-stub.o \
+	sbrk.o \
+	mcount.o
+
+UART_8250_INSTALL = install-uart-8250
+UART_8250_SCRIPTS = iotdk.specs hsdk.specs
+
+UART_8250_LIBS = $(UART_8250_LIB) $(IOTDK_UART_LIB) $(HSDK_UART_LIB)
+
 DW_UART_LIB = libdw_uart.a
 DW_UART_OBJS = \
 	write.o \
@@ -99,7 +117,9 @@ EMSK_SCRIPTS = emsk_em9d.specs \
                emsk_em11d.specs
 
 MEMORY_MAPS = emsk_em9d.x \
-              emsk_em11d.x
+	      emsk_em11d.x \
+	      iotdk.x \
+	      hsdk.x
 MEMORY_MAP_INSTALL = install-map
 
 DW_UART_DIR = dw_uart-dir
@@ -110,11 +130,19 @@ override CFLAGS += $(DW_UART_CFLAGS) $(HL_CFLAGS)
 
 CPU_FAMILY = $(findstring em,${MULTISUBDIR})
 ifeq ($(CPU_FAMILY), em)
-ALL = $(CRT0) $(NSIM_BSP) $(DW_UART_LIB) $(QEMU_BSP) $(HL_BSP)
+ALL = $(CRT0) $(NSIM_BSP) $(DW_UART_LIB) $(QEMU_BSP) $(HL_BSP) $(UART_8250_LIBS)
 else
-ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP) $(HL_BSP)
+ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP) $(HL_BSP) $(UART_8250_LIBS)
 endif
-ALL_INSTALL = $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL) $(DW_UART_INSTALL) $(MEMORY_MAP_INSTALL) $(QEMU_INSTALL) $(HL_INSTALL)
+ALL_INSTALL = \
+	$(CRT0_INSTALL) \
+	$(NSIM_INSTALL) \
+	$(NANO_INSTALL) \
+	$(DW_UART_INSTALL) \
+	$(MEMORY_MAP_INSTALL) \
+	$(QEMU_INSTALL) \
+	$(HL_INSTALL) \
+	$(UART_8250_INSTALL)
 
 # These are roughly topologically sorted in order to make porting more
 # streamlined.
@@ -173,6 +201,18 @@ $(HL_BSP): $(HL_OBJS) $(HL_DIR)
 	$(AR) $(ARFLAGS) $@ $(HL_OBJS) hl/*.o
 	$(RANLIB) $@
 
+$(UART_8250_LIB): $(UART_8250_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+$(IOTDK_UART_LIB): $(IOTDK_UART_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+$(HSDK_UART_LIB): $(HSDK_UART_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
 libcfunc.o: libcfunc.c
 nsim-syscalls.o: nsim-syscalls.c
 sbrk.o: sbrk.c
@@ -188,6 +228,10 @@ hl-stub.o: hl-stub.c
 hl-setup.o: hl-setup.c
 arc-timer.o: arc-timer.c
 arc-main-helper.o: arc-main-helper.c
+uart-8250.o: uart-8250.c
+uart-8250-stub.o: uart-8250-stub.c
+iotdk-uart-setup.o: iotdk-uart-setup.c
+hsdk-uart-setup.o: hsdk-uart-setup.c
 
 $(DW_UART_OBJS):
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
@@ -241,6 +285,13 @@ $(HL_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(HL_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(HL_BSP)
 	for x in $(HL_SCRIPTS); do \
+	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(UART_8250_INSTALL):
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	for x in $(UART_8250_LIBS); do \
+	    $(INSTALL_DATA) $$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+	for x in $(UART_8250_SCRIPTS); do \
 	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 $(MEMORY_MAP_INSTALL):
