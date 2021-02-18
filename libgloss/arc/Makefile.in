@@ -158,12 +158,10 @@ $(HL_DIR): hl
 $(UART_DIR): dw_uart
 
 $(HL_DIR) $(UART_DIR):
-	for dir in .. $^; do \
-	  if [ x$$dir != x.. ]; then \
-	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) all) || exit $$?; \
-	    else true; fi; \
-	  else true; fi; \
+	for dir in $^; do \
+	  if [ -d $$dir ]; then \
+	    (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) all) || exit $$?; \
+	  fi; \
 	done
 
 $(QEMU_BSP): $(QEMU_OBJS)
