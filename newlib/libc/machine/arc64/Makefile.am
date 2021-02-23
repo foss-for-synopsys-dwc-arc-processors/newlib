@@ -8,6 +8,7 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES =			\
 	memcpy.S		\
+	memset.S		\
 	setjmp.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
