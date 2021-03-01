@@ -28,7 +28,9 @@ Lets build and run simple program:
 
 Where `-mcpu` and `-prop=nsim_isa_family` is specific to your version of ARC CPU.
 Option `-prop=nsim_hlink_gnu_io_ext=1` enables GNU IO extension for nSIM which
-is used for some system calls.
+is used for some system calls. The `nsimdrv` option `-prop=nsim_emt={0,1,2}`
+enables trap emulation and should be disabled (removed or set to `0`) to use
+Metaware hostlink.
 
 **NB:** Metaware hostlink requires symbols `__HOSTLINK__` and `_hl_blockedPeek`
 to be present. So stripped binary won't work properly with Metaware hostlink.
