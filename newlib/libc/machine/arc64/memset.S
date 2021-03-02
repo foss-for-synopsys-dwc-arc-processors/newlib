@@ -36,7 +36,8 @@
 ; ret (R0): dest
 ENTRY (memset)
 	bmsk_s	r1, r1, 7		; treat it like unsigned char
-	brlo.d	r2, 8, .L_write_1_bytes
+	cmp	r2, 64
+	bls.d	@.L_write_1_bytes
 	movl	r4, r0			; work on a copy of "r0"
 	lsl8	r3, r1
 	or_s	r1, r1, r3
@@ -45,14 +46,17 @@ ENTRY (memset)
 	; FIXME vpack2wl r1, r1, r1
 	mov_s	r3, r1
 	addhl	r1, r1, r3
-	lsrl	r5, r2, 3		; counter for 8-byte chunks
-.L_write_8_bytes:
-	dbnz.d	r5, .L_write_8_bytes
+	lsrl	r5, r2, 5		; counter for 32-byte chunks
+.L_write_32_bytes:
 	stl.ab	r1, [r4, +8]
-	bmsk_s	r2, r2, 2
+	stl.ab	r1, [r4, +8]
+	stl.ab	r1, [r4, +8]
+	dbnz.d	r5, @.L_write_32_bytes
+	stl.ab	r1, [r4, +8]
+	bmsk_s	r2, r2, 4
 .L_write_1_bytes:
-	breq	r2, 0, .L_return
-	dbnz.d	r2, .
+	breq	r2, 0, @.L_return
+	dbnz.d	r2, @.
 	stb.ab	r1, [r4, +1]
 .L_return:
 	j_s	[blink]
