@@ -35,19 +35,26 @@
 ; R2: count
 ; ret (R0): dest
 ENTRY (memcpy)
-	brlo.d	r2, 8, .L_write_1_bytes
-	movl	r3, r0			; work on a copy of "r0"
-	lsrl	r5, r2, 3		; counter for 8-byte chunks
-.L_write_8_bytes:
+	cmp	r2, 64
+	bls.d	@.L_write_1_bytes
+	movl	r3, r0			; do not clobber the "dest"
+	lsrl	r11, r2, 5		; counter for 32-byte chunks
+.L_write_32_bytes:
 	ldl.ab	r4, [r1, +8]
-	dbnz.d	r5, .L_write_8_bytes
 	stl.ab	r4, [r3, +8]
-	bmsk_s	r2, r2, 2
+	ldl.ab	r4, [r1, +8]
+	stl.ab	r4, [r3, +8]
+	ldl.ab	r4, [r1, +8]
+	stl.ab	r4, [r3, +8]
+	ldl.ab	r4, [r1, +8]
+	dbnz.d	r11, @.L_write_32_bytes
+	stl.ab	r4, [r3, +8]
+	bmsk_s	r2, r2, 4
 .L_write_1_bytes:
-	breq	r2, 0, .L_return
+	breq	r2, 0, @.L_return
 1:
 	ldb.ab	r4, [r1, +1]
-	dbnz.d	r2, 1b
+	dbnz.d	r2, @1b
 	stb.ab	r4, [r3, +1]
 .L_return:
 	j_s	[blink]
