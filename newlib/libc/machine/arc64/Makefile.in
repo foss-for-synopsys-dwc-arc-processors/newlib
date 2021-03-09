@@ -69,8 +69,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-memcpy.$(OBJEXT) lib_a-memset.$(OBJEXT) \
-	lib_a-setjmp.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-memset.$(OBJEXT) lib_a-setjmp.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -198,6 +198,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = \
+	memcmp.S		\
 	memcpy.S		\
 	memset.S		\
 	setjmp.S
@@ -263,6 +264,12 @@ distclean-compile:
 
 .S.obj:
 	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+lib_a-memcmp.o: memcmp.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcmp.o `test -f 'memcmp.S' || echo '$(srcdir)/'`memcmp.S
+
+lib_a-memcmp.obj: memcmp.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcmp.obj `if test -f 'memcmp.S'; then $(CYGPATH_W) 'memcmp.S'; else $(CYGPATH_W) '$(srcdir)/memcmp.S'; fi`
 
 lib_a-memcpy.o: memcpy.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
