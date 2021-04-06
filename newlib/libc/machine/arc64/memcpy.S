@@ -30,6 +30,42 @@
 
 #include "asm.h"
 
+; This file contains variants of the same function with different
+; instructions.  The generic one, the implementation that comes the
+; last after the #else macro, is the most commented.
+
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
+
+ENTRY (memcpy)
+	cmp	r2, 64
+	bls.d	@.L_write_1_bytes
+	movl	r3, r0
+	lsrl	r11, r2, 6
+.L_write_64_bytes:
+	lddl.ab	r4r5, [r1, +16]
+	stdl.ab	r4r5, [r3, +16]
+	lddl.ab	r4r5, [r1, +16]
+	stdl.ab	r4r5, [r3, +16]
+	lddl.ab	r4r5, [r1, +16]
+	stdl.ab	r4r5, [r3, +16]
+	lddl.ab	r4r5, [r1, +16]
+	dbnz.d	r11, @.L_write_64_bytes
+	stdl.ab	r4r5, [r3, +16]
+	bmsk_s	r2, r2, 5
+.L_write_1_bytes:
+	breq	r2, 0, @.L_return
+1:
+	ldb.ab	r4, [r1, +1]
+	dbnz.d	r2, @1b
+	stb.ab	r4, [r3, +1]
+.L_return:
+	j_s	[blink]
+ENDFUNC (memcpy)
+
+; The generic implementation without any frills.
+#else
+
 ; R0: dest
 ; R1: source
 ; R2: count
@@ -59,3 +95,6 @@ ENTRY (memcpy)
 .L_return:
 	j_s	[blink]
 ENDFUNC (memcpy)
+
+; if !defined (__ARC64_M128__)
+#endif
