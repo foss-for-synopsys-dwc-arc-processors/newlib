@@ -30,6 +30,45 @@
 
 #include "asm.h"
 
+; This file contains variants of the same function with different
+; instructions.  The generic one, the implementation that comes the
+; last after the #else macro, is the most commented.
+
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
+
+ENTRY (memset)
+	bmsk_s	r1, r1, 7
+	cmp	r2, 64
+	bls.d	@.L_write_1_bytes
+	movl	r4, r0	
+	lsl8	r3, r1
+	or_s	r1, r1, r3
+	lsl16	r3, r1
+	or	r6, r1, r3
+	; FIXME vpack2wl r6, r1, r1
+	mov_s	r3, r6
+	addhl	r6, r6, r3
+	movl	r7, r6
+	lsrl	r5, r2, 6
+.L_write_64_bytes:
+	stdl.ab	r6r7, [r4, +16]
+	stdl.ab	r6r7, [r4, +16]
+	stdl.ab	r6r7, [r4, +16]
+	dbnz.d	r5, @.L_write_64_bytes
+	stdl.ab	r6r7, [r4, +16]
+	bmsk_s	r2, r2, 5
+.L_write_1_bytes:
+	breq	r2, 0, @.L_return
+	dbnz.d	r2, @.
+	stb.ab	r1, [r4, +1]
+.L_return:
+	j_s	[blink]
+ENDFUNC (memset)
+
+; The generic implementation without any frills.
+#else
+
 ; R0: dest
 ; R1: ch
 ; R2: count
@@ -42,17 +81,17 @@ ENTRY (memset)
 	lsl8	r3, r1
 	or_s	r1, r1, r3
 	lsl16	r3, r1
-	or_s	r1, r1, r3
-	; FIXME vpack2wl r1, r1, r1
-	mov_s	r3, r1
-	addhl	r1, r1, r3
+	or	r6, r1, r3
+	; FIXME vpack2wl r6, r1, r1
+	mov_s	r3, r6
+	addhl	r6, r6, r3
 	lsrl	r5, r2, 5		; counter for 32-byte chunks
 .L_write_32_bytes:
-	stl.ab	r1, [r4, +8]
-	stl.ab	r1, [r4, +8]
-	stl.ab	r1, [r4, +8]
+	stl.ab	r6, [r4, +8]
+	stl.ab	r6, [r4, +8]
+	stl.ab	r6, [r4, +8]
 	dbnz.d	r5, @.L_write_32_bytes
-	stl.ab	r1, [r4, +8]
+	stl.ab	r6, [r4, +8]
 	bmsk_s	r2, r2, 4
 .L_write_1_bytes:
 	breq	r2, 0, @.L_return
@@ -61,3 +100,6 @@ ENTRY (memset)
 .L_return:
 	j_s	[blink]
 ENDFUNC (memset)
+
+; if !defined (__ARC64_M128__)
+#endif
