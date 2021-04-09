@@ -38,60 +38,102 @@
 ;   - lhs = rhs:  0
 ;   - lhs > rhs: >0
 ENTRY (memcmp)
-	cmp	r2, 64
-	bls.d	@.L_compare_1_bytes
-	movl	r3, r0		; soon "r0" will be used as return value
-	lsrl	r11, r2, 5	; counter for 32-byte chunks
-	; If one is curious why the code below looks like the way it does, it
-	; is possible to consult the documentation at the end of this file.
-	ldl.ab	r4, [r3, +8]
-	b.d	@1f		; go to the start of the loop without
-	ldl.ab	r6, [r1, +8]	; checking "r8 == r10".
+	cmpl	  r2, 64
+	bls.d	  @.L_compare_1_bytes
+	movl	  r3, r0	; "r0" will be used as return value
+	; If one is curious why the code below looks like the way it does,
+	; there is a documentation at the end of this file.
+	lsrl	  r12, r2, 5	; counter for 32-byte chunks
+	xor	  r13, r13, r13	; the mask showing inequal registers
+	ldl.ab	  r4,  [r3, +8]
+	ldl.ab	  r5,  [r1, +8]
 .L_compare_32_bytes:
-	brnel.d	r8,  r10, @.L_8_byte_unequal_r8r10
-	ldl.ab	r6,  [r1, +8]
-1:
-	ldl.ab	r8,  [r3, +8]
-	brnel.d	r4,  r6, @.L_8_byte_unequal_r4r6
-	ldl.ab	r10, [r1, +8]
-	ldl.ab	r4,  [r3, +8]
-	brnel.d	r8,  r10, @.L_8_byte_unequal_r8r10
-	ldl.ab	r6,  [r1, +8]
-	ldl.ab	r8,  [r3, +8]
-	brnel.d	r4,  r6, @.L_8_byte_unequal_r4r6
-	ldl.ab	r10, [r1, +8]
-	dbnz.d	r11, @.L_compare_32_bytes
-	ldl.ab	r4,  [r3, +8]	; may access beyond the "count"
-	; Wrapping up the last loop by making one last compare
-	; and adjusting the pointer because of an extra load
-	; in the end
-	brnel.d	r8,  r10, @.L_8_byte_unequal_r8r10
-	subl	r3, r3, 8
-	bmsk_s	r2, r2, 4
+	ldl.ab	  r6,  [r3, +8]
+	ldl.ab	  r7,  [r1, +8]
+	ldl.ab	  r8,  [r3, +8]
+	ldl.ab	  r9,  [r1, +8]
+	ldl.ab	  r10, [r3, +8]
+	ldl.ab	  r11, [r1, +8]
+	xorl.f	  0, r4, r5
+	xor.ne	  r13, r13, 0b0001
+	xorl.f	  0, r6, r7
+	xor.ne	  r13, r13, 0b0010
+	xorl.f	  0, r8, r9
+	xor.ne	  r13, r13, 0b0100
+	xorl.f	  0, r10, r11
+	xor.ne	  r13, r13, 0b1000
+	brne	  r13, 0, @.L_unequal_find
+	ldl.ab	  r4,  [r3, +8]
+	dbnz.d	  r12, @.L_compare_32_bytes
+	ldl.ab	  r5,  [r1, +8]
+	; Adjusting the pointers because of the extra loads in the end
+	subl	  r1, r1, 8
+	subl	  r3, r3, 8
+	bmsk_s	  r2, r2, 4	; any remaining bytes to compare
 .L_compare_1_bytes:
-	breq.d	r2, 0, @.L_return
-	xor_s	r0, r0, r0
-	ldb.ab	r4, [r3, +1]	
+	cmp	  r2, 0
+	jeq.d	  [blink]
+	xor_s     r0, r0, r0
+	ldb.ab	  r4, [r3, +1]
+	ldb.ab	  r5, [r1, +1]
 2:
-	ldb.ab	r6, [r1, +1]
-	brne.d	r4, r6, @.L_return
-	sub	r0, r4, r6	; delay slot exits, we might as well use it.
-	dbnz.d	r2, @2b
-	ldb.ab	r4, [r3, +1]	; this load may read beyond the "count".
-.L_return:
-	j_s	[blink]
-.L_8_byte_unequal_r4r6:
-	movl	r1, r4
-	b.d	@.L_diff_byte_in_regs
-	movl	r2, r6
-.L_8_byte_unequal_r8r10:
-	movl	r1, r8
-	movl	r2, r10
+	sub.f	  r0, r4, r5
+	jne.d	  [blink]
+	ldb.ab	  r4, [r3, +1]
+	dbnz.d	  r2, @2b
+	ldb.ab	  r5, [r1, +1]	; this load may read beyond the "count".
+	j_s	  [blink]
+; At this point, we want to find the _first_ comparison that marked the
+; inequality of "lhs" and "rhs".  The rest acts like a multiplexer:
+;
+; if r4  was not equal to r5  --> r1=r4,  r2=r5
+; if r6  was not equal to r7  --> r1=r6,  r2=r7
+; if r8  was not equal to r9  --> r1=r8,  r2=r9
+; if r10 was not equal to r11 --> r1=r10, r2=r11
+; find_different_byte(r1, r2)
+;
+; About the "bi [n]" (branch index) instruction:  This instruction alters
+; next PC (program counter):
+;
+; next_pc = current_pc + n*4                n*4 is the same as n<<2
+;
+; In other words, it tells the processor to execute the n'th instruction
+; from where we are (assuming all the next instructions are 4 bytes long).
+;
+; We used this to our benefit.  We made each "case" (unequal_r4r5,
+; unequal_r5r6, ...) 16 bytes long (power of 2) and fed "bi" an index
+; that is already multiplied by 4 (asl r13, r13, 2).  This translates
+; into "bi [n]" jumping to 16-bytes slots.  The last slot we did not
+; make 16 bytes long with "nop" because we don't need to address after
+; it.
+.L_unequal_find:
+	ffs	  r13, r13
+	asl	  r13, r13, 2
+	bi	  [r13]
+.L_unequal_r4r5:
+	movl	  r1, r4
+	b.d	  @.L_diff_byte_in_regs
+	movl	  r2, r5
+	nop
+.L_unequal_r6r7:
+	movl	  r1, r6
+	b.d	  @.L_diff_byte_in_regs
+	movl	  r2, r7
+	nop
+.L_unequal_r8r9:
+	movl	  r1, r8
+	b.d	  @.L_diff_byte_in_regs
+	movl	  r2, r9
+	nop
+.L_unequal_r10r11:
+	movl	  r1, r10
+	movl	  r2, r11
+	; fall-through
 ; If we're here, that means the two operands are not equal.
 ; 1) First we have to get a mask of their inequality through "xor"
 ; 2) Then, find the first bit position that they're different: "ffs"
 ; 3) Depending on the bit position, we want the whole byte containing
-;    that bit, in both operands, becomes the very first byte (least
+;    that bit, in both operands, to become the very first byte (least
 ;    significant byte), so that we can subtract one from another.
 ;    Below is an illustration of bit positions and how much we should
 ;    shift the numbers right:
@@ -108,122 +150,115 @@ ENTRY (memcmp)
 ; 4) When the bytes are positioned at byte #0, mask out the rest of the
 ;    bytes and subtract the two operands: lhs - rhs
 .L_diff_byte_in_regs:
-	xorl	r0, r1, r2	; (1)
-	ffsl	r0, r0		; (2)
-	and	r0, r0, 0x38	; (3)
-	lsrl	r1, r1, r0	; (3)
-	lsrl	r2, r2, r0	; (3)
-	bmsk_s	r1, r1, 7	; (4)
-	bmsk_s	r2, r2, 7	; (4)
-	j_s.d	[blink]
-	subl	r0, r1, r2	; (4)
+	xorl	  r0, r1, r2	; (1)
+	ffsl	  r0, r0	; (2)
+	and	  r0, r0, 0x38	; (3)
+	lsrl	  r1, r1, r0	; (3)
+	lsrl	  r2, r2, r0	; (3)
+	bmsk_s	  r1, r1, 7	; (4)
+	bmsk_s	  r2, r2, 7	; (4)
+	j_s.d	  [blink]
+	subl	  r0, r1, r2	; (4)
 ENDFUNC (memcmp)
 
-; The 32-byte loop at the heart of the "memcmp" function has gone through
-; a few optimisation filters.  Knowing the transformations will help
-; in understanding the logic of the final code.
+; The loop at the heart of the "memcmp" function follows some specific
+; logic and has gone through a few optimisation filters.  Knowing them
+; will help understand the code better.
 ;
-; 1) At first, we have the unrolled loop to process 32-byte chunks
-;      1:
-;        ldl.ab r4, [r3, 8]
-;        ldl.ab r6, [r1, 8]
-;        brnel  r4, r6, @.L_unequal
-;        ldl.ab r4, [r3, 8]
-;        ldl.ab r6, [r1, 8]
-;        ...
-;        brnel  r4, r6, @.L_unequal
-;        dbnz   r11, @1b
+; The comparison logic
+; --------------------
+; In each loop, we compare 32 bytes of data from "lhs" and "rhs".  Those
+; comparisons takes place by using 8 sets of registers:
 ;
-; 2) We would like to create a gap between the "loads" and the "branch"
-;    instruction that consumes them.  For that purpose, we use two more
-;    registers (r8, r10) and intertwine the "load"s and "compare"s:
-;      ldl.ab r4, [r3, 8]
-;      ldl.ab r6, [r1, 8]
-;      brnel  r8, r10, @.L_unequal_r8r10
-;      ldl.ab r8, [r3, 8]
-;      ldl.ab r10, [r1, 8]
-;      brnel  r4, r6, @.L_unequal_r4r6
+; r4  == r5        xor.f 0, r4,  r5       lhs[i+0]  == rhs[i+0]
+; r6  == r7        xor.f 0, r6,  r7       lhs[i+8]  == rhs[i+8]
+; r8  == r9        xor.f 0, r8,  r9       lhs[i+16] == rhs[i+16]
+; r10 == r11       xor.f 0, r10, r11      lhs[i+24] == rhs[i+32]
+;
+; The idea is to set a corresponding bit in r13 register for each
+; comparison that fails.  The relation between the bits and the
+; comparisons are:
+;
+; r13[0..63] = 0
+; r13[0]     = 1 if r4  != r5
+; r13[1]     = 1 if r6  != r7
+; r13[2]     = 1 if r8  != r9
+; r13[3]     = 1 if r10 != r11
+;
+; If r13 remains 0, the next possible iteration of the loop begins.
+; If it is not 0 anymore, the algorithm will be interested in the
+; lowest bit that is set to 1.  That is achieved by the "ffs"
+; (find first set) instruction.
+;
+; The loop transformation
+; -----------------------
+; 1) At first, the loop looks like below:
+;
+;    .loop
+;      ldl.ab  r4,  [r3, +8]
+;      ldl.ab  r5,  [r1, +8]
 ;      ...
-;    The first "brnel r8, r10" during the first iteration of the loop
-;    does not hold the correct data.  In order to adjust for that, before
-;    entering the loop, we will load the data into "r4" and "r6" and then
-;    instead of a "fall-through" to the loop body, we jump after the first
-;    "brnel r8, r10":
-;        ldl.ab r4, [r3, 8]
-;        ldl.ab r6, [r1, 8]
-;        b      @2f
-;    1:
-;        ldl.ab r4, [r3, 8]
-;        ldl.ab r6, [r1, 8]
-;        brnel  r8, r10, @.L_unequal_r8r10
-;    2:
-;        ldl.ab r8, [r3, 8]
-;        ldl.ab r10, [r1, 8]
-;        brnel  r4, r6, @.L_unequal_r4r6
-;        ldl.ab r4, [r3, 8]
-;        ldl.ab r6, [r1, 8]
-;        brnel  r8, r10, @.L_unequal_r8r10
-;        ldl.ab r8, [r3, 8]
-;        ldl.ab r10, [r1, 8]
-;        brnel  r4, r6, @.L_unequal_r4r6
-;        dbnz   r11, @1b
-;        brnel  r8, r10, @.L_unequal_r8r10
-;    Take a note of the extra "brnel" added after the "dbnz" which will
-;    compare the result of the last "loads" into "r8" and "r10".  In the
-;    beginning we made 4 loads before starting to compare (each compare
-;    consumes 2 loads), so this extra "brnel" is only catching up.
+;      ldl.ab  r10, [r3, +8]
+;      ldl.ab  r11, [r1, +8]
+;      xorl.f  0, r4, r5
+;      xor.ne  r13, r13, 0b0001
+;      ...
+;      xorl.f  0, r10, r11
+;      xor.ne  r13, r13, 0b1000
+;      brne    r13, 0, @.unequal_find
+;      dbnz    r12, @.loop
 ;
-; 3) Time to fill the delay slot of all those "brnel":
-;        ldl.ab r4, [r3, 8]
-;        b.d    @2f                          ; filled with what used
-;        ldl.ab r6, [r1, 8]                  ; to be previous inst.
-;    1:
-;        ldl.ab  r4, [r3, 8]
-;        brnel.d r8, r10, @.L_unequal_r8r10  ; filled with what used
-;        ldl.ab  r6, [r1, 8]                 ; to be previous inst.
-;    2:
-;        ldl.ab  r8, [r3, 8]
-;        brnel.d r4, r6, @.L_unequal_r4r6    ; filled with what used
-;        ldl.ab  r10, [r1, 8]                ; to be previous inst.
-;        ...
-;        brnel.d r4, r6, @.L_unequal_r4r6    ; filled with what used
-;        ldl.ab  r10, [r1, 8]                ; to be previous inst.
-;        dbnz    r11, @1b                    ; cannot be filled (yet)
-;        brnel  r8, r10, @.L_unequal_r8r10   ; cannot be filled (yet)
+; 2) "dbnz" instruction has a delay slot.  To make the code more
+;    efficient, we can bring the first 2 instructions of the loop
+;    to the end (they will be executed just before the next iteration
+;    begins).  To make the logic of the program sound, those 2
+;    instructions need to be duplicated before the loop start as well:
 ;
-; 4) Since "dbnz" could benefit from having a loop _body_ instruction
-;    in its delay slot, the first "load" in the beginning of the loop
-;    body can come to the end of the loop, so it can fill "dbnz.d".
-;    That is possible because that code chunk was skipped during the
-;    first iteration and have spilled before the loop start:
-;        ldl.ab r4, [r3, 8]
-;        b.d    @2f
-;        ldl.ab r6, [r1, 8]
-;    1:
-;        brnel.d r8, r10, @.L_unequal_r8r10
-;        ldl.ab  r6, [r1, 8]
-;    2:
-;        ldl.ab  r8, [r3, 8]
-;        ...
-;        brnel.d r4, r6, @.L_unequal_r4r6
-;        ldl.ab  r10, [r1, 8]
-;        dbnz.d  r11, @1b                    ; filled!
-;        ldl.ab  r4, [r3, 8]
-;    There is one catch though:  During the _last_ iteration, that
-;    "load" is executed once too many.  To correct for that:
-;        ...
-;        ldl.ab  r10, [r1, 8]
-;        dbnz.d  r11, @1b
-;        ldl.ab  r4, [r3, 8]
-;        subl    r3, r3, 8                   ; adjusting instruction
-;        brnel   r8, r10, @.L_unequal_r8r10  ; not filled yet!
-;        ...
-;    Last bit of the puzzle falls into its place:  The "brnel" outside
-;    the loop can be filled with this "subl" instruction:
-;        ...
-;        ldl.ab  r10, [r1, 8]
-;        dbnz.d  r11, @1b
-;        ldl.ab  r4, [r3, 8]
-;        brnel.d r8, r10, @.L_unequal_r8r10  ; filled by the 
-;        subl    r3, r3, 8                   ; adjusting instruction
-;        ...
+;      ldl.ab  r4,  [r3, +8]
+;      ldl.ab  r5,  [r1, +8]
+;    .loop
+;      ldl.ab  r6, [r3, +8]
+;      ldl.ab  r7, [r1, +8]
+;      ...
+;      ldl.ab  r10, [r3, +8]
+;      ldl.ab  r11, [r1, +8]
+;      xorl.f  0, r4, r5
+;      xor.ne  r13, r13, 0b0001
+;      ...
+;      xorl.f  0, r10, r11
+;      xor.ne  r13, r13, 0b1000
+;      brne    r13, 0, @.unequal_find
+;      ldl.ab  r4,  [r3, +8]
+;      dbnz.d  r12, @.loop
+;      ldl.ab  r5,  [r1, +8]
+;
+;    There is one more loose end to take care of:  At the last iteration
+;    of the loop, there is an extra load into r4 and r5 registers while
+;    incrementing the pointers (r3 and r1).  We have to correct for that
+;    after the loop:
+;
+;    .loop:
+;      ..
+;      brne    r13, 0, @.unequal_find
+;      ldl.ab  r4,  [r3, +8]
+;      dbnz.d  r12, @.loop
+;      ldl.ab  r5,  [r1, +8]
+;      subl    r1, r1, 8
+;      subl    r3, r3, 8
+;
+;    One last remark about NOT filling the delay slot of "brne" with
+;    "ldl.ab r4, ...".  If the branch is taken, the rest of code that
+;    is responsible for finding the differentiating bytes relies that
+;    all 8 registers hold the comparison data of the loop.  Putting
+;    "ldl.ab r4, ..." into the delay slot of "brne ..." would clobber
+;    the "r4" register:
+;
+;    .loop:
+;      ..
+;      brne.d  r13, 0, @.unequal_find    --> this branch might be taken
+;      ldl.ab  r4,  [r3, +8]             --> clobbers r4
+;      dbnz.d  r12, @.loop
+;      ldl.ab  r5,  [r1, +8]
+;
+;    Having "ldl.ab r4, ..." between "brne" and "dbnz" as two control flow
+;    altering instructions is good enough.
