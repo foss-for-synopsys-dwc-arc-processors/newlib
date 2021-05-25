@@ -20,6 +20,10 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/times.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "glue.h"
 
@@ -53,4 +57,39 @@ _fstat (int fd, struct stat *st)
   st->st_blksize = 1024;
 
   return 0;
+}
+
+/* hostlink backend has only fstat(), so use fstat() in stat().  */
+int
+_stat (const char *pathname, struct stat *buf)
+{
+  int fd;
+  int ret;
+  int saved_errno;
+
+  fd = open (pathname, O_RDONLY);
+  if (fd < 0)
+    {
+      /* errno is set by open().  */
+      return -1;
+    }
+
+  ret = fstat (fd, buf);
+  saved_errno = errno;
+
+  close (fd);
+
+  errno = saved_errno;
+
+  return ret;
+}
+
+
+/* No Metaware hostlink backend for this call.  */
+int
+_link (const char *oldpath __attribute__ ((unused)),
+       const char *newpath __attribute__ ((unused)))
+{
+  errno = ENOSYS;
+  return -1;
 }
