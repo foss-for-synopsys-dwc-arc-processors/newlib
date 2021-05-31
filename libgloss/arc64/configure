@@ -1967,7 +1967,6 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 
 LIB_AC_PROG_CC
-
 AS=${AS-as}
 
 AR=${AR-ar}
@@ -2068,7 +2067,7 @@ fi
 
 LIB_AM_PROG_AS
 
-host_makefile_frag=${srcdir}/../config/default.mh
+host_makefile_frag=`cd ${srcdir}/../config;pwd`/default.mh
 
 host_makefile_frag_path=$host_makefile_frag
 
