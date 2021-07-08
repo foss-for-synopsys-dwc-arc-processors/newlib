@@ -24,8 +24,6 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 
-SUBDIRS = @subdirs@
-
 # Multilib support variables.
 # TOP is used instead of MULTI{BUILD,SRC}TOP.
 MULTIDIRS =
@@ -42,7 +40,6 @@ AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
 
-DW_UART_CFLAGS = @DW_UART_CFLAGS@
 HL_CFLAGS = @HL_CFLAGS@
 
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
@@ -94,6 +91,9 @@ IOTDK_UART_OBJS = iotdk-uart-setup.o
 HSDK_UART_LIB = libhsdk_uart.a
 HSDK_UART_OBJS = hsdk-uart-setup.o
 
+EMSK_UART_LIB = libemsk_uart.a
+EMSK_UART_OBJS = emsk-uart-setup.o
+
 UART_8250_LIB = libuart_8250.a
 UART_8250_OBJS = \
 	uart-8250.o \
@@ -102,19 +102,12 @@ UART_8250_OBJS = \
 	mcount.o
 
 UART_8250_INSTALL = install-uart-8250
-UART_8250_SCRIPTS = iotdk.specs hsdk.specs
+UART_8250_SCRIPTS = emsk_em9d.specs emsk_em11d.specs iotdk.specs hsdk.specs
 
-UART_8250_LIBS = $(UART_8250_LIB) $(IOTDK_UART_LIB) $(HSDK_UART_LIB)
-
-DW_UART_LIB = libdw_uart.a
-DW_UART_OBJS = \
-	write.o \
-	read.o \
-	stub.o \
-	sbrk.o
-DW_UART_INSTALL = install-dw_uart
-EMSK_SCRIPTS = emsk_em9d.specs \
-               emsk_em11d.specs
+UART_8250_LIBS = $(UART_8250_LIB) \
+	$(IOTDK_UART_LIB) \
+	$(HSDK_UART_LIB) \
+	$(EMSK_UART_LIB)
 
 MEMORY_MAPS = emsk_em9d.x \
 	      emsk_em11d.x \
@@ -122,23 +115,16 @@ MEMORY_MAPS = emsk_em9d.x \
 	      hsdk.x
 MEMORY_MAP_INSTALL = install-map
 
-DW_UART_DIR = dw_uart-dir
 HL_DIR = hl-dir
 
 CFLAGS = -g
-override CFLAGS += $(DW_UART_CFLAGS) $(HL_CFLAGS)
+override CFLAGS += $(HL_CFLAGS)
 
-CPU_FAMILY = $(findstring em,${MULTISUBDIR})
-ifeq ($(CPU_FAMILY), em)
-ALL = $(CRT0) $(NSIM_BSP) $(DW_UART_LIB) $(QEMU_BSP) $(HL_BSP) $(UART_8250_LIBS)
-else
 ALL = $(CRT0) $(NSIM_BSP) $(QEMU_BSP) $(HL_BSP) $(UART_8250_LIBS)
-endif
 ALL_INSTALL = \
 	$(CRT0_INSTALL) \
 	$(NSIM_INSTALL) \
 	$(NANO_INSTALL) \
-	$(DW_UART_INSTALL) \
 	$(MEMORY_MAP_INSTALL) \
 	$(QEMU_INSTALL) \
 	$(HL_INSTALL) \
@@ -179,14 +165,9 @@ $(NSIM_BSP): $(NSIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
-$(DW_UART_LIB): $(DW_UART_OBJS) $(DW_UART_DIR)
-	$(AR) $(ARFLAGS) $@ $(DW_UART_OBJS) dw_uart/*.o
-	$(RANLIB) $@
-
 $(HL_DIR): hl
-$(DW_UART_DIR): dw_uart
 
-$(HL_DIR) $(DW_UART_DIR):
+$(HL_DIR):
 	for dir in $^; do \
 	  if [ -d $$dir ]; then \
 	    (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) all) || exit $$?; \
@@ -213,16 +194,17 @@ $(HSDK_UART_LIB): $(HSDK_UART_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
+$(EMSK_UART_LIB): $(EMSK_UART_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
 libcfunc.o: libcfunc.c
 nsim-syscalls.o: nsim-syscalls.c
 sbrk.o: sbrk.c
 mcount.o: mcount.c
 gcrt0.o: gcrt0.S crt0.S
 crt0.o: crt0.S
-write.o: write.c
 qemu-write.o: qemu-write.c
-read.o: read.c
-stub.o: stub.c
 qemu-stub.o: qemu-stub.c
 hl-stub.o: hl-stub.c
 hl-setup.o: hl-setup.c
@@ -232,9 +214,7 @@ uart-8250.o: uart-8250.c
 uart-8250-stub.o: uart-8250-stub.c
 iotdk-uart-setup.o: iotdk-uart-setup.c
 hsdk-uart-setup.o: hsdk-uart-setup.c
-
-$(DW_UART_OBJS):
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $(CFLAGS) $<
+emsk-uart-setup.o: emsk-uart-setup.c
 
 clean mostlyclean:
 	rm -f *.o *.a
@@ -266,13 +246,6 @@ $(NSIM_INSTALL):
 $(NANO_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
 	for x in $(NANO_SCRIPTS); do \
-		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
-
-$(DW_UART_INSTALL):
-	if [ "$(CPU_FAMILY)" == "em" ]; then \
-		$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR} ; \
-		$(INSTALL_DATA) $(DW_UART_LIB) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(DW_UART_LIB) ; fi
-	for x in $(EMSK_SCRIPTS); do \
 		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 $(QEMU_INSTALL):
