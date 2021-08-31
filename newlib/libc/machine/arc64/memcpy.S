@@ -38,28 +38,26 @@
 #if defined (__ARC64_M128__)
 
 ENTRY (memcpy)
-	cmp	r2, 64
-	bls.d	@.L_write_1_bytes
+	lsrl.f	r12, r2, 6
+	beq.d	@.L_write_1_bytes
 	movl	r3, r0
-	lsrl	r11, r2, 6
 .L_write_64_bytes:
 	lddl.ab	r4r5, [r1, +16]
+	lddl.ab	r6r7, [r1, +16]
+	lddl.ab	r8r9, [r1, +16]
+	lddl.ab	r10r11, [r1, +16]
 	stdl.ab	r4r5, [r3, +16]
-	lddl.ab	r4r5, [r1, +16]
-	stdl.ab	r4r5, [r3, +16]
-	lddl.ab	r4r5, [r1, +16]
-	stdl.ab	r4r5, [r3, +16]
-	lddl.ab	r4r5, [r1, +16]
-	dbnz.d	r11, @.L_write_64_bytes
-	stdl.ab	r4r5, [r3, +16]
-	bmsk_s	r2, r2, 5
+	stdl.ab	r6r7, [r3, +16]
+	stdl.ab	r8r9, [r3, +16]
+	dbnz.d	r12, @.L_write_64_bytes
+	stdl.ab	r10r11, [r3, +16]
 .L_write_1_bytes:
-	breq	r2, 0, @.L_return
+	bmsk.f	r2, r2, 5
+	jeq	[blink]
 1:
 	ldb.ab	r4, [r1, +1]
 	dbnz.d	r2, @1b
 	stb.ab	r4, [r3, +1]
-.L_return:
 	j_s	[blink]
 ENDFUNC (memcpy)
 
@@ -77,14 +75,14 @@ ENTRY (memcpy)
 	lsrl	r11, r2, 5		; counter for 32-byte chunks
 .L_write_32_bytes:
 	ldl.ab	r4, [r1, +8]
+	ldl.ab	r5, [r1, +8]
+	ldl.ab	r6, [r1, +8]
+	ldl.ab	r7, [r1, +8]
 	stl.ab	r4, [r3, +8]
-	ldl.ab	r4, [r1, +8]
-	stl.ab	r4, [r3, +8]
-	ldl.ab	r4, [r1, +8]
-	stl.ab	r4, [r3, +8]
-	ldl.ab	r4, [r1, +8]
+	stl.ab	r5, [r3, +8]
+	stl.ab	r6, [r3, +8]
 	dbnz.d	r11, @.L_write_32_bytes
-	stl.ab	r4, [r3, +8]
+	stl.ab	r7, [r3, +8]
 	bmsk_s	r2, r2, 4
 .L_write_1_bytes:
 	breq	r2, 0, @.L_return
