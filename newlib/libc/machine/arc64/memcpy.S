@@ -110,8 +110,8 @@ ENTRY (memcpy)
 	j_s	[blink]
 ENDFUNC (memcpy)
 
-; The generic implementation without any frills.
-#else
+; The generic 64-bit implementation without any frills.
+#elif defined (__ARC64_ARCH64__)
 
 ; R0: dest
 ; R1: source
@@ -143,5 +143,5 @@ ENTRY (memcpy)
 	j_s	[blink]
 ENDFUNC (memcpy)
 
-; if !defined (__ARC64_M128__)
+; __ARC64_ARCH64__ && !__ARC64_M128__
 #endif

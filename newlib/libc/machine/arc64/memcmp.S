@@ -30,6 +30,8 @@
 
 #include <sys/asm.h>
 
+#if defined (__ARC64_ARCH64__)
+
 ; R0: lhs
 ; R1: rhs
 ; R2: count
@@ -160,6 +162,9 @@ ENTRY (memcmp)
 	j_s.d	  [blink]
 	subl	  r0, r1, r2	; (4)
 ENDFUNC (memcmp)
+
+; __ARC64_ARCH64__
+#endif
 
 ; The loop at the heart of the "memcmp" function follows some specific
 ; logic and has gone through a few optimisation filters.  Knowing them

@@ -37,44 +37,44 @@
        .file "setjmp.S"
 
 ABIr14	= 0
-ABIr15	= ABIr14 + 8
-ABIr16	= ABIr15 + 8
-ABIr17	= ABIr16 + 8
-ABIr18	= ABIr17 + 8
-ABIr19	= ABIr18 + 8
-ABIr20	= ABIr19 + 8
-ABIr21	= ABIr20 + 8
-ABIr22	= ABIr21 + 8
-ABIr23	= ABIr22 + 8
-ABIr24	= ABIr23 + 8
-ABIr25	= ABIr24 + 8
-ABIr26	= ABIr25 + 8
-ABIr27	= ABIr26 + 8
-ABIr28	= ABIr27 + 8
-ABIr29	= ABIr28 + 8
-ABIr30	= ABIr29 + 8
-ABIr31	= ABIr30 + 8
+ABIr15	= ABIr14 + REG_SZ
+ABIr16	= ABIr15 + REG_SZ
+ABIr17	= ABIr16 + REG_SZ
+ABIr18	= ABIr17 + REG_SZ
+ABIr19	= ABIr18 + REG_SZ
+ABIr20	= ABIr19 + REG_SZ
+ABIr21	= ABIr20 + REG_SZ
+ABIr22	= ABIr21 + REG_SZ
+ABIr23	= ABIr22 + REG_SZ
+ABIr24	= ABIr23 + REG_SZ
+ABIr25	= ABIr24 + REG_SZ
+ABIr26	= ABIr25 + REG_SZ
+ABIr27	= ABIr26 + REG_SZ
+ABIr28	= ABIr27 + REG_SZ
+ABIr29	= ABIr28 + REG_SZ
+ABIr30	= ABIr29 + REG_SZ
+ABIr31	= ABIr30 + REG_SZ
 
 
 ENTRY (setjmp)
-	stl	r14, [r0, ABIr14]
-	stl	r15, [r0, ABIr15]
-	stl	r16, [r0, ABIr16]
-	stl	r17, [r0, ABIr17]
-	stl	r18, [r0, ABIr18]
-	stl	r19, [r0, ABIr19]
-	stl	r20, [r0, ABIr20]
-	stl	r21, [r0, ABIr21]
-	stl	r22, [r0, ABIr22]
-	stl	r23, [r0, ABIr23]
-	stl	r24, [r0, ABIr24]
-	stl	r25, [r0, ABIr25]
-	stl	r26, [r0, ABIr26]
-	stl	r27, [r0, ABIr27]
-	stl	r28, [r0, ABIr28]
-	stl	r29, [r0, ABIr29]
-	stl	r30, [r0, ABIr30]
-	stl	blink, [r0, ABIr31]
+	REG_ST	r14, [r0, ABIr14]
+	REG_ST	r15, [r0, ABIr15]
+	REG_ST	r16, [r0, ABIr16]
+	REG_ST	r17, [r0, ABIr17]
+	REG_ST	r18, [r0, ABIr18]
+	REG_ST	r19, [r0, ABIr19]
+	REG_ST	r20, [r0, ABIr20]
+	REG_ST	r21, [r0, ABIr21]
+	REG_ST	r22, [r0, ABIr22]
+	REG_ST	r23, [r0, ABIr23]
+	REG_ST	r24, [r0, ABIr24]
+	REG_ST	r25, [r0, ABIr25]
+	REG_ST	r26, [r0, ABIr26]
+	REG_ST	r27, [r0, ABIr27]
+	REG_ST	r28, [r0, ABIr28]
+	REG_ST	r29, [r0, ABIr29]
+	REG_ST	r30, [r0, ABIr30]
+	REG_ST	blink, [r0, ABIr31]
 
 	j.d	[blink]
 	mov	r0,0
@@ -82,27 +82,27 @@ ENTRY (setjmp)
 
 ENTRY (longjmp)
 	; load registers
-	ldl	r14, [r0, ABIr14]
-	ldl	r15, [r0, ABIr15]
-	ldl	r16, [r0, ABIr16]
-	ldl	r17, [r0, ABIr17]
-	ldl	r18, [r0, ABIr18]
-	ldl	r19, [r0, ABIr19]
-	ldl	r20, [r0, ABIr20]
-	ldl	r21, [r0, ABIr21]
-	ldl	r22, [r0, ABIr22]
-	ldl	r23, [r0, ABIr23]
-	ldl	r24, [r0, ABIr24]
-	ldl	r25, [r0, ABIr25]
-	ldl	r26, [r0, ABIr26]
-	ldl	r27, [r0, ABIr27]
-	ldl	r28, [r0, ABIr28]
-	ldl	r29, [r0, ABIr29]
-	ldl	r30, [r0, ABIr30]
-	ldl	blink, [r0, ABIr31]
+	REG_LD	r14, [r0, ABIr14]
+	REG_LD	r15, [r0, ABIr15]
+	REG_LD	r16, [r0, ABIr16]
+	REG_LD	r17, [r0, ABIr17]
+	REG_LD	r18, [r0, ABIr18]
+	REG_LD	r19, [r0, ABIr19]
+	REG_LD	r20, [r0, ABIr20]
+	REG_LD	r21, [r0, ABIr21]
+	REG_LD	r22, [r0, ABIr22]
+	REG_LD	r23, [r0, ABIr23]
+	REG_LD	r24, [r0, ABIr24]
+	REG_LD	r25, [r0, ABIr25]
+	REG_LD	r26, [r0, ABIr26]
+	REG_LD	r27, [r0, ABIr27]
+	REG_LD	r28, [r0, ABIr28]
+	REG_LD	r29, [r0, ABIr29]
+	REG_LD	r30, [r0, ABIr30]
+	REG_LD	blink, [r0, ABIr31]
 
 	mov.f	r1, r1			; to avoid return 0 from longjmp
-	mov.eq	r1, 1
+	mov.z	r1, 1
 	j.d	[blink]
 	mov	r0,r1
 	.size	longjmp,.-longjmp
