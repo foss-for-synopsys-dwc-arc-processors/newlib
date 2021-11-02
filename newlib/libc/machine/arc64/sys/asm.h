@@ -1,6 +1,3 @@
-#ifndef ARC64_NEWLIB_ASM_H
-#define ARC64_NEWLIB_ASM_H
-
 /*
    Copyright (c) 2021, Synopsys, Inc. All rights reserved.
 
@@ -31,6 +28,8 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _SYS_ASM_H
+#define _SYS_ASM_H
 
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
@@ -39,4 +38,4 @@
 #define ENDFUNC(name) ENDFUNC0 (name)
 #define ENTRY(name) _ENTRY (name) ` FUNC (name)
 
-#endif /* ARC64_NEWLIB_ASM_H */
+#endif /* _SYS_ASM_H */

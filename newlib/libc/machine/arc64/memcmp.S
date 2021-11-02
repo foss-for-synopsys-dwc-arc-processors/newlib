@@ -28,7 +28,7 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "asm.h"
+#include <sys/asm.h>
 
 ; R0: lhs
 ; R1: rhs
