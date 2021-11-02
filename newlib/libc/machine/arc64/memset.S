@@ -66,8 +66,8 @@ ENTRY (memset)
 	j_s	[blink]
 ENDFUNC (memset)
 
-; The generic implementation without any frills.
-#else
+; The generic 64-bit implementation without any frills.
+#elif defined (__ARC64_ARCH64__)
 
 ; R0: dest
 ; R1: ch
@@ -101,5 +101,5 @@ ENTRY (memset)
 	j_s	[blink]
 ENDFUNC (memset)
 
-; if !defined (__ARC64_M128__)
+; __ARC64_ARCH64__ && !__ARC64_M128__
 #endif
