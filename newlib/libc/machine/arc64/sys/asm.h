@@ -31,6 +31,21 @@
 #ifndef _SYS_ASM_H
 #define _SYS_ASM_H
 
+/*
+ * Macros to handle different pointer/register sizes for 32/64-bit code
+ */
+#if defined (__ARC64_ARCH32__)
+# define REG_SZ 4
+# define REG_ST st
+# define REG_LD ld
+#elif defined (__ARC64_ARCH64__)
+# define REG_SZ 8
+# define REG_ST stl
+# define REG_LD ldl
+#else
+# error Please use either 32-bit or 64-bit version of arc64 compiler
+#endif
+
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
 #define FUNC(name)         .type name,@function
