@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2019, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2021, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,8 @@
 */
 
 #if defined (__ARC64__)
+# include "asm.h"
+
 	.file	"crt0.S"
 	.extern main
 
@@ -46,8 +48,7 @@
 	.type	__start, @function
 	.align 4
 __start:
-	movhl_s	sp,@__stack_top		; Stack address
-	orl_s	sp,sp,@__stack_top
+	MOVRI_S	sp, @__stack_top	; Stack address
 
 	; Allow unaligned accesses.
 	lr      r2, [0xA]
@@ -55,67 +56,51 @@ __start:
 	flag    r2
 
 ;;;  Clear the bss segment.
-	movhl_s	r0,@__sbss_start	; r0 = start of the bss section
-	orl_s	r0,r0,@__sbss_start
-	movhl_s	r2,@_end
-	orl_s	r2,r2,@_end
-	subl	r2,r2,r0		; r2 = size of the bss section in bytes
-	movl_s	r1,0
+	MOVRI_S	r0, @__sbss_start	; r0 = start of the bss section
+	MOVRI_S	r2, @_end
+	SUBR	r2, r2, r0		; r2 = size of the bss section in bytes
+	MOVR_S	r1, 0			; r1 = bytes to fill in
 	bl	@memset
 
 ;;; Clear the registers.
-	movl_s	r0,0
-	movl_s	r1,0
-	movl_s	r2,0
-	movl_s	r3,0
-	movl_s	r4,0
-	movl_s	r5,0
-	movl_s	r6,0
-	movl_s	r7,0
-	movl_s	r8,0
-	movl_s	r9,0
-	movl_s	r10,0
-	movl_s	r11,0
-	movl_s	r12,0
-	movl_s	r13,0
-	movl_s	r14,0
-	movl_s	r15,0
-	movl_s	r16,0
-	movl_s	r17,0
-	movl_s	r18,0
-	movl_s	r19,0
-	movl_s	r20,0
-	movl_s	r21,0
-	movl_s	r22,0
-	movl_s	r23,0
-	movl_s	r24,0
-	movl_s	r25,0
-	movl_s	r26,0
-	movl_s	r27,0
+	MOVR_S	r0, 0
+	MOVR_S	r1, 0
+	MOVR_S	r2, 0
+	MOVR_S	r3, 0
+	MOVR_S	r4, 0
+	MOVR_S	r5, 0
+	MOVR_S	r6, 0
+	MOVR_S	r7, 0
+	MOVR_S	r8, 0
+	MOVR_S	r9, 0
+	MOVR_S	r10, 0
+	MOVR_S	r11, 0
+	MOVR_S	r12, 0
+	MOVR_S	r13, 0
+	MOVR_S	r14, 0
+	MOVR_S	r15, 0
+	MOVR_S	r16, 0
+	MOVR_S	r17, 0
+	MOVR_S	r18, 0
+	MOVR_S	r19, 0
+	MOVR_S	r20, 0
+	MOVR_S	r21, 0
+	MOVR_S	r22, 0
+	MOVR_S	r23, 0
+	MOVR_S	r24, 0
+	MOVR_S	r25, 0
+	MOVR_S	r26, 0
+	MOVR_S	r27, 0
 	;; SP (r28) is initialized
-	movl_s	ilink,0
-	movl	r30,0
+	MOVR_S	ilink, 0
+	MOVR	r30, 0
 
 	;; Call constructors.
 	jl	@_init
 
-#if 0
-;;; Setup destuctors to be called from exit if main never returns
-	movhl_s	blink,@_impure_ptr
-	orl_s	blink,blink,@inpure_ptr
-	ldl	r1,[blink]
-	movhl_s	r0,@_fini
-	orl_s	r0,r0,@_fini
-	addl	r1,r1,need_find_out	; &_GLOBAL_REENT->atexit0
-	stl	r1,[r1,-8]		; _GLOBAL_REENT->atexit
-	stl	r0,[r1,16]		; _GLOBAL_REENT->atexit0._fns[0]
-	stl	1,[r1,8]		; _GLOBAL_REENT->atexit0._ind
-#else
 ;;; Setup fini routines to be called from exit
-	movhl_s	r0,@_fini
-	orl_s	r0,r0,@_fini
+	MOVRI_S	r0, @_fini
 	jl	@atexit
-#endif
 
 	jl	@__setup_argv_and_call_main
 
@@ -129,18 +114,17 @@ __start:
 	.type	__setup_argv_and_call_main, @function
 	.align 4
 __setup_argv_and_call_main:
-	pushl_s	blink
+	PUSHR	blink
 ;;; Call main() with empty argc/argv/envp
-	movl_s	r0,0
-	movl_s	r1,0
-	movl_s	r2,0
-	movl_s	r3,0
+	MOVR_S	r0, 0
+	MOVR_S	r1, 0
+	MOVR_S	r2, 0
+	MOVR_S	r3, 0
 
-	movhl_s	blink,@main
-	orl_s	blink,blink,@main
+	MOVRI_S	blink, @main
 	jl	[blink]
 
-	popl_s	blink
+	POPR	blink
 	j_s	[blink]
 
 	.size	__setup_argv_and_call_main, .-__setup_argv_and_call_main
@@ -151,7 +135,7 @@ __setup_argv_and_call_main:
 	.align 4
 _exit_halt:
 	; r0 contains exit code
-	mov	r0,r0
+	mov	r0, r0
 	flag	1
 	b	@_exit_halt
 	.size	_exit_halt, .-_exit_halt
