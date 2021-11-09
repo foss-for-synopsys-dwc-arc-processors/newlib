@@ -8,8 +8,11 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES =			\
 	memcmp.S		\
+	memcmp-stub.c		\
 	memcpy.S		\
+	memcpy-stub.c		\
 	memset.S		\
+	memset-stub.c		\
 	setjmp.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
