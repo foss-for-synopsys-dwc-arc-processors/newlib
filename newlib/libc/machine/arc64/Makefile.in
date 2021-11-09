@@ -69,8 +69,10 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
-	lib_a-memset.$(OBJEXT) lib_a-setjmp.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-memcmp.$(OBJEXT) lib_a-memcmp-stub.$(OBJEXT) \
+	lib_a-memcpy.$(OBJEXT) lib_a-memcpy-stub.$(OBJEXT) \
+	lib_a-memset.$(OBJEXT) lib_a-memset-stub.$(OBJEXT) \
+	lib_a-setjmp.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -199,8 +201,11 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = \
 	memcmp.S		\
+	memcmp-stub.c		\
 	memcpy.S		\
+	memcpy-stub.c		\
 	memset.S		\
+	memset-stub.c		\
 	setjmp.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
@@ -210,7 +215,7 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .S .o .obj
+.SUFFIXES: .S .c .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -288,6 +293,30 @@ lib_a-setjmp.o: setjmp.S
 
 lib_a-setjmp.obj: setjmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
+.c.o:
+	$(COMPILE) -c $<
+
+.c.obj:
+	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-memcmp-stub.o: memcmp-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp-stub.o `test -f 'memcmp-stub.c' || echo '$(srcdir)/'`memcmp-stub.c
+
+lib_a-memcmp-stub.obj: memcmp-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp-stub.obj `if test -f 'memcmp-stub.c'; then $(CYGPATH_W) 'memcmp-stub.c'; else $(CYGPATH_W) '$(srcdir)/memcmp-stub.c'; fi`
+
+lib_a-memcpy-stub.o: memcpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.o `test -f 'memcpy-stub.c' || echo '$(srcdir)/'`memcpy-stub.c
+
+lib_a-memcpy-stub.obj: memcpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.obj `if test -f 'memcpy-stub.c'; then $(CYGPATH_W) 'memcpy-stub.c'; else $(CYGPATH_W) '$(srcdir)/memcpy-stub.c'; fi`
+
+lib_a-memset-stub.o: memset-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset-stub.o `test -f 'memset-stub.c' || echo '$(srcdir)/'`memset-stub.c
+
+lib_a-memset-stub.obj: memset-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset-stub.obj `if test -f 'memset-stub.c'; then $(CYGPATH_W) 'memset-stub.c'; else $(CYGPATH_W) '$(srcdir)/memset-stub.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
