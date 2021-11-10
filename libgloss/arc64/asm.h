@@ -32,71 +32,82 @@
 #define _ARC64_ASM_H
 
 #if defined (__ARC64_ARCH32__)
-/* Move register immediate (short): r:reg, i:immediate */
+
+/* Define 32-bit word.  */
+.macro WORD w
+  .word \w
+.endm
+
+/* Move register immediate (short): r:reg, i:immediate  */
 .macro MOVRI_S r, i
   mov_s	  \r, \i
 .endm
 
-/* Move register immediate (short): r:reg, ri:reg/immediate */
+/* Move register immediate (short): r:reg, ri:reg/immediate  */
 .macro MOVR_S r, ri
   mov_s	  \r, \ri
 .endm
 
-/* Move register immediate: r:reg, ri:reg/immediate */
+/* Move register immediate: r:reg, ri:reg/immediate  */
 .macro MOVR r, ri
   mov	  \r, \ri
 .endm
 
-/* Push register: r:reg */
+/* Push register: r:reg  */
 .macro PUSHR   r
   push  \r
 .endm
 
-/* Pop register: r:reg */
+/* Pop register: r:reg  */
 .macro POPR r
   pop	  \r
 .endm
 
-/* Subtract register: r1(reg), r2(reg), r3(reg) */
+/* Subtract register: r1(reg), r2(reg), r3(reg)  */
 .macro SUBR r1, r2, r3
   sub	  \r1, \r2, \r3
 .endm
 
 #elif defined (__ARC64_ARCH64__)
 
-/* Move immediate (short): r:reg, i:immediate */
+/* Define 64-bit word.  */
+.macro WORD w
+  .xword \w
+.endm
+
+/* Move immediate (short): r:reg, i:immediate  */
 .macro MOVRI_S r, i
   movhl_s \r, \i
   orl_s	  \r, \r, \i
 .endm
 
-/* Move register immediate (short): r:reg, ri:reg/immediate */
+/* Move register immediate (short): r:reg, ri:reg/immediate  */
 .macro MOVR_S r, ri
   movl_s  \r, \ri
 .endm
 
-/* Move register immediate: r:reg, ri:reg/immediate */
+/* Move register immediate: r:reg, ri:reg/immediate  */
 .macro MOVR r, ri
   movl	  \r, \ri
 .endm
 
-/* Push register: r:reg */
+/* Push register: r:reg  */
 .macro PUSHR   r
   pushl_s \r
 .endm
 
-/* Pop register: r:reg */
+/* Pop register: r:reg  */
 .macro POPR   r
   popl_s  \r
 .endm
 
-/* Subtract register: r1(reg), r2(reg), r3(reg) */
+/* Subtract register: r1(reg), r2(reg), r3(reg)  */
 .macro SUBR r1, r2, r3
   subl	  \r1, \r2, \r3
 .endm
 
-#else /* !__ARC64_ARC32__  && !__ARC64_ARC64__ */
+#else /* !__ARC64_ARC32__  && !__ARC64_ARC64__  */
 # error Please use either 32-bit or 64-bit version of arc64 compiler
 #endif
 
-#endif /* _ARC64_ASM_H */
+#endif /* _ARC64_ASM_H  */

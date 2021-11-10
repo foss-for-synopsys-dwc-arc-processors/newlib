@@ -26,11 +26,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # This file just makes sure that the .fini and .init sections do in
 # fact return. This file is the last thing linked into any executable.
 
+#include "asm.h"
+
 	.section .init
-	popl_s	blink
+	POPR	blink
 	j_s	[blink]
 
 
 	.section .fini
-	popl_s	blink
+	POPR	blink
 	j_s	[blink]
