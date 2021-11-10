@@ -1,6 +1,6 @@
 /* .fini/.init stack frame setup for the Synopsys DesignWare ARC CPU.
 
-   Copyright (C) 2019 Free Software Foundation, Inc.
+   Copyright (C) 2021 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -26,16 +26,18 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #  This file contains the stack frame setup for contents of the .fini and
 # .init sections.
 
+#include "asm.h"
+
 	.section .init
 	.global _init
-	.xword 0
+	WORD    0
 	.type	_init,@function
 _init:
-	pushl_s	blink
+	PUSHR	blink
 
 	.section .fini
 	.global _fini
-	.xword 0
+	WORD    0
 	.type	_fini,@function
 _fini:
-	pushl_s	blink
+	PUSHR	blink
