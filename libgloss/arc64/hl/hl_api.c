@@ -313,18 +313,62 @@ _hl_get_ptr_len (volatile __uncached char *p)
   return *size;
 }
 
+#define AUX_PCT_BUILD		0xF5
+#define AUX_PCT_BUILD_VERSION	0xFF
+#define AUX_PCT_CONTROL		0x255
+#define AUX_PCT_CONTROL_EN	0x1
+
+static inline void
+_arc_pct_disable ()
+{
+  uint32_t tmp;
+  tmp = __builtin_arc_lr (AUX_PCT_CONTROL);
+  __builtin_arc_sr ((tmp & 0xFFFF0000), AUX_PCT_CONTROL);
+}
+
+static inline void
+_arc_pct_enable ()
+{
+  uint32_t tmp;
+  tmp = __builtin_arc_lr (AUX_PCT_CONTROL);
+  __builtin_arc_sr ((tmp & 0xFFFF0000) | AUX_PCT_CONTROL_EN,
+		    AUX_PCT_CONTROL);
+}
+
+static inline int
+_arc_pct_is_enabled ()
+{
+  uint32_t build, control;
+
+  build = __builtin_arc_lr (AUX_PCT_BUILD);
+
+  if ((build & AUX_PCT_BUILD_VERSION) == 0)
+    return 0;
+
+  control = __builtin_arc_lr (AUX_PCT_CONTROL);
+
+  return !!(control & AUX_PCT_CONTROL_EN);
+}
+
 /* Public version of _hl_message_va().  */
 volatile __uncached char *
 _hl_message (uint32_t syscall, const char *format, ...)
 {
   va_list ap;
   volatile __uncached char *p;
+  int pct_enabled = _arc_pct_is_enabled ();
+
+  if (pct_enabled)
+    _arc_pct_disable ();
 
   va_start (ap, format);
 
   p = _hl_message_va (syscall, 0, format, ap);
 
   va_end (ap);
+
+  if (pct_enabled)
+    _arc_pct_enable ();
 
   return p;
 }
@@ -339,12 +383,19 @@ _user_hostlink (uint32_t vendor, uint32_t opcode, const char *format, ...)
   va_list ap;
   struct _hl_user_info ui = { .vendor_id = vendor,
 			      .opcode = opcode };
+  int pct_enabled = _arc_pct_is_enabled ();
+
+  if (pct_enabled)
+    _arc_pct_disable ();
 
   va_start (ap, format);
 
   _hl_message_va (HL_SYSCALL_USER, &ui, format, ap);
 
   va_end (ap);
+
+  if (pct_enabled)
+    _arc_pct_enable ();
 
   return ui.result;
 }
