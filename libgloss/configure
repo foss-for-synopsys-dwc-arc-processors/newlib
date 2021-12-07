@@ -2630,7 +2630,7 @@ subdirs="$subdirs aarch64"
 
 	subdirs="$subdirs arc"
 	;;
-  arc64-*-*)
+  arc[6432]*-*-*)
 	ac_config_files="$ac_config_files arc64/Makefile"
 
 	subdirs="$subdirs arc64"
