@@ -124,7 +124,7 @@ case "${host_cpu}" in
   arc | arceb)
 	machine_dir=arc
 	;;
-  arc64)
+  arc64 | arc32)
 	machine_dir=arc64
 	;;
   arm*)

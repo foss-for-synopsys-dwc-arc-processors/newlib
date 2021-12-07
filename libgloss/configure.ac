@@ -43,7 +43,7 @@ case "${target}" in
 	AC_CONFIG_FILES([arc/Makefile])
 	subdirs="$subdirs arc"
 	;;
-  arc64-*-*)
+  arc[[6432]]*-*-*)
 	AC_CONFIG_FILES([arc64/Makefile])
 	subdirs="$subdirs arc64"
 	;;
