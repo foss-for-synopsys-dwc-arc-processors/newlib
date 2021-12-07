@@ -41,7 +41,7 @@ case "${target}" in
   arc-*-* | arceb-*-*)
 	AC_CONFIG_SUBDIRS(arc)
 	;;
-  arc64-*-*)
+  arc[[6432]]*-*-*)
 	AC_CONFIG_SUBDIRS(arc64)
 	;;
   epiphany-*-*)
