@@ -216,6 +216,7 @@ if test -n "${machine_dir}"; then
     aarch64) AC_CONFIG_FILES([machine/aarch64/Makefile]) ;;
     amdgcn) AC_CONFIG_FILES([machine/amdgcn/Makefile]) ;;
     arc) AC_CONFIG_FILES([machine/arc/Makefile]) ;;
+    arc64) AC_CONFIG_FILES([machine/arc64/Makefile]) ;;
     arm) AC_CONFIG_FILES([machine/arm/Makefile]) ;;
     bfin) AC_CONFIG_FILES([machine/bfin/Makefile]) ;;
     cr16) AC_CONFIG_FILES([machine/cr16/Makefile]) ;;
