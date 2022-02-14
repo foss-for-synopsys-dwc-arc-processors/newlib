@@ -38,19 +38,18 @@
 #if defined (__ARC64_M128__)
 
 ENTRY (memset)
+	;; Assemble 128b token
 	bmsk_s	r1, r1, 7
-	cmp	r2, 64
-	bls.d	@.L_write_1_bytes
-	movl	r4, r0	
 	lsl8	r3, r1
 	or_s	r1, r1, r3
 	lsl16	r3, r1
 	or	r6, r1, r3
-	; FIXME vpack2wl r6, r1, r1
-	mov_s	r3, r6
-	addhl	r6, r6, r3
+	addhl	r6, r6, r6
 	movl	r7, r6
-	lsrl	r5, r2, 6
+
+	lsrl.f	r5, r2, 6
+	beq.d	@.L_write_63_bytes
+	movl	r4, r0
 .L_write_64_bytes:
 	stdl.ab	r6r7, [r4, +16]
 	stdl.ab	r6r7, [r4, +16]
@@ -58,6 +57,29 @@ ENTRY (memset)
 	dbnz.d	r5, @.L_write_64_bytes
 	stdl.ab	r6r7, [r4, +16]
 	bmsk_s	r2, r2, 5
+
+.L_write_63_bytes:
+	bbit0.d	r2, 3, @1f
+	lsr	r3, r2, 4
+	stl.ab	r6, [r4, 8]
+1:
+	bbit0.d	r2, 2, @1f
+	xor	r3, r3, 3
+	st.ab	r6, [r4, 4]
+1:
+	bbit0	r2, 1, @1f
+	sth.ab	r6, [r4, 2]
+1:
+	bbit0	r2, 0, @1f
+	stb.ab	r6, [r4, 1]
+1:
+	bi	[r3]
+	stdl.ab	r6r7,[r4, 16]
+	stdl.ab	r6r7,[r4, 16]
+	stdl.ab	r6r7,[r4, 16]
+
+	j_s	[blink]
+
 .L_write_1_bytes:
 	breq	r2, 0, @.L_return
 	dbnz.d	r2, @.
@@ -67,39 +89,96 @@ ENTRY (memset)
 ENDFUNC (memset)
 
 ; The generic 64-bit implementation without any frills.
+#elif defined (__ARC64_ARCH64__) || defined (__ARC64_LL64__)
+
+#if defined (__ARC64_ARCH32__)
+# define MOVH  mov	r7,r6
 #elif defined (__ARC64_ARCH64__)
+# define MOVH  addhl	r6,r6,r6
+#else
+# error Please use either 32-bit or 64-bit version of arc64 compiler
+#endif
 
 ; R0: dest
 ; R1: ch
 ; R2: count
 ; ret (R0): dest
 ENTRY (memset)
+	;; Assemble the bytes to 64bit words
 	bmsk_s	r1, r1, 7		; treat it like unsigned char
-	cmp	r2, 64
-	bls.d	@.L_write_1_bytes
-	movl	r4, r0			; work on a copy of "r0"
 	lsl8	r3, r1
 	or_s	r1, r1, r3
 	lsl16	r3, r1
 	or	r6, r1, r3
-	; FIXME vpack2wl r6, r1, r1
-	mov_s	r3, r6
-	addhl	r6, r6, r3
-	lsrl	r5, r2, 5		; counter for 32-byte chunks
+	MOVH
+
+	LSRP.f	r5, r2, 5		; counter for 32-byte chunks
+	beq.d	@.L_write_31_bytes
+	MOVP	r4, r0			; work on a copy of "r0"
 .L_write_32_bytes:
-	stl.ab	r6, [r4, +8]
-	stl.ab	r6, [r4, +8]
-	stl.ab	r6, [r4, +8]
+	ST64.ab	r6, [r4, +8]
+	ST64.ab	r6, [r4, +8]
+	ST64.ab	r6, [r4, +8]
 	dbnz.d	r5, @.L_write_32_bytes
-	stl.ab	r6, [r4, +8]
+	ST64.ab	r6, [r4, +8]
 	bmsk_s	r2, r2, 4
-.L_write_1_bytes:
-	breq	r2, 0, @.L_return
-	dbnz.d	r2, @.
-	stb.ab	r1, [r4, +1]
-.L_return:
+
+.L_write_31_bytes:
+	bbit0.d	r2, 2, @1f
+	lsr	r3, r2, 3
+	st.ab	r6, [r4, 4]
+1:
+	bbit0.d	r2, 1, @1f
+	xor	r3, r3, 3
+	sth.ab	r6, [r4, 2]
+1:
+	bbit0	r2, 0, @1f
+	stb.ab	r6, [r4, 1]
+1:
+	bi	[r3]
+	ST64.ab	r6,[r4, 8]
+	ST64.ab	r6,[r4, 8]
+	ST64.ab	r6,[r4, 8]
+
 	j_s	[blink]
 ENDFUNC (memset)
 
-; __ARC64_ARCH64__ && !__ARC64_M128__
+#elif defined (__ARC64_ARCH32__)
+ENTRY (memset)
+	;; Assemble the bytes to 32bit words
+	bmsk_s	r1, r1, 7		; treat it like unsigned char
+	lsl8	r3, r1
+	or_s	r1, r1, r3
+	lsl16	r3, r1
+	or	r6, r1, r3
+
+	lsr.f	r5, r2, 4		; counter for 16-byte chunks
+	beq.d	@.L_write_15_bytes
+	mov	r4, r0			; work on a copy of "r0"
+.L_write_16_bytes:
+	st.ab	r6, [r4, 4]
+	st.ab	r6, [r4, 4]
+	st.ab	r6, [r4, 4]
+	dbnz.d	r5, @.L_write_16_bytes
+	st.ab	r6, [r4, 4]
+	bmsk_s	r2, r2, 3
+
+.L_write_15_bytes:
+	bbit0.d	r2, 1, @1f
+	lsr	r3, r2, 2
+	sth.ab	r6, [r4, 2]
+1:
+	bbit0.d	r2, 0, @1f
+	xor	r3, r3, 3
+	stb.ab	r6, [r4, 1]
+1:
+	bi	[r3]
+	st.ab	r6,[r4, 4]
+	st.ab	r6,[r4, 4]
+	st.ab	r6,[r4, 4]
+
+	j_s	[blink]
+ENDFUNC (memset)
+#else
+# error Unknown configuration
 #endif
