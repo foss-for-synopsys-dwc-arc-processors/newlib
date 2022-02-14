@@ -111,37 +111,97 @@ ENTRY (memcpy)
 ENDFUNC (memcpy)
 
 ; The generic 64-bit implementation without any frills.
-#elif defined (__ARC64_ARCH64__)
+#elif defined (__ARC64_ARCH64__) || defined (__ARC64_LL64__)
 
 ; R0: dest
 ; R1: source
 ; R2: count
 ; ret (R0): dest
+; clobber: r1, r3, r4r5, r6r7, r8r9, r10r11, r12
 ENTRY (memcpy)
-	cmp	r2, 64
-	bls.d	@.L_write_1_bytes
-	movl	r3, r0			; do not clobber the "dest"
-	lsrl	r11, r2, 5		; counter for 32-byte chunks
+	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
+	beq.d	@.L_write_31_bytes
+	MOVP	r3, r0			; do not clobber the "dest"
 .L_write_32_bytes:
-	ldl.ab	r4, [r1, +8]
-	ldl.ab	r5, [r1, +8]
-	ldl.ab	r6, [r1, +8]
-	ldl.ab	r7, [r1, +8]
-	stl.ab	r4, [r3, +8]
-	stl.ab	r5, [r3, +8]
-	stl.ab	r6, [r3, +8]
-	dbnz.d	r11, @.L_write_32_bytes
-	stl.ab	r7, [r3, +8]
+	LD64.ab	r4, [r1, +8]
+	LD64.ab	r6, [r1, +8]
+	LD64.ab	r8, [r1, +8]
+	LD64.ab	r10,[r1, +8]
+	ST64.ab	r4, [r3, +8]
+	ST64.ab	r6, [r3, +8]
+	ST64.ab	r8, [r3, +8]
+	dbnz.d	r12, @.L_write_32_bytes
+	ST64.ab	r10, [r3, +8]
 	bmsk_s	r2, r2, 4
-.L_write_1_bytes:
-	breq	r2, 0, @.L_return
+
+.L_write_31_bytes:
+	bbit0.d	r2, 2, @1f
+	lsr	r12, r2, 3
+	ld.ab	r4, [r1, 4]
+	st.ab	r4, [r3, 4]
 1:
-	ldb.ab	r4, [r1, +1]
-	dbnz.d	r2, @1b
-	stb.ab	r4, [r3, +1]
-.L_return:
+	bbit0.d	r2, 1, @1f
+	xor	r12, r12, 3
+	ldh.ab	r4, [r1, 2]
+	sth.ab	r4, [r3, 2]
+1:
+	bbit0.d	r2, 0, @1f
+	asl	r12, r12, 1
+	ldb.ab	r4, [r1, 1]
+	stb.ab	r4, [r3, 1]
+1:
+	bi	[r12]
+	LD64.ab	r4, [r1, 8]
+	ST64.ab	r4, [r3, 8]
+	LD64.ab	r4, [r1, 8]
+	ST64.ab	r4, [r3, 8]
+	LD64.ab	r4, [r1, 8]
+	ST64.ab	r4, [r3, 8]
+
 	j_s	[blink]
 ENDFUNC (memcpy)
 
-; __ARC64_ARCH64__ && !__ARC64_M128__
+#elif defined (__ARC64_ARCH32__)
+
+ENTRY (memcpy)
+	lsr.f	r11, r2, 4		; counter for 16-byte chunks
+	beq.d	@.L_write_15_bytes
+	mov	r3, r0			; work on a copy of "r0"
+.L_write_16_bytes:
+	ld.ab	r4, [r1, 4]
+	ld.ab	r5, [r1, 4]
+	ld.ab	r6, [r1, 4]
+	ld.ab	r7, [r1, 4]
+	st.ab	r4, [r3, 4]
+	st.ab	r5, [r3, 4]
+	st.ab	r6, [r3, 4]
+	dbnz.d	r11, @.L_write_16_bytes
+	st.ab	r7, [r3, 4]
+	bmsk_s	r2, r2, 3
+
+.L_write_15_bytes:
+	bbit0.d	r2, 1, @1f
+	lsr	r11, r2, 2
+	ldh.ab	r4, [r1, 2]
+	sth.ab	r4, [r3, 2]
+1:
+	bbit0.d	r2, 0, @1f
+	xor	r11, r11, 3
+	ldb.ab	r4, [r1, 1]
+	stb.ab	r4, [r3, 1]
+1:
+	asl	r11, r11, 1
+	bi	[r11]
+	ld.ab	r4,[r1, 4]
+	st.ab	r4,[r3, 4]
+	ld.ab	r4,[r1, 4]
+	st.ab	r4,[r3, 4]
+	ld	r4,[r1]
+	st	r4,[r3]
+
+	j_s	[blink]
+ENDFUNC (memcpy)
+
+#else
+# error Unknown configuration
 #endif

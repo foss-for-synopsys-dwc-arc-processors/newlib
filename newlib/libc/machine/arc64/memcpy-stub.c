@@ -28,7 +28,7 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-#if defined (__ARC64_ARCH32__)
+#if !defined (__ARC64_ARCH32__) && !defined (__ARC64_ARCH64__)
 # include "../../string/memcpy.c"
 #else
 /* See memcpy.S.  */
