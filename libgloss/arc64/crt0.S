@@ -40,6 +40,13 @@
 #if defined (__ARC64__)
 # include "asm.h"
 
+	.macro initfp from=0, to=31
+	fmvi2s	f0+\from,r0
+	.if	\to-\from
+	initfp	"(\from+1)",\to
+	.endif
+	.endm
+
 	.file	"crt0.S"
 	.extern main
 
@@ -94,6 +101,10 @@ __start:
 	;; SP (r28) is initialized
 	MOVR_S	ilink, 0
 	MOVR	r30, 0
+
+#if defined(__ARC_FPU_DP__) || defined (__ARC_FPU_SP__)
+	initfp	0,31
+#endif
 
 	;; Call constructors.
 	jl	@_init
