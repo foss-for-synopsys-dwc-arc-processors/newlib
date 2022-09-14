@@ -4,8 +4,11 @@
 ; r1 const void* src
 ; r2 size_t count
 
+<<<<<<< HEAD
 #if defined (__ARC64_ARCH64__)
 
+=======
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 ENTRY (memmove)
 	; If the source plus count is greater than the destination
 	; There is an overlap, and a backwards copy must be performed
@@ -14,11 +17,16 @@ ENTRY (memmove)
 	
 	; Dst is less than src, can safely perform normal memcpy
 	BRLO.d		r0, r1, @.L_normal_memcpy
+<<<<<<< HEAD
 	addl		r4, r1, r2
+=======
+	ADDP		r4, r1, r2
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 
 	BRLO.d		r4, r0, @.L_normal_memcpy
 	; Only relevant when not taking the branch, but might as well
 	; use the delay slot (after the branch, this will be redone
+<<<<<<< HEAD
 	addl	r3, r0, r2
 ; Backwards search
 ; The only thing that changes between memcpy and memmove is copy direction
@@ -30,6 +38,22 @@ ENTRY (memmove)
 	addl	r1, r1, r2
 	bmsk_s	r2, r2, 4
 
+=======
+	ADDP	r3, r0, r2
+
+	;BRGT.d	r0, r4, @.L_backwards_search
+
+; Backwards search
+; The only thing that changes between memcpy and memmove is copy direction
+; in case the dest and src address memory locations overlap
+; For a scratch implementation, have separate code for incremental and decremental copies	
+	; Set both r0 and r1 to point to the end of eahc memory location
+	ADDP	r1, r1, r2
+	bmsk_s	r2, r2, 4
+
+; Take care of the last 31 bytes
+.L_B_write_31_bytes:
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 	bbit0.d	r2, 0, @1f
 	lsr	r11, r2, 3
 	ldb.aw	r4, [r1, -1]
@@ -53,9 +77,17 @@ ENTRY (memmove)
 	LD64.aw	r4, [r1, -8]
 	ST64.aw	r4, [r3, -8]
 
+<<<<<<< HEAD
 	jeq	[blink]
 
 .L_write_backwards_32_bytes:			; Take care of 32 byte chunks
+=======
+; Do we have more than 32 bytes to take care of?
+	jeq	[blink]
+
+; Only take care of the 32 byte chunks at the end
+.L_B_write_32_bytes:
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 	LD64.aw	r4, [r1, -8]
 	LD64.aw	r6, [r1, -8]
 	LD64.aw	r8, [r1, -8]
@@ -63,6 +95,7 @@ ENTRY (memmove)
 	ST64.aw	r4, [r3, -8]
 	ST64.aw	r6, [r3, -8]
 	ST64.aw	r8, [r3, -8]
+<<<<<<< HEAD
 	dbnz.d	r12, @.L_write_backwards_32_bytes
 	ST64.aw	r10, [r3, -8]
     
@@ -74,6 +107,23 @@ ENTRY (memmove)
 	beq.d	@.L_write_forwards_31_bytes
 	MOVP	r3, r0			; do not clobber the "dest"
 .L_write_forwards_32_bytes:			; Take care of 32 byte chunks
+=======
+	dbnz.d	r12, @.L_B_write_32_bytes
+	ST64.aw	r10, [r3, -8]
+
+	j_s	[blink]
+
+
+; Normal memcpy
+.L_normal_memcpy:
+
+	; Flags were set by LSRP.f, meaning it will jump if
+	; there are no 32 byte chunks
+	beq.d	@.L_F_write_31_bytes
+	MOVP	r3, r0			; do not clobber the "dest"
+
+.L_F_write_32_bytes:
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 	LD64.ab	r4, [r1, +8]
 	LD64.ab	r6, [r1, +8]
 	LD64.ab	r8, [r1, +8]
@@ -81,6 +131,7 @@ ENTRY (memmove)
 	ST64.ab	r4, [r3, +8]
 	ST64.ab	r6, [r3, +8]
 	ST64.ab	r8, [r3, +8]
+<<<<<<< HEAD
 	dbnz.d	r12, @.L_write_forwards_32_bytes
 	ST64.ab	r10, [r3, +8]	; Shove store in delay slot
 	bmsk_s	r2, r2, 4		; From now on, we only care for the remainder % 32
@@ -130,6 +181,29 @@ ENTRY (memmove)
 ;	asl	    r12, r12, 1    [3]
 1:
 	bi	    [r12]
+=======
+	dbnz.d	r12, @.L_F_write_32_bytes
+	ST64.ab	r10, [r3, +8]
+	bmsk_s	r2, r2, 4
+
+.L_F_write_31_bytes:
+	bbit0.d	r2, 2, @1f
+	lsr	r12, r2, 3
+	ld.ab	r4, [r1, 4]
+	st.ab	r4, [r3, 4]
+1:
+	bbit0.d	r2, 1, @1f
+	xor	r12, r12, 3
+	ldh.ab	r4, [r1, 2]
+	sth.ab	r4, [r3, 2]
+1:
+	bbit0.d	r2, 0, @1f
+	asl	r12, r12, 1
+	ldb.ab	r4, [r1, 1]
+	stb.ab	r4, [r3, 1]
+1:
+	bi	[r12]
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 	LD64.ab	r4, [r1, 8]
 	ST64.ab	r4, [r3, 8]
 	LD64.ab	r4, [r1, 8]
@@ -139,7 +213,13 @@ ENTRY (memmove)
 
 	j_s	[blink]
 
+<<<<<<< HEAD
 ENDFUNC (memmove)
 
 #endif
+=======
+
+
+ENDFUNC (memmove)
+>>>>>>> 79d05417d (Added tested implementation of memmove based on current implementation of memcpy. Need to compare efficiency/speed with default implementation)
 
