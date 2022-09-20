@@ -36,6 +36,25 @@
 
 ; dest and src MUST NOT intercept
 
+; Brief:
+; Perform the same operation as strlen for finding the end
+; of r0
+; If r0 and r1 have
+; If 4 byte aligned
+; 	Do 4 byte search until there are no more 4 byte chunks
+;	Then, do 1 byte search
+; Otherwise, 1 byte search until alignment
+;	Then, do 4 byte search as previously specified
+;
+;; More in depth description at the end
+;
+; R0 void* ptr
+; R1 int ch
+; R2 size_t count
+; ret (R0):
+;		- 0 : Byte not found
+;		- Byte position
+
 ENTRY (strcat)
 ; Find end of r0
 ; ========================== STRLEN CODE START ==========================
@@ -113,6 +132,33 @@ ldb		r10,	[r13]
 
 	; If alignments are different, will never match alignment
 	bne		@.L_start_1byte_search
+    
+    ; Aligned at 4 byte!
+	bmsk.f	r3,		r13,		1
+	beq.d			@.L_start_4byte_search_src
+
+	SUBP	r3,		r3,		1		; [0]
+	asl		r3,		r3,		2		; [1]
+
+	; r3 now represents the inverse of the amount of instructions to skip
+	bi	    [r3]
+; Read 3 bytes
+	ldb.ab	r10,	[r1,	+1]
+	cmp		r10,	0
+	beq.d			@.L_return_ptr
+    stb.ab	r10,	[r13,	+1]
+; Read 2 bytes
+	ldb.ab	r10,	[r1,	+1]
+	cmp		r10,	0
+	beq.d			@.L_return_ptr
+    stb.ab	r10,	[r13,	+1]
+; Read 1 byte
+	ldb.ab	r10,	[r1,	+1]
+	cmp		r10,	0
+	beq.d			@.L_return_ptr
+    stb.ab	r10,	[r13,	+1]
+
+.L_start_4byte_search_src:
 
 ld.ab	r11,	[r1, +4]
 sub		r12, r11, r8
