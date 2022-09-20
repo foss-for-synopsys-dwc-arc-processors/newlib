@@ -39,7 +39,10 @@
 ENTRY (strcat)
 ; Find end of r0
 ; ========================== STRLEN CODE START ==========================
-
+	;; Setup byte detector (more information bellow)
+	mov		r8,		0x01010101
+	ror		r9,		r8
+    
 	; address is 4 byte aligned, go to 4 byte search
 	bmsk.f	r3,		r0,		1
 	beq.d			@.L_start_4byte_search
@@ -67,9 +70,6 @@ ENTRY (strcat)
 	SUBP	r2,		r2,		1
 
 .L_start_4byte_search:
-	;; Setup byte detector (more information bellow)
-	mov		r8,		0x01010101
-	ror		r9,		r8
 
 	; Load next 4 bytes
 	ld.ab	r10,	[r13, +4]
@@ -91,9 +91,8 @@ ENTRY (strcat)
 ; Backtrack 8 bytes [2]
 ; 4 because of write-back, 4 because we dont know for sure where in the
 ; 4 bytes the NULL byte is. Then perform 1 byte search
-	SUBP	r13,		r13,		8
-
-	ldb		r10,	[r13]
+SUBP	r13,		r13,		8
+ldb		r10,	[r13]
 
 ;; 1 byte search until NULL byte is found
 .L_search_next_1byte_chunk:
@@ -107,15 +106,47 @@ ENTRY (strcat)
 
 ; ========================== STRLEN CODE END >|< ==========================
 
-.L_search_next_1byte_chunk_src:
+	; Compare address alignments
+	bmsk.f		r10,		r13,		2
+	bmsk.f		r11,		r1,		    2
+	SUB.f		r10,		r10,	    r11
 
-	ldb.ab	r11,	[r1, +1]
+	; If alignments are different, will never match alignment
+	bne		@.L_start_1byte_search
+
+ld.ab	r11,	[r1, +4]
+sub		r12, r11, r8
+bic		r12, r12, r11
+tst		r12, r9
+bne.d	@.L_start_search_next_1byte_chunk
+
+.L_copy_4byte_chunk:
+	; Set r10 to be the previously read 4 bytes
+    ; Move known non NULL containing bytes to r10
+	MOVP	r10,    r11
+	; Read next 4 bytes
+	ld.ab	r11,	[r1, +4]
+	; Check if NULL byte is in the next 4 bytes
+	sub		r12,    r11,    r8
+	bic		r12,    r12,    r11
+	tst		r12,    r9
+
+	; NULL byte not found, store previous non-NULL byte containing bytes and continue
+	beq.d	@.L_copy_4byte_chunk
+	st.ab	r10,	[r13, +4]
+
+.L_start_search_next_1byte_chunk:
+
+SUBP	r1,     r1,     4
+
+.L_start_1byte_search:
+
 	; Look for NULL byte
+	ldb.ab	r11,	[r1, +1]
 	cmp		r11,	0
-	beq.d	@.L_return_ptr
 
+    bne.d   @.L_start_1byte_search
 	stb.ab	r11,	[r13, +1]
-	j		@.L_search_next_1byte_chunk_src
 
 .L_return_ptr:
 	j_s	[blink]
