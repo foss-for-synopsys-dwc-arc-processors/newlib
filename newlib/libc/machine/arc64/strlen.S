@@ -30,33 +30,52 @@
 
 #include <sys/asm.h>
 
+; Brief:
+; If 4 byte aligned
+; 	Do 4 byte NULL byte search
+;	When it is found, perfom a 1 byte search on the last 4 bytes
+; Otherwise, 1 byte search until alignment
+;	Then, do 4 byte search as previously specified
+;
+;; More in depth description at the end
+;
+; R0 const char* ptr
+; ret (R0):
+;		- String size
+
 ENTRY (strlen)
-	; If the address is already 4 byte aligned, just jump to 4 byte search
-	bmsk.f	0,		r0,		1
-	beq.d	@.L_start_4byte_search
+
+	; address is 4 byte aligned, go to 4 byte search
+	bmsk.f	r3,		r0,		1
+	beq.d			@.L_start_4byte_search
 	MOVP	r13,	r0	; Store r0 for size calculation
 
-.L_start_1byte_search:
-	; 1 byte search until 4 byte alignment is found
-	ldb		r10,	[r13]
+	SUBP	r3,		r3,		1		; [0]
+	asl		r3,		r3,		2		; [1]
+
+	; r3 now represents the inverse of the amount of instructions to skip
+	bi	    [r3]
+; Read 3 bytes
+	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-
-.L_search_next_1byte_chunk:
-	; Found NULL byte!
-	beq.d	@.L_return_ptr
-	ldb.aw	r10,	[r13, +1]
-
-	; 4 byte alignment not reached yet
-	bmsk.f	0,		r13,		1
-	bne.d	@.L_search_next_1byte_chunk
+	beq.d			@.L_return_ptr
+	SUBP	r2,		r2,		1
+; Read 2 bytes
+	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
+	beq.d			@.L_return_ptr
+	SUBP	r2,		r2,		1
+; Read 1 byte
+	ldb.ab	r10,	[r13,	+1]
+	cmp		r10,	0
+	beq.d			@.L_return_ptr
+	SUBP	r2,		r2,		1
 
-; 4 byte alignment reached!
 
-; Bootstrap magic NULL byte detector for 4 byte search
 .L_start_4byte_search:
+	;; Setup byte detector (more information bellow)
 	mov		r8,		0x01010101
-	ror		r9,		r8						; Further magic byte detector setup
+	ror		r9,		r8
 
 	; Load next 4 bytes
 	ld.ab	r10,	[r13, +4]
@@ -69,23 +88,61 @@ ENTRY (strlen)
 	bic		r2,		r2,		r10
 	tst		r2,		r9
 
-	; byte not found yet
+	; NULL byte not found yet
 	beq.d	@.L_search4byte_chunk
 	; Load next 4 bytes
 	ld.ab	r10,	[r13, +4]
 	
-	; NULL byte found!
-	; Backtrack 8 bytes
-	; 4 because of write-back, 4 because we dont know for sure where in the
-	; 4 bytes the NULL byte is
-	; Then let 1 byte search do its' thing
+; NULL byte found!
+; Backtrack 8 bytes [2]
+; 4 because of write-back, 4 because we dont know for sure where in the
+; 4 bytes the NULL byte is. Then perform 1 byte search
 	SUBP	r13,		r13,		8
-	j		@.L_start_1byte_search
 
-; Byte was found in r0 - 1
+	ldb		r10,	[r13]
+
+;; 1 byte search until NULL byte is found
+.L_search_next_1byte_chunk:
+	cmp		r10,	0
+	bne.d	@.L_search_next_1byte_chunk
+	ldb.aw	r10,	[r13, +1]
+
+; NULL byte was found in r0 - 1
 .L_return_ptr:
 	SUBP	r0,		r13,		r0
 	j_s.d	[blink]
 	SUBP	r0,		r0,		1
+
+;; The first step in this code is to "fix" the address alignment
+;; This is done by looking at the last 2 bits in the address, and infering
+;; how many 1 byte loads are required
+; The following table shows how the last two bytes correlate to branch index
+; and how many bytes we need to read
+;
+;   (b1,b0) | bytes to search |  branch index  | required jump
+; ----------+-----------------+----------------+--------------
+;   00b (0) |   <---  Already aligned, jumps directly to 4 byte search
+;   01b (1) |        3        |        0       |   0
+;   10b (2) |        2        |        1       |   4
+;   11b (3) |        1        |        2       |   8
+;
+; Removing 1 from b1b0 [0] gives us the branch index.
+; Now to get the appropriate jump size, we can just multiply by 4 [1]
+;
+;; This code uses a common technique for NULL byte detection inside a word.
+;; Details on this technique can be found in:
+;; (https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord)
+;
+; In sum, this technique allows for detecting a NULL byte inside any given amount of
+; bits by performing the following operation
+; 		DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)
+;
+; The code above implements this by setting r8 to 0x01010101 and r9 to 0x80808080
+;
+;; There are a few possible optimizations identified
+;
+; [2]
+; Dont reload from memory, but instead use the current value of r11
+; There might be a possible problem due to endianness
 
 ENDFUNC (strlen)
