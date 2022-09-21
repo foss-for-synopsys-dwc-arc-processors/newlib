@@ -55,6 +55,8 @@
 ;		- 0 : Byte not found
 ;		- Byte position
 
+#if defined (__ARC64_ARCH64__)
+
 ENTRY (strcat)
 ; Find end of r0
 ; ========================== STRLEN CODE START ==========================
@@ -67,7 +69,7 @@ ENTRY (strcat)
 	beq.d			@.L_start_4byte_search
 	MOVP	r13,	r0	; Store r0 for size calculation
 
-	SUBP	r3,		r3,		1		; [0]
+	subl	r3,		r3,		1		; [0]
 	asl		r3,		r3,		2		; [1]
 
 	; r3 now represents the inverse of the amount of instructions to skip
@@ -76,17 +78,17 @@ ENTRY (strcat)
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
 	beq.d			@.L_string_end_found
-	SUBP	r2,		r2,		1
+	subl	r2,		r2,		1
 ; Read 2 bytes
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
 	beq.d			@.L_string_end_found
-	SUBP	r2,		r2,		1
+	subl	r2,		r2,		1
 ; Read 1 byte
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
 	beq.d			@.L_string_end_found
-	SUBP	r2,		r2,		1
+	subl	r2,		r2,		1
 
 .L_start_4byte_search:
 
@@ -110,7 +112,7 @@ ENTRY (strcat)
 ; Backtrack 8 bytes [2]
 ; 4 because of write-back, 4 because we dont know for sure where in the
 ; 4 bytes the NULL byte is. Then perform 1 byte search
-SUBP	r13,		r13,		8
+subl	r13,		r13,		8
 ldb		r10,	[r13]
 
 ;; 1 byte search until NULL byte is found
@@ -121,7 +123,7 @@ ldb		r10,	[r13]
 
 ; NULL byte was found in r0 - 1
 .L_string_end_found:
-	SUBP	r13,		r13,	1
+	subl	r13,		r13,	1
 
 ; ========================== STRLEN CODE END >|< ==========================
 
@@ -137,7 +139,7 @@ ldb		r10,	[r13]
 	bmsk.f	r3,		r13,		1
 	beq.d			@.L_start_4byte_search_src
 
-	SUBP	r3,		r3,		1		; [0]
+	subl	r3,		r3,		1		; [0]
 	asl		r3,		r3,		2		; [1]
 
 	; r3 now represents the inverse of the amount of instructions to skip
@@ -183,7 +185,7 @@ bne.d	@.L_start_search_next_1byte_chunk
 
 .L_start_search_next_1byte_chunk:
 
-SUBP	r1,     r1,     4
+subl	r1,     r1,     4
 
 .L_start_1byte_search:
 
@@ -199,3 +201,5 @@ SUBP	r1,     r1,     4
 
 
 ENDFUNC (strcat)
+
+#endif
