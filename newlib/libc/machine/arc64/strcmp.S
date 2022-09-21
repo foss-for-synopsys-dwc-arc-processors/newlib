@@ -30,6 +30,8 @@
 
 #include <sys/asm.h>
 
+#if defined (__ARC64_ARCH64__)
+
 ENTRY (strcmp)
 	; Compare address alignments
 	bmsk.f		r8,		r0,		1
@@ -46,12 +48,12 @@ ENTRY (strcmp)
 	or			r8,		r0,		r1
 	bmsk.f	r3,		r8,		1
 	beq.d		@.L_start_4byte_search
-	SUBP	r3,		r3,		1		; [0]
+	subl	r3,		r3,		1		; [0]
 	
     ; r3x6
 	asl		r8,		r3,		1		; [1]
 	asl		r9,		r3,		2		; [2]
-    ADDP    r3,     r8,     r9
+    addl	r3,     r8,     r9
 
 	; r3 now represents the inverse of the amount of instructions to skip
 	bi	    [r3]
@@ -60,21 +62,21 @@ ENTRY (strcmp)
 	ldb.ab		r12,	[r1,	+1]
 	and.f		r0,		r11,	r12
 	beq.d		@.L_return
-	SUBP.f		r0,		r11,	r12
+	subl.f		r0,		r11,	r12
 	bne.d		@.L_return
 ; Read 2 bytes
 	ldb.ab		r11,	[r10,	+1]
 	ldb.ab		r12,	[r1,	+1]
 	and.f		r0,		r11,	r12
 	beq.d		@.L_return
-	SUBP.f		r0,		r11,	r12
+	subl.f		r0,		r11,	r12
 	bne.d		@.L_return
 ; Read 1 byte
 	ldb.ab		r11,	[r10,	+1]
 	ldb.ab		r12,	[r1,	+1]
 	and.f		r0,		r11,	r12
 	beq.d		@.L_return
-	SUBP.f		r0,		r11,	r12
+	subl.f		r0,		r11,	r12
 	bne			@.L_return
 
 .L_start_4byte_search:
@@ -86,7 +88,7 @@ ENTRY (strcmp)
 	ld.ab		r12,		[r1,	+4]
 
 	; Find difference. If found, let 1 byte search handle it
-	SUBP.f		r0,		r11,		r12
+	subl.f		r0,		r11,		r12
 	bne.d		@.L_found_difference_in_4B
 	
 	; Find a NULL byte (the srings are the same, so if present, the NULL is in both)
@@ -102,8 +104,8 @@ ENTRY (strcmp)
 	
 .L_found_difference_in_4B:
 ; Need to make sure the 1B search takes a 4B chunk into consideration
-SUBP	r1,		r1,		4
-SUBP	r10,	r10,	4
+subl	r1,		r1,		4
+subl	r10,	r10,	4
 
 ; 1 Byte search
 .L_start_1byte_search:
@@ -115,7 +117,7 @@ ldb.ab		r12,		[r1,	+1]
 	; Check for end of string. Do sub either way to provide appropriate difference
 	and.f		r0,		r11,		r12
 	beq.d		@.L_return
-	SUBP.f		r0,		r11,		r12
+	subl.f		r0,		r11,		r12
 
 	; Load next r10
 	ldb.ab		r11,		[r10,	+1]
@@ -130,3 +132,7 @@ ldb.ab		r12,		[r1,	+1]
 	j_s	[blink]
 
 ENDFUNC (strcmp)
+
+#endif
+
+
