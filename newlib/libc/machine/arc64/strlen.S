@@ -50,7 +50,7 @@ ENTRY (strlen)
 	beq.d			@.L_start_4byte_search
 	MOVP	r13,	r0	; Store r0 for size calculation
 
-	SUBP	r3,		r3,		1		; [0]
+	subl	r3,		r3,		1		; [0]
 	asl		r3,		r3,		2		; [1]
 
 	; r3 now represents the inverse of the amount of instructions to skip
@@ -59,17 +59,17 @@ ENTRY (strlen)
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
 	beq.d			@.L_return_ptr
-	SUBP	r2,		r2,		1
+	subl	r2,		r2,		1
 ; Read 2 bytes
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
 	beq.d			@.L_return_ptr
-	SUBP	r2,		r2,		1
+	subl	r2,		r2,		1
 ; Read 1 byte
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
 	beq.d			@.L_return_ptr
-	SUBP	r2,		r2,		1
+	subl	r2,		r2,		1
 
 
 .L_start_4byte_search:
@@ -97,7 +97,7 @@ ENTRY (strlen)
 ; Backtrack 8 bytes [2]
 ; 4 because of write-back, 4 because we dont know for sure where in the
 ; 4 bytes the NULL byte is. Then perform 1 byte search
-	SUBP	r13,		r13,		8
+	subl	r13,		r13,		8
 
 	ldb		r10,	[r13]
 
@@ -109,9 +109,9 @@ ENTRY (strlen)
 
 ; NULL byte was found in r0 - 1
 .L_return_ptr:
-	SUBP	r0,		r13,		r0
+	subl	r0,		r13,		r0
 	j_s.d	[blink]
-	SUBP	r0,		r0,		1
+	subl	r0,		r0,		1
 
 ;; The first step in this code is to "fix" the address alignment
 ;; This is done by looking at the last 2 bits in the address, and infering
