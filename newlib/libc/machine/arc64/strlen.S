@@ -42,6 +42,7 @@
 ; R0 const char* ptr
 ; ret (R0):
 ;		- String size
+#if defined (__ARC64_ARCH64__)
 
 ENTRY (strlen)
 
@@ -52,52 +53,60 @@ ENTRY (strlen)
 
 	subl	r3,		r3,		1		; [0]
 	asl		r3,		r3,		2		; [1]
+;	add		r3,		r3,		r2		; x3
 
 	; r3 now represents the inverse of the amount of instructions to skip
 	bi	    [r3]
 ; Read 3 bytes
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-	beq.d			@.L_return_ptr
-	subl	r2,		r2,		1
+	beq 			@.L_return_ptr
+	nop
 ; Read 2 bytes
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-	beq.d			@.L_return_ptr
-	subl	r2,		r2,		1
+	beq				@.L_return_ptr
+	nop
 ; Read 1 byte
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-	beq.d			@.L_return_ptr
-	subl	r2,		r2,		1
-
+	beq				@.L_return_ptr
+	nop
 
 .L_start_4byte_search:
 	;; Setup byte detector (more information bellow)
-	mov		r8,		0x01010101
-	ror		r9,		r8
+	MOVP	r8,		NULL_DT_1
+	ror		r9,		r8			; Less cycles than moving than LIMM with NULL_DT_2
 
+; Is it aligned to 4 or 8 bytes?
+	andl.f	0,		r13,		0x7
+	beq		@1f
+
+	ld.ab	r10,	[r13,	+4]
+	cmp		r10,	0
+	beq			@.L_return_ptr
+
+
+1:
 	; Load next 4 bytes
-	ld.ab	r10,	[r13, +4]
+	ldl.ab	r10,	[r13, +8]
 
 ; Handle 4 byte chunks
-.L_search4byte_chunk:
+.L_search8byte_chunk:
 	
 	; Look for the NULL byte
 	sub		r2,		r10,	r8
-	bic		r2,		r2,		r10
+	bicl	r2,		r2,		r10
 	tst		r2,		r9
 
 	; NULL byte not found yet
-	beq.d	@.L_search4byte_chunk
+	beq.d	@.L_search8byte_chunk
 	; Load next 4 bytes
-	ld.ab	r10,	[r13, +4]
+	ldl.ab	r10,	[r13, +8]
 	
 ; NULL byte found!
 ; Backtrack 8 bytes [2]
-; 4 because of write-back, 4 because we dont know for sure where in the
-; 4 bytes the NULL byte is. Then perform 1 byte search
-	subl	r13,		r13,		8
+	subl	r13,		r13,		24
 
 	ldb		r10,	[r13]
 
@@ -146,3 +155,4 @@ ENTRY (strlen)
 ; There might be a possible problem due to endianness
 
 ENDFUNC (strlen)
+#endif
