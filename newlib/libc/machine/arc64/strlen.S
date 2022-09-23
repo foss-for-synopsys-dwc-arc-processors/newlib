@@ -31,31 +31,28 @@
 #include <sys/asm.h>
 
 ; Brief:
-; If 4 byte aligned
-; 	Do 4 byte NULL byte search
-;	When it is found, perfom a 1 byte search on the last 4 bytes
-; Otherwise, 1 byte search until alignment
-;	Then, do 4 byte search as previously specified
-;
-;; More in depth description at the end
+; This code "fixes" alignment of the input pointer and performs 8 byte searches
+; in 32 byte chunks.
+; It is therefore optimized for big strings, presenting some overhead for
+; smaller strings
 ;
 ; R0 const char* ptr
 ; ret (R0):
 ;		- String size
+
 #if defined (__ARC64_ARCH64__)
 
 ENTRY (strlen)
 
-	; address is 4 byte aligned, go to 4 byte search
+; If address is 4 byte aligned, we can just directly read 4 bytes
 	bmsk.f	r3,		r0,		1
 	beq.d			@.L_start_4byte_search
 	MOVP	r13,	r0	; Store r0 for size calculation
 
 	subl	r3,		r3,		1		; [0]
 	asl		r3,		r3,		2		; [1]
-;	add		r3,		r3,		r2		; x3
 
-	; r3 now represents the inverse of the amount of instructions to skip
+; Jump depending on the alignment
 	bi	    [r3]
 ; Read 3 bytes
 	ldb.ab	r10,	[r13,	+1]
@@ -73,44 +70,73 @@ ENTRY (strlen)
 	beq				@.L_return_ptr
 	nop
 
+; r13 is now either 4 or 8 byte aligned
 .L_start_4byte_search:
-	;; Setup byte detector (more information bellow)
-	MOVP	r8,		NULL_DT_1
-	ror		r9,		r8			; Less cycles than moving than LIMM with NULL_DT_2
 
-; Is it aligned to 4 or 8 bytes?
-	andl.f	0,		r13,		0x7
-	beq		@1f
+; If aligned to 8 bytes, just jump ahead
+	andl.f	0,		r13,	0b111
+	beq.d	@1f
+	xorl	r6,		r6,		r6	; reset mask showing NULL byte location
 
 	ld.ab	r10,	[r13,	+4]
-	cmp		r10,	0
-	beq			@.L_return_ptr
-
+	sub		r8,		r10,	NULL_32DT_1
+	bic		r8,		r8,		r10
+	tst		r8,		NULL_32DT_2
+	bne.d		@.L_reread_last_4bytes
+	xorl	r9,		r9,		r9
 
 1:
-	; Load next 4 bytes
-	ldl.ab	r10,	[r13, +8]
+; Setup byte detector (more information bellow) [2]
+	movhl	r8,		NULL_32DT_1
+	orl		r8,		r8,		NULL_32DT_1
 
-; Handle 4 byte chunks
-.L_search8byte_chunk:
-	
-	; Look for the NULL byte
-	sub		r2,		r10,	r8
-	bicl	r2,		r2,		r10
-	tst		r2,		r9
+	movhl	r9,		NULL_32DT_2
+	orl		r9,		r9,		NULL_32DT_2
 
-	; NULL byte not found yet
-	beq.d	@.L_search8byte_chunk
-	; Load next 4 bytes
-	ldl.ab	r10,	[r13, +8]
-	
-; NULL byte found!
-; Backtrack 8 bytes [2]
-	subl	r13,		r13,		24
+	ldl.ab	  r2,	[r13, +8]
+.L_search_32bytes:
+	ldl.ab	  r3,	[r13, +8]
+	ldl.ab	  r4,	[r13, +8]
+	ldl.ab	  r5,	[r13, +8]
 
-	ldb		r10,	[r13]
+; If there is a 0 in any of the read 32 bytes, its location is encoded
+; in r6 as a bit mask
+; This bitmask can be used to calculate the appropriate regression in the pointer [3]
+	subl	r10,	r2,		r8
+	bicl	r10,	r10,	r2
+	tstl	r10,	r9
+	xor.ne	r6,		r6,		0b10000
+
+	subl	r11,	r3,		r8
+	bicl	r11,	r11,	r3
+	tstl	r11,	r9
+	xor.ne	r6,		r6,		0b01000
+
+	subl	r12,	r4,		r8
+	bicl	r12,	r12,	r4
+	tstl	r12,	r9
+	xor.ne	r6,		r6,		0b00100
+
+	subl	r7,		r5,		r8
+	bicl	r7,		r7,		r5
+	tstl	r7,		r9
+	xor.ne	r6,		r6,		0b00010
+
+	breq.d	r6,		0,		@.L_search_32bytes
+	ldl.ab	r2,		[r13,	+8]
+
+; Back track only what is required [4]
+fls		r6,		r6
+asl		r6,		r6,		3
+subl	r13,	r13,	r6
+
+; Compensate writeback
+subl	r13,	r13,	4
+.L_reread_last_4bytes:
+subl	r13,	r13,	4
 
 ;; 1 byte search until NULL byte is found
+ldb		r10,	[r13]
 .L_search_next_1byte_chunk:
 	cmp		r10,	0
 	bne.d	@.L_search_next_1byte_chunk
@@ -123,7 +149,11 @@ ENTRY (strlen)
 	subl	r0,		r0,		1
 
 ;; The first step in this code is to "fix" the address alignment
-;; This is done by looking at the last 2 bits in the address, and infering
+;
+;; First, we check if the address is already 4 byte aligned.
+;; If so, we can simply read 4 bytes and start the 8 byte reads
+;
+;; Otherwise, we can look at the last 2 bits in the address, and infer
 ;; how many 1 byte loads are required
 ; The following table shows how the last two bytes correlate to branch index
 ; and how many bytes we need to read
@@ -135,8 +165,9 @@ ENTRY (strlen)
 ;   10b (2) |        2        |        1       |   4
 ;   11b (3) |        1        |        2       |   8
 ;
-; Removing 1 from b1b0 [0] gives us the branch index.
-; Now to get the appropriate jump size, we can just multiply by 4 [1]
+; Removing 1 from b1b0 [0] gives us the "branch index".
+; Now to get the appropriate jump size (how many instructions there are per branch)
+; we can just multiply by 4 [1]
 ;
 ;; This code uses a common technique for NULL byte detection inside a word.
 ;; Details on this technique can be found in:
@@ -147,12 +178,20 @@ ENTRY (strlen)
 ; 		DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)
 ;
 ; The code above implements this by setting r8 to 0x01010101 and r9 to 0x80808080
+; This operation differs slightly between 64 bit and 32 bit analizysis, as LIMM are 32
+; bit only, we need to perform MOVHL and ORL [2] operations to have the appropriate 64bit
+; values in place
 ;
-;; There are a few possible optimizations identified
+;; The major optimization in this code is to perform several 8 load byte loads
+;; in a row and using the previously mentioned NULL byte detection method to find
+;; the end of the string
 ;
-; [2]
-; Dont reload from memory, but instead use the current value of r11
-; There might be a possible problem due to endianness
+; To achieve this, finding a NULL byte sets a bitmask that [3], when passed via
+; the "find last set" instruction returns the amount of 8 byte chunks to backtrack
+; We can then simply multiply by 8 and remove that value from the pointer
+;
+;
+;
 
 ENDFUNC (strlen)
 #endif

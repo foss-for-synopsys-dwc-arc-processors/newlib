@@ -35,8 +35,6 @@
  * Macros to handle different pointer/register sizes for 32/64-bit code
  */
 #if defined (__ARC64_ARCH32__)
-# define NULL_DT_1 0x01010101
-# define NULL_DT_2 0x80808080
 # define ST64  std
 # define LD64  ldd
 # define MOVP  mov
@@ -45,8 +43,6 @@
 # define REG_ST st
 # define REG_LD ld
 #elif defined (__ARC64_ARCH64__)
-# define NULL_DT_1 0x0101010101010101
-# define NULL_DT_2 0x8080808080808080
 # define ST64  stl
 # define LD64  ldl
 # define MOVP  movl
@@ -57,6 +53,9 @@
 #else
 # error Please use either 32-bit or 64-bit version of arc64 compiler
 #endif
+
+# define NULL_32DT_1 0x01010101
+# define NULL_32DT_2 0x80808080
 
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
