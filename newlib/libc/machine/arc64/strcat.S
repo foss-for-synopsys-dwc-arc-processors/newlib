@@ -60,11 +60,7 @@
 ENTRY (strcat)
 ; Find end of r0
 ; ========================== STRLEN CODE START ==========================
-	;; Setup byte detector (more information bellow)
-	mov		r8,		0x01010101
-	ror		r9,		r8
-    
-	; address is 4 byte aligned, go to 4 byte search
+; If address is 4 byte aligned, we can just directly read 4 bytes
 	bmsk.f	r3,		r0,		1
 	beq.d			@.L_start_4byte_search
 	MOVP	r13,	r0	; Store r0 for size calculation
@@ -72,50 +68,92 @@ ENTRY (strcat)
 	subl	r3,		r3,		1		; [0]
 	asl		r3,		r3,		2		; [1]
 
-	; r3 now represents the inverse of the amount of instructions to skip
+; Jump depending on the alignment
 	bi	    [r3]
 ; Read 3 bytes
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-	beq.d			@.L_string_end_found
-	subl	r2,		r2,		1
+	beq 			@.L_string_end_found
+	nop
 ; Read 2 bytes
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-	beq.d			@.L_string_end_found
-	subl	r2,		r2,		1
+	beq				@.L_string_end_found
+	nop
 ; Read 1 byte
 	ldb.ab	r10,	[r13,	+1]
 	cmp		r10,	0
-	beq.d			@.L_string_end_found
-	subl	r2,		r2,		1
+	beq				@.L_string_end_found
+	nop
 
+; r13 is now either 4 or 8 byte aligned
 .L_start_4byte_search:
 
-	; Load next 4 bytes
-	ld.ab	r10,	[r13, +4]
+; If aligned to 8 bytes, just jump ahead
+	andl.f	0,		r13,	0b111
+	beq.d	@1f
+	xorl	r6,		r6,		r6	; reset mask showing NULL byte location
 
-; Handle 4 byte chunks
-.L_search4byte_chunk:
-	
-	; Look for the NULL byte
-	sub		r2,		r10,	r8
-	bic		r2,		r2,		r10
-	tst		r2,		r9
+	ld.ab	r10,	[r13,	+4]
+	sub		r11,	r10,	NULL_32DT_1
+	bic		r11,	r11,	r10
+	tst		r11,	NULL_32DT_2
+	bne		@.L_reread_last_4bytes
 
-	; NULL byte not found yet
-	beq.d	@.L_search4byte_chunk
-	; Load next 4 bytes
-	ld.ab	r10,	[r13, +4]
-	
-; NULL byte found!
-; Backtrack 8 bytes [2]
-; 4 because of write-back, 4 because we dont know for sure where in the
-; 4 bytes the NULL byte is. Then perform 1 byte search
-subl	r13,		r13,		8
-ldb		r10,	[r13]
+1:
+; Setup byte detector (more information bellow) [2]
+	movhl	r8,		NULL_32DT_1
+	orl		r8,		r8,		NULL_32DT_1
+
+	movhl	r9,		NULL_32DT_2
+	orl		r9,		r9,		NULL_32DT_2
+
+	ldl.ab	  r2,	[r13, +8]
+.L_search_32bytes:
+	ldl.ab	  r3,	[r13, +8]
+	ldl.ab	  r4,	[r13, +8]
+	ldl.ab	  r5,	[r13, +8]
+
+; If there is a 0 in any of the read 32 bytes, its location is encoded
+; in r6 as a bit mask
+; This bitmask can be used to calculate the appropriate regression in the pointer [3]
+	subl	r10,	r2,		r8
+	subl	r11,	r3,		r8
+	subl	r12,	r4,		r8
+	subl	r7,		r5,		r8
+
+	bicl	r10,	r10,	r2
+	bicl	r11,	r11,	r3
+	bicl	r12,	r12,	r4
+	bicl	r7,		r7,		r5
+
+	tstl		r10,	r9
+	bset.ne		r6,		r6,		4
+
+	tstl		r11,	r9
+	bset.ne		r6,		r6,		3
+
+	tstl		r12,	r9
+	bset.ne		r6,		r6,		2
+
+	tstl		r7,		r9
+	bset.ne		r6,		r6,		1
+
+	breq.d	r6,		0,		@.L_search_32bytes
+	ldl.ab	r2,		[r13,	+8]
+
+; Back track only what is required [4]
+fls		r6,		r6
+asl		r6,		r6,		3
+subl	r13,	r13,	r6
+
+; Compensate writeback
+subl	r13,	r13,	4
+.L_reread_last_4bytes:
+subl	r13,	r13,	4
 
 ;; 1 byte search until NULL byte is found
+ldb		r10,	[r13]
 .L_search_next_1byte_chunk:
 	cmp		r10,	0
 	bne.d	@.L_search_next_1byte_chunk
@@ -123,7 +161,8 @@ ldb		r10,	[r13]
 
 ; NULL byte was found in r0 - 1
 .L_string_end_found:
-	subl	r13,		r13,	1
+	subl	r13,	r13,		1
+
 
 ; ========================== STRLEN CODE END >|< ==========================
 
@@ -133,8 +172,8 @@ ldb		r10,	[r13]
 	SUB.f		r10,		r10,	    r11
 
 	; If alignments are different, will never match alignment
-	bne		@.L_start_1byte_search
-    
+	bne		@.L_start_1byte_search_src
+
     ; Aligned at 4 byte!
 	bmsk.f	r3,		r13,		1
 	beq.d			@.L_start_4byte_search_src
@@ -160,40 +199,93 @@ ldb		r10,	[r13]
 	beq.d			@.L_return_ptr
     stb.ab	r10,	[r13,	+1]
 
+
+; r13 is now either 4 or 8 byte aligned
 .L_start_4byte_search_src:
 
-ld.ab	r11,	[r1, +4]
-sub		r12, r11, r8
-bic		r12, r12, r11
-tst		r12, r9
-bne.d	@.L_start_search_next_1byte_chunk
+; If aligned to 8 bytes, just jump ahead
+	andl.f	0,		r1,		0b111
+	beq.d	@.L_search_32bytes_src
+	xorl	r6,		r6,		r6	; reset mask showing NULL byte location
 
-.L_copy_4byte_chunk:
-	; Set r10 to be the previously read 4 bytes
-    ; Move known non NULL containing bytes to r10
-	MOVP	r10,    r11
-	; Read next 4 bytes
-	ld.ab	r11,	[r1, +4]
-	; Check if NULL byte is in the next 4 bytes
-	sub		r12,    r11,    r8
-	bic		r12,    r12,    r11
-	tst		r12,    r9
+	ld.ab	r10,	[r1,	+4]
+	sub		r11,	r10,	NULL_32DT_1
+	bic		r11,	r11,	r10
+	tst		r11,	NULL_32DT_2
+	bne		@.L_reread_last_4bytes_src
 
-	; NULL byte not found, store previous non-NULL byte containing bytes and continue
-	beq.d	@.L_copy_4byte_chunk
-	st.ab	r10,	[r13, +4]
+	stl.ab	r10,	[r13,	+4]
 
-.L_start_search_next_1byte_chunk:
+.L_search_32bytes_src:
+	ldl.ab	r2,	[r1,	+8]
+	ldl.ab	r3,	[r1,	+8]
+	ldl.ab	r4,	[r1,	+8]
+	ldl.ab	r5,	[r1,	+8]
+
+; If there is a 0 in any of the read 32 bytes, its location is encoded
+; in r6 as a bit mask
+; This bitmask can be used to calculate the appropriate regression in the pointer [3]
+	subl	r10,	r2,		r8
+	subl	r11,	r3,		r8
+	subl	r12,	r4,		r8
+	subl	r7,		r5,		r8
+
+	bicl	r10,	r10,	r2
+	bicl	r11,	r11,	r3
+	bicl	r12,	r12,	r4
+	bicl	r7,		r7,		r5
+
+	tstl		r10,	r9
+	bset.ne		r6,		r6,		4
+
+	tstl		r11,	r9
+	bset.ne		r6,		r6,		3
+
+	tstl		r12,	r9
+	bset.ne		r6,		r6,		2
+
+	tstl		r7,		r9
+	bset.ne		r6,		r6,		1
+
+	brne	r6,		0,		@.L_found_in_32B
+
+	stl.ab	r2,	[r13,	+8]
+	stl.ab	r3,	[r13,	+8]
+	stl.ab	r4,	[r13,	+8]
+	stl.ab	r5,	[r13,	+8]
+
+	j @.L_search_32bytes_src
+
+.L_found_in_32B:
+
+; Back track only what is required [4]
+;fls		r6,		r6
+
+;bi		[r6]
+;stl.ab	r5,	[r13,	+8]
+;stl.ab	r4,	[r13,	+8]
+;stl.ab	r3,	[r13,	+8]
+;stl.ab	r2,	[r13,	+8]
+
+;asl		r6,		r6,		3
+;subl	r1,		r1,		r6
+
+; Compensate writeback
+;addl	r1,	r1,	4
+
+subl	r1,		r1,		28
+
+.L_reread_last_4bytes_src:
 
 subl	r1,     r1,     4
 
-.L_start_1byte_search:
+.L_start_1byte_search_src:
 
 	; Look for NULL byte
 	ldb.ab	r11,	[r1, +1]
 	cmp		r11,	0
 
-    bne.d   @.L_start_1byte_search
+    bne.d   @.L_start_1byte_search_src
 	stb.ab	r11,	[r13, +1]
 
 .L_return_ptr:
