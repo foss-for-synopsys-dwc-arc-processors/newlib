@@ -103,22 +103,24 @@ ENTRY (strlen)
 ; in r6 as a bit mask
 ; This bitmask can be used to calculate the appropriate regression in the pointer [3]
 	subl	r10,	r2,		r8
+	subl	r11,	r3,		r8
+	subl	r12,	r4,		r8
+	subl	r7,		r5,		r8
+
 	bicl	r10,	r10,	r2
+	bicl	r11,	r11,	r3
+	bicl	r12,	r12,	r4
+	bicl	r7,		r7,		r5
+
 	tstl	r10,	r9
 	xor.ne	r6,		r6,		0b10000
 
-	subl	r11,	r3,		r8
-	bicl	r11,	r11,	r3
 	tstl	r11,	r9
 	xor.ne	r6,		r6,		0b01000
 
-	subl	r12,	r4,		r8
-	bicl	r12,	r12,	r4
 	tstl	r12,	r9
 	xor.ne	r6,		r6,		0b00100
 
-	subl	r7,		r5,		r8
-	bicl	r7,		r7,		r5
 	tstl	r7,		r9
 	xor.ne	r6,		r6,		0b00010
 
