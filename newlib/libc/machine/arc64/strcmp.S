@@ -42,7 +42,7 @@ ENTRY (strcmp)
 	bne.d		@.L_start_1byte_search
 
 	; Dont clobber r0
-	; Pass it to r13 and use r0 for output immediately
+	; Pass it to r10 and use r0 for output immediately
 	MOVP		r13,	r0
 	; Check if have 4 byte alignment
 	or			r8,		r0,		r1
@@ -60,24 +60,26 @@ ENTRY (strcmp)
 ; Read 3 bytes
 	ldb.ab		r11,	[r13,	+1]
 	ldb.ab		r12,	[r1,	+1]
-	mpy.f		r0,		r11,	r12		; Found NULL terminator
+	and.f		r0,		r11,	r12
 	beq.d		@.L_return
-	subl.f		r0,		r11,	r12		; Found difference
+	subl.f		r0,		r11,	r12
 	bne.d		@.L_return
 ; Read 2 bytes
 	ldb.ab		r11,	[r13,	+1]
 	ldb.ab		r12,	[r1,	+1]
-	and.f		r0,		r11,	r12		; Found NULL terminator
+	and.f		r0,		r11,	r12
 	beq.d		@.L_return
-	subl.f		r0,		r11,	r12		; Found difference
+	subl.f		r0,		r11,	r12
 	bne.d		@.L_return
 ; Read 1 byte
 	ldb.ab		r11,	[r13,	+1]
 	ldb.ab		r12,	[r1,	+1]
-	and.f		r0,		r11,	r12		; Found NULL terminator
+	and.f		r0,		r11,	r12
 	beq.d		@.L_return
-	subl.f		r0,		r11,	r12		; Found difference
+	subl.f		r0,		r11,	r12
 	bne			@.L_return
+
+
 
 ; r13 is now either 4 or 8 byte aligned
 .L_start_4byte_search:
@@ -116,94 +118,33 @@ ENTRY (strcmp)
 ; If there is a 0 in any of the read 32 bytes, its location is encoded
 ; in r6 as a bit mask
 ; This bitmask can be used to calculate the appropriate regression in the pointer [3]
-.L_search_32bytes:
-	ldl.ab	  r4,	[r1, +8]
-	ldl.ab	  r0,	[r1, +8]
-	ldl.ab	  r2,	[r1, +8]
+.L_search_8bytes:
 	ldl.ab	  r3,	[r1, +8]
 	;r4 r5
-
-	ldl.ab	  r11,	[r13, +8]
-	ldl.ab	  r5,	[r13, +8]
-	ldl.ab	  r7,	[r13, +8]
 	ldl.ab	  r10,	[r13, +8]
-
-; Look for a zero
-	subl	r12,	r4,		r8
-	bicl	r12,	r12,	r4
-	tstl	r12,	r9
-	bset.ne	r6,		r6,		4
-
-	subl	r12,	r11,	r8
-	bicl	r12,	r12,	r11
-	tstl	r12,	r9
-	bset.ne	r6,		r6,		4
-; Look for difference
-	subl.f	0,		r4,		r11
-	bset.ne	r6,		r6,		4
-
-
-
-; Look for a zero
-	subl	r12,	r0,		r8
-	bicl	r12,	r12,	r0
-	tstl	r12,	r9
-	bset.ne	r6,		r6,		3
-
-	subl	r12,	r5,		r8
-	bicl	r12,	r12,	r5
-	tstl	r12,	r9
-	bset.ne	r6,		r6,		3
-; Look for difference
-	subl.f	0,		r0,		r5
-	bset.ne	r6,		r6,		3
-
-
-; Look for a zero
-	subl	r12,	r2,		r8
-	bicl	r12,	r12,	r2
-	tstl	r12,	r9
-	bset.ne	r6,		r6,		2
-
-	subl	r12,	r7,		r8
-	bicl	r12,	r12,	r7
-	tstl	r12,	r9
-	bset.ne	r6,		r6,		2
-; Look for difference
-	subl.f	0,		r2,		r7
-	bset.ne	r6,		r6,		2
-
 
 ; Look for a zero
 	subl	r12,	r3,		r8
 	bicl	r12,	r12,	r3
 	tstl	r12,	r9
-	bset.ne	r6,		r6,		1
+	bne.d	@.L_found_difference_in_8B
 
 	subl	r12,	r10,	r8
 	bicl	r12,	r12,	r10
 	tstl	r12,	r9
-	bset.ne	r6,		r6,		1
+	bne.d	@.L_found_difference_in_8B
 ; Look for difference
 	subl.f	0,		r3,		r10
-	bset.ne	r6,		r6,		1
+	bne		@.L_found_difference_in_8B
 
 
-	brne	r6,		0,		@1f
 
-	j		@.L_search_32bytes
+	j		@.L_search_8bytes
 
-1:
 
-; Back track only what is required [4]
-; This isnt working, no clue why, for now always go back the full 32 bytes
-fls		r6,		r6
-asl		r6,		r6,		3
-subl	r1,		r1,		r6
-subl	r13,	r13,	r6
-
-addl	r1,		r1,		4
-addl	r13,	r13,	4
+.L_found_difference_in_8B:
+subl	r1,		r1,		4
+subl	r13,	r13,	4
 
 .L_found_difference_in_4B:
 ; Need to make sure the 1B search takes a 4B chunk into consideration
@@ -218,11 +159,12 @@ ldb.ab		r12,		[r1,	+1]
 
 .L_search_1byte_chunks:
 	; Check for end of string. Do sub either way to provide appropriate difference
-	and.f		r0,		r11,		r12
+	cmp			0,		r11
+	cmp			0,		r12
 	beq.d		@.L_return
 	subl.f		r0,		r11,		r12
 
-	; Load next r13
+	; Load next r10
 	ldb.ab		r11,		[r13,	+1]
 
 	; If the current bytes are different, SUB will return non zero
@@ -234,16 +176,6 @@ ldb.ab		r12,		[r1,	+1]
 .L_return:
 	j_s	[blink]
 
-
-
-
-
-
-
-
-
-
-	
 ENDFUNC (strcmp)
 
 #endif
