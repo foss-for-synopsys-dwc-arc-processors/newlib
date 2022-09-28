@@ -54,7 +54,7 @@ MOVP	r13,	r0
 subl	r3,		r3,		1		; [0]
 asl		r3,		r3,		2		; [1]
 
-; Jump depending on the alignment.
+; Jump depending on the alignment
 bi	    [r3]
 ; Read 3 bytes
 ldb.ab	r10,	[r13,	+1]
@@ -71,8 +71,6 @@ ldb.ab	r10,	[r13,	+1]
 cmp		r10,	0
 beq				@.L_return_size
 
-; Last nop can be removed [2]
-
 ; By this point, r13 is either 4 or 8 byte aligned
 .L_4B_step:
 
@@ -86,7 +84,7 @@ ld.ab	r10,	[r13,	+4]
 sub		r11,	r10,	NULL_32DT_1
 bic		r11,	r11,	r10
 tst		r11,	NULL_32DT_2
-bne		@.L_reread_last_4bytes
+bne				@.L_reread_last_4bytes
 
 .L_start_4_8B_search:
 ; Setup byte detector (more information bellow) [3] [5]
@@ -97,6 +95,7 @@ orl		r8,		r8,		NULL_32DT_1
 orl		r9,		r9,		NULL_32DT_2
 
 ldl.ab	r2,		[r13,	+8]
+
 .L_4_8B_search:
 		ldl.ab	r3,		[r13,	+8]
 		ldl.ab	r4,		[r13,	+8]
@@ -113,20 +112,20 @@ ldl.ab	r2,		[r13,	+8]
 		bicl	r12,	r12,	r4
 		bicl	r7,		r7,		r5
 
-		tstl	r10,	r9
-		xor.ne	r6,		r6,		0b10000
+		tstl		r10,	r9
+		bset.ne		r6,		r6,		4
 
-		tstl	r11,	r9
-		xor.ne	r6,		r6,		0b01000
+		tstl		r11,	r9
+		bset.ne		r6,		r6,		3
 
-		tstl	r12,	r9
-		xor.ne	r6,		r6,		0b00100
+		tstl		r12,	r9
+		bset.ne		r6,		r6,		2
 
-		tstl	r7,		r9
-		xor.ne	r6,		r6,		0b00010
+		tstl		r7,		r9
+		bset.ne		r6,		r6,		1
 
-		breq.d	r6,		0,		@.L_4_8B_search
-		ldl.ab	r2,		[r13,	+8]
+		breq.d		r6,		0,		@.L_4_8B_search
+		ldl.ab		r2,		[r13,	+8]
 
 ; Back track only what is required [4]
 fls		r6,		r6
