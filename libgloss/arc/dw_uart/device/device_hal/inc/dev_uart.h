@@ -64,6 +64,8 @@
 #ifndef _DEVICE_HAL_UART_H_
 #define _DEVICE_HAL_UART_H_
 
+#include <stdint.h>
+
 /**
  *   Device callback function typedef.
  * This is usually used in device callback settings,
