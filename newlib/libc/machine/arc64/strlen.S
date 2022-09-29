@@ -124,6 +124,16 @@ ENDFUNC (strlen)
 #elif defined (__ARC64_ARCH64__) \
       || (defined (__ARC64_ARCH32__) && defined (__ARC64_LL64__))
 
+; Code Brief (more info at the bottom):
+; Searches the provided string, 32 bytes at a time, using 64 bit loads
+; Finds the NULL bytes inside the loaded data
+; Analyzes the first NULL byte containing double word and calculates
+; size appropriately
+;
+; R0 const char* ptr (string to measure)
+; ret (R0):
+;		- unsigned (string size)
+;
 ENTRY (strlen)
 
 ; Preserve r0 for size calculation when returning
