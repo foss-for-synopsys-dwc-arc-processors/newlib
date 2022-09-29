@@ -31,7 +31,7 @@
 #include <sys/asm.h>
 
 ; Using 128-bit memory operations
-#if defined (__ARC64_ARCH64__)
+#if defined (__ARC64_M128__)
 
 ; Code Brief (more info at the bottom):
 ; Searches the provided string, 32 bytes at a time, using 128 bit loads
