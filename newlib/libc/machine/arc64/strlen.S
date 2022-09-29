@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2021, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2022, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -45,113 +45,113 @@
 ENTRY (strlen)
 
 ; If address is 4 byte aligned, we can just directly read 4 bytes
-bmsk.f	r3,		r0,		1
-beq.d			@.L_4B_step
+	bmsk.f	r3, r0, 1
+	beq.d	@.L_4B_step
 
 ; Store r0 for size calculation when returning
-MOVP	r13,	r0
+	MOVP	r13, r0
 
-subl	r3,		r3,		1		; [0]
-asl		r3,		r3,		2		; [1]
+	subl	r3, r3, 1		; [0]
+	asl	r3, r3, 2		; [1]
 
 ; Jump depending on the alignment
-bi	    [r3]
+	bi	[r3]
 ; Read 3 bytes
-ldb.ab	r10,	[r13,	+1]
-cmp		r10,	0
-beq 			@.L_return_size
-nop
+	ldb.ab	r10, [r13, +1]
+	cmp	r10, 0
+	beq	@.L_return_size
+	nop
 ; Read 2 bytes
-ldb.ab	r10,	[r13,	+1]
-cmp		r10,	0
-beq				@.L_return_size
-nop
+	ldb.ab	r10, [r13, +1]
+	cmp	r10, 0
+	beq	@.L_return_size
+	nop
 ; Read 1 byte
-ldb.ab	r10,	[r13,	+1]
-cmp		r10,	0
-beq				@.L_return_size
+	ldb.ab	r10, [r13, +1]
+	cmp	r10, 0
+	beq	@.L_return_size
 
 ; By this point, r13 is either 4 or 8 byte aligned
 .L_4B_step:
 
 ; If aligned to 8 bytes, just jump ahead
-andl.f	0,		r13,	0b111
-beq.d	@.L_start_4_8B_search
+	andl.f	0, r13, 0b111
+	beq.d	@.L_start_4_8B_search
 ; Always reset bit mask that will encode NULL byte location
-xorl	r6,		r6,		r6
+	xorl	r6, r6, r6
 
-ld.ab	r10,	[r13,	+4]
-sub		r11,	r10,	NULL_32DT_1
-bic		r11,	r11,	r10
-tst		r11,	NULL_32DT_2
-bne				@.L_reread_last_4bytes
+	ld.ab	r10, [r13, +4]
+	sub	r11, r10, NULL_32DT_1
+	bic	r11, r11, r10
+	tst r11, NULL_32DT_2
+	bne @.L_reread_last_4bytes
 
 .L_start_4_8B_search:
 ; Setup byte detector (more information bellow) [3] [5]
-movhl	r8,		NULL_32DT_1
-movhl	r9,		NULL_32DT_2
+	movhl	r8, NULL_32DT_1
+	movhl	r9, NULL_32DT_2
 
-orl		r8,		r8,		NULL_32DT_1
-orl		r9,		r9,		NULL_32DT_2
+	orl	r8, r8, NULL_32DT_1
+	orl	r9, r9, NULL_32DT_2
 
-ldl.ab	r2,		[r13,	+8]
+	ldl.ab	r2, [r13, +8]
 
 .L_4_8B_search:
-		ldl.ab	r3,		[r13,	+8]
-		ldl.ab	r4,		[r13,	+8]
-		ldl.ab	r5,		[r13,	+8]
+	ldl.ab	r3, [r13, +8]
+	ldl.ab	r4, [r13, +8]
+	ldl.ab	r5, [r13, +8]
 
-	; NULL byte position is detected and encoded in r6 [4] [5]
-		subl	r10,	r2,		r8
-		subl	r11,	r3,		r8
-		subl	r12,	r4,		r8
-		subl	r7,		r5,		r8
+; NULL byte position is detected and encoded in r6 [4] [5]
+	subl	r10, r2, r8
+	subl	r11, r3, r8
+	subl	r12, r4, r8
+	subl	r7, r5, r8
 
-		bicl	r10,	r10,	r2
-		bicl	r11,	r11,	r3
-		bicl	r12,	r12,	r4
-		bicl	r7,		r7,		r5
+	bicl	r10, r10, r2
+	bicl	r11, r11, r3
+	bicl	r12, r12, r4
+	bicl	r7, r7, r5
 
-		tstl		r10,	r9
-		bset.ne		r6,		r6,		4
+	tstl	r10, r9
+	bset.ne	r6, r6, 4
 
-		tstl		r11,	r9
-		bset.ne		r6,		r6,		3
+	tstl	r11, r9
+	bset.ne	r6, r6, 3
 
-		tstl		r12,	r9
-		bset.ne		r6,		r6,		2
+	tstl	r12, r9
+	bset.ne	r6, r6, 2
 
-		tstl		r7,		r9
-		bset.ne		r6,		r6,		1
+	tstl	r7, r9
+	bset.ne	r6, r6, 1
 
-		breq.d		r6,		0,		@.L_4_8B_search
-		ldl.ab		r2,		[r13,	+8]
+	breq.d	r6, 0, @.L_4_8B_search
+	ldl.ab	r2, [r13, +8]
 
 ; Back track only what is required [4]
-fls		r6,		r6
-asl		r6,		r6,		3
-subl	r13,	r13,	r6
+	fls	r6, r6
+	asl	r6, r6, 3
+	subl	r13, r13, r6
 
 ; Compensate writeback in the loop break
 ; Should be 8 byte compensation, but if we only compensate 4 bytes we can
 ; fallthrough to 4 byte reread
-subl	r13,	r13,	4
+	subl	r13, r13, 4
 
 .L_reread_last_4bytes:
-subl	r13,	r13,	4
+	subl	r13, r13, 4
 
 ; Perform 1 byte search until NULL byte is found
-ldb		r10,	[r13]
+	ldb	r10, [r13]
 .L_search_next_1byte_chunk:
-		cmp		r10,	0
-		bne.d	@.L_search_next_1byte_chunk
-		ldb.aw	r10,	[r13, +1]
+	cmp	r10, 0
+	bne.d	@.L_search_next_1byte_chunk
+	ldb.aw	r10, [r13, +1]
 
 ; NULL byte was found in r13 - 1
 .L_return_size:
-subl	r0,		r13,		r0
-j_s.d	[blink]
-subl	r0,		r0,		1
+	subl	r0, r13, r0
+	j_s.d	[blink]
+	subl	r0, r0, 1
 
 ;; The first step in this code is to "fix" the address alignment
 ;
