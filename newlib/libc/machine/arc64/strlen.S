@@ -46,7 +46,7 @@
 ENTRY (strlen)
 
 ; Preserve r0 for size calculation when returning
-	MOVP	r13, r0
+	movl	r13, r0
 	xorl	r6, r6, r6
 
 ; Setup byte detector (more information bellow) [1]
@@ -99,24 +99,22 @@ ENTRY (strlen)
 
 	breq.d	r6, 0, @.L_4_8B_search
 
-	fls	r6, r6 ; [2]
+	fls	r5, r6 ; [2]
 
 ; Point r13 to first NULL byte containing double word [3]
-	sub3l	r13, r13, r6
+	sub3l	r13, r13, r5
 
 ; Select appropriate register to analyze [4]
-	subl	r6, r6, 1
-	asl	r6, r6, 1
-	
-	bi	[r6]
-	MOVP	r2, r7
-	b	@.L_fix_r13
-	MOVP	r2, r12
-	b	@.L_fix_r13
-	MOVP	r2, r11
-	b	@.L_fix_r13
-	MOVP	r2, r10
-	nop
+	movl	r2, r7
+
+	asr.f	r6, r6, 3
+	movl.c	r2, r12
+
+	asr.f	r6, r6, 1
+	movl.c	r2, r11
+
+	asr.f	r6, r6, 1
+	movl.c	r2, r10
 
 ; Point r13 to first NULL byte in selected double word
 .L_fix_r13:
@@ -154,14 +152,26 @@ ENDFUNC (strlen)
 ;; in r6, which is then used to adjust r13
 ;
 ; r6 is set via bset, which means we can simply use a fls to obtain the first
-; match (or ffs depending on the values in bset) [2]
+; match (or ffs depending on the values in bset) [2].
+; The reason for starting at 1 and not 0 is so r6 encodes how many double
+; words to go back, and it wouldnt make sense to go back 0 (the NULL would be
+; in the next loop iteration).
 ; 
 ; The first step to take is point r13 to the appropriate double word.
 ; As the chosen encoded information is how many double words to go back,
 ; we can simply multiply r6 by 8 and reduce r13 by that amount [3]
 ; 
 ; Then, we need to place the loaded double word containing the first NULL byte
-; into a "common" register we can operate on later [4]
+; into a "common" register we can operate on later [4].
+; 
+; To do this without any jumps, we can shift r6 and perform a conditional mov
+; based on the carry flag value.
+; The order is very important because the NULL byte can appear in several
+; double words, so we want to analyze from last to first.
+; 
+; We can ignore the first asr (which would be asr.f 2, as we started r6 on 1)
+; because if r7 isnt the NULL byte, r2 will always be overwritten so we can
+; just decide to start at r7, and overwrite it if needed.
 ; 
 ; Now comes the tricky part. In order to obtain the first NULL byte, we need to
 ; understand the NULL byte detection operation. It is explained in depth in the
