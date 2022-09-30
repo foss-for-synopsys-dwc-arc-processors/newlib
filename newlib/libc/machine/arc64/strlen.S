@@ -62,8 +62,7 @@ ENTRY (strlen)
 	lddl.ab	r4r5, [r13, +16]
 
 ; The 64-bit crunching implementation.
-#elif defined (__ARC64_ARCH64__) \
-      || (defined (__ARC64_ARCH32__) && defined (__ARC64_LL64__))
+#elif defined (__ARC64_ARCH64__)
 	
 	ldl.ab	r2, [r13, +8]
 	ldl.ab	r3, [r13, +8]
