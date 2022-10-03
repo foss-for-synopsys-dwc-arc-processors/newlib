@@ -20,17 +20,16 @@ ENTRY (memmove)
 	; Only relevant when not taking the branch, but might as well
 	; use the delay slot (after the branch, this will be redone
 	addl	r3, r0, r2
-
 ; Backwards search
 ; The only thing that changes between memcpy and memmove is copy direction
 ; in case the dest and src address memory locations overlap
-; For a scratch implementation, have separate code for incremental and decremental copies	
+; More detailed information is in the forwards copy and at the end of
+; this document
+
 	; Set both r0 and r1 to point to the end of eahc memory location
 	addl	r1, r1, r2
 	bmsk_s	r2, r2, 4
 
-; Take care of the last 31 bytes
-.L_B_write_31_bytes:
 	bbit0.d	r2, 0, @1f
 	lsr	r11, r2, 3
 	ldb.aw	r4, [r1, -1]
@@ -54,11 +53,9 @@ ENTRY (memmove)
 	LD64.aw	r4, [r1, -8]
 	ST64.aw	r4, [r3, -8]
 
-; Do we have more than 32 bytes to take care of?
 	jeq	[blink]
 
-; Only take care of the 32 byte chunks at the end
-.L_B_write_32_bytes:
+.L_write_backwards_32_bytes:			; Take care of 32 byte chunks
 	LD64.aw	r4, [r1, -8]
 	LD64.aw	r6, [r1, -8]
 	LD64.aw	r8, [r1, -8]
@@ -66,21 +63,17 @@ ENTRY (memmove)
 	ST64.aw	r4, [r3, -8]
 	ST64.aw	r6, [r3, -8]
 	ST64.aw	r8, [r3, -8]
-	dbnz.d	r12, @.L_B_write_32_bytes
+	dbnz.d	r12, @.L_write_backwards_32_bytes
 	ST64.aw	r10, [r3, -8]
-
+    
 	j_s	[blink]
-
 
 ; Normal memcpy
 .L_normal_memcpy:
-
-	; Flags were set by LSRP.f, meaning it will jump if
-	; there are no 32 byte chunks
-	beq.d	@.L_F_write_31_bytes
+	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
+	beq.d	@.L_write_forwards_31_bytes
 	MOVP	r3, r0			; do not clobber the "dest"
-
-.L_F_write_32_bytes:
+.L_write_forwards_32_bytes:			; Take care of 32 byte chunks
 	LD64.ab	r4, [r1, +8]
 	LD64.ab	r6, [r1, +8]
 	LD64.ab	r8, [r1, +8]
@@ -88,27 +81,55 @@ ENTRY (memmove)
 	ST64.ab	r4, [r3, +8]
 	ST64.ab	r6, [r3, +8]
 	ST64.ab	r8, [r3, +8]
-	dbnz.d	r12, @.L_F_write_32_bytes
-	ST64.ab	r10, [r3, +8]
-	bmsk_s	r2, r2, 4
+	dbnz.d	r12, @.L_write_forwards_32_bytes
+	ST64.ab	r10, [r3, +8]	; Shove store in delay slot
+	bmsk_s	r2, r2, 4		; From now on, we only care for the remainder % 32
 
-.L_F_write_31_bytes:
-	bbit0.d	r2, 2, @1f
-	lsr	r12, r2, 3
+
+; The remainder bits indicating how many more bytes to copy
+; .------------------------.
+; | b4 | b3 | b2 | b1 | b0 |
+; `------------------------'
+;   16    8    4    2    1
+.L_write_forwards_31_bytes:
+	bbit0.d	r2, 2, @1f		; is b2 set? then copy 4 bytes
+	lsr	    r12, r2, 3		; see the notes below
 	ld.ab	r4, [r1, 4]
 	st.ab	r4, [r3, 4]
 1:
-	bbit0.d	r2, 1, @1f
-	xor	r12, r12, 3
+	bbit0.d	r2, 1, @1f		; is b1 set? then copy 2 bytes
+	xor	    r12, r12, 3
 	ldh.ab	r4, [r1, 2]
 	sth.ab	r4, [r3, 2]
 1:
-	bbit0.d	r2, 0, @1f
-	asl	r12, r12, 1
+	bbit0.d	r2, 0, @1f		; is b0 set? then copy 1 byte
+	asl	    r12, r12, 1
 	ldb.ab	r4, [r1, 1]
 	stb.ab	r4, [r3, 1]
+
+; Interpreting bits (b4,b3) [1] and how they correlate to branch index:
+;
+; (b4,b3) | bytes to copy | branch index
+; --------+---------------+-------------
+;   00b   |       0       |   3 (11b)
+;   01b   |       8       |   2 (10b)
+;   10b   |      16       |   1 (01b)
+;   11b   |      24       |   0 (00b)
+;
+; To go from (b4,b3) to branch index, the bits must be flipped.
+; In other words, they must be XORed with 11b [2].
+;
+; Last but not least, "bi" jumps at boundaries of 4. We need to double
+; the index to jump 8 bytes [3].
+;
+; Hence, the 3 operations for calculating the branch index that are spread
+; in "bbit0" delay slots:
+;
+;	lsr	    r12, r2,  3    [1]
+;	xor	    r12, r12, 3    [2]
+;	asl	    r12, r12, 1    [3]
 1:
-	bi	[r12]
+	bi	    [r12]
 	LD64.ab	r4, [r1, 8]
 	ST64.ab	r4, [r3, 8]
 	LD64.ab	r4, [r1, 8]
@@ -117,8 +138,6 @@ ENTRY (memmove)
 	ST64.ab	r4, [r3, 8]
 
 	j_s	[blink]
-
-
 
 ENDFUNC (memmove)
 
