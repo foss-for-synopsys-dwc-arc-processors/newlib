@@ -259,38 +259,40 @@ ENTRY (strcat)
 	MOVP	r10, r7
 	MOVP	r11, r5
 
-
+; r11 now contains the data to write
+; r10 contains most of the NULL byte detector operation
 .L_store_lastL64bits:
 
 	andl	r10, r10, r9 ; [5]
 
-	ffsl	r12, r10 ; [6]
-	addl	r12, r12, 1
+	ffsl	r2, r10 ; [6]
+	addl	r2, r2, 1
 
-	xbful 	r12, r12, 0b00111000011 ; [7]
+	xbful 	r2, r2, 0b00111000011 ; [7]
+
+	movl	r3, 0xffffffffffffffff	; Bitmask setup
 
 	; If the NULL byte is in byte 3 (starting from the right)
 	; we want to store 8-3 bytes
-	subl	r12, 8, r12
-	asl		r12, r12, 3
+	subl	r2, 8, r2
+	asl		r2, r2, 3
 
 	; According to the target byte, setup masks
-	movl	r10, 0xffffffffffffffff
-	lsrl	r10, r10, r12
-	notl	r9, r10
-
+	lsrl	r3, r3, r2
+	notl	r4, r3
 
 	; Obtain relevant data from destination
-	ldl	r2, [r13]
-	; Get which data from dest is not to be overwritten and or it
+	ldl	r10, [r13]
+
+	; Get which data from dest is not to be overwritten and OR it
 	; with the relevant data to write
-	andl	r3, r10, r11
-	andl	r4, r9, r2
+	andl	r3, r3, r11
+	andl	r4, r4, r10
 
 	orl		r3, r3, r4
 
 	stl.ab	r3, [r13, +8]
-	
+
 	j_s.d	[blink]
 
 
