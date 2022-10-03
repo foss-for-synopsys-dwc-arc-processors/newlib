@@ -173,8 +173,11 @@ ENDFUNC (strlen)
 ; 
 ; Now comes the tricky part. In order to obtain the first NULL byte, we need to
 ; understand the NULL byte detection operation. It is explained in depth in the
-; link above but in short, it works by triggering an overflow and then checking
-; against an expected value, that is only set if any bit in each byte is set.
+; link above but in short, it works by first setting the highest bit of each
+; byte to 1, if the corresponding byte is either 0 or more than 0x80
+; Then, separately, it makes the highest bit of each byte 1, if the byte is
+; less than 0x80. The last step is to AND these two values (this operation is
+; simplified with the SUB, BIC and TST instructions).
 ; 
 ; This means that the evaluated equation result value [5] has zeros for all non
 ; zero bytes, except for the NULL bytes. Therefore, we can simply find the
