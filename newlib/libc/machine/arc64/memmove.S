@@ -4,7 +4,12 @@
 ; r1 const void* src
 ; r2 size_t count
 
-#if defined (__ARC64_ARCH64__)
+
+
+; Using 128-bit memory operations
+
+
+; The 64-bit crunching implementation.
 
 ENTRY (memmove)
 	; If the source plus count is greater than the destination
@@ -56,6 +61,17 @@ ENTRY (memmove)
 	jeq	[blink]
 
 .L_write_backwards_32_bytes:			; Take care of 32 byte chunks
+#if defined (__ARC64_M128__)
+
+	lddl.aw	r4r5, [r1, -16]
+	lddl.aw	r6r7, [r1, -16]
+
+	stdl.aw	r4r5, [r3, -16]
+	stdl.aw	r6r7, [r3, -16]
+	dbnz	r12, @.L_write_backwards_32_bytes
+
+#elif defined (__ARC64_ARCH64__)
+
 	LD64.aw	r4, [r1, -8]
 	LD64.aw	r6, [r1, -8]
 	LD64.aw	r8, [r1, -8]
@@ -65,7 +81,11 @@ ENTRY (memmove)
 	ST64.aw	r8, [r3, -8]
 	dbnz.d	r12, @.L_write_backwards_32_bytes
 	ST64.aw	r10, [r3, -8]
-    
+
+#else
+# error Unknown configuration
+#endif
+
 	j_s	[blink]
 
 ; Normal memcpy
@@ -74,6 +94,17 @@ ENTRY (memmove)
 	beq.d	@.L_write_forwards_31_bytes
 	MOVP	r3, r0			; do not clobber the "dest"
 .L_write_forwards_32_bytes:			; Take care of 32 byte chunks
+#if defined (__ARC64_M128__)
+
+	lddl.ab	r4r5, [r1, +16]
+	lddl.ab	r6r7, [r1, +16]
+
+	stdl.ab	r4r5, [r3, +16]
+	stdl.ab	r6r7, [r3, +16]
+	dbnz	r12, @.L_write_forwards_32_bytes
+
+#elif defined (__ARC64_ARCH64__)
+
 	LD64.ab	r4, [r1, +8]
 	LD64.ab	r6, [r1, +8]
 	LD64.ab	r8, [r1, +8]
@@ -83,6 +114,12 @@ ENTRY (memmove)
 	ST64.ab	r8, [r3, +8]
 	dbnz.d	r12, @.L_write_forwards_32_bytes
 	ST64.ab	r10, [r3, +8]	; Shove store in delay slot
+
+#else
+# error Unknown configuration
+#endif
+
+
 	bmsk_s	r2, r2, 4		; From now on, we only care for the remainder % 32
 
 
@@ -141,5 +178,4 @@ ENTRY (memmove)
 
 ENDFUNC (memmove)
 
-#endif
 
