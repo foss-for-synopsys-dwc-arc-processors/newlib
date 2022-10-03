@@ -121,7 +121,7 @@ ENTRY (strlen)
 
 	ffsl	r9, r9 ; [6]
 
-	xbful 	r9, r9, 0b01111000011 ; [7]
+	xbful 	r9, r9, 0b0111000011 ; [7]
 
 	addl r13, r13, r9 ; [8]
 
@@ -189,9 +189,11 @@ ENDFUNC (strlen)
 ; NULL byte and we wouldnt be here) we dont need to worry about that. [6]
 ; 
 ; We can then convert the bit position into the last byte position by looking
-; into bits 3 to 6, and shifting 3 bits to the right. This can be combined into
+; into bits 3 to 5, and shifting 3 bits to the right. This can be combined into
 ; a single xbful operation. The bottom 000011 represent shift by 3 and the top
-; 01111 represents the mask (3 to 6 shifted by 3 is 0 to 3) [7]
+; 0111 represents the mask (3 to 5 shifted by 3 is 0 to 2). We dont need to worry
+; about the case where ffs does not find a bit, because we know for sure there is
+; at least one NULL byte, and therefore one of the highest bits is set to 1 [7]
 ; 
 ; Finally, we can add the NULL byte position inside the loaded double word to
 ; r13 and subtract r0 from r13 to obtain the string size [8]
