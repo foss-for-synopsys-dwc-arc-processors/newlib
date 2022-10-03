@@ -252,59 +252,34 @@ fls	r6, r6 ; [2]
 	MOVP	r10, r7
 	MOVP	r11, r5
 
-; r10 contains 
-; r11 contains the last 64 bits to potentially write
 
 ; Point r13 to first NULL byte in selected double word
 .L_fix_r1:
 	andl	r10, r10, r9 ; [5]
-; R10 now has only the highest bit in each byte set, for NULL bytes.
-; So, we find the rightmost bit, which will belong to the first NULL byte, counting from the right.
-; r10 will be 0 to 7
 
 	ffsl	r12, r10 ; [6]
-
 	addl	r12, r12, 1 ; [6]
-
 	xbful 	r12, r12, 0b00111000011 ; [7]
 
-; r12 now contains which byte the last NULL byte is
-; If r12 is 0, the NULL byte is the last one and we need to copy 7 bytes,
-; if it is 7, we need to copy 0 bytes
-
-;ldl.ab	r2, [r13, +8]
-
-; How many bytes to copy is in r10 now
-
+	; 
 	subl	r12, 8, r12
+	asl		r12, r12, 3
 
-	asl		r12, r12, 1
+	movl	r10, 0xffffffffffffffff
 
-	bi [r12]
+	lsrl	r10, r10, r12
 
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
+	notl	r9, r10
 
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
+	ldl	r2, [r13]
 
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
+	andl	r3, r10, r11
 
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
+	andl	r4, r9, r2
 
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
-
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
-
-	stb.ab	r11, [r13, +1]
-	lsrl	r11, r11, 8
-
-	stb.ab	r11, [r13, +1]
-	nop
+	orl		r3, r3, r4
+	
+	stl.ab	r3, [r13, +8]
 
 	j_s.d	[blink]
 
