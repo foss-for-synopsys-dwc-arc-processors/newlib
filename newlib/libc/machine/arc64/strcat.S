@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2021, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2022, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -53,264 +53,260 @@
 ;		- char* (destiantion string)
 ;
 
-#if defined (__ARC64_ARCH64__)
-
 ENTRY (strcat)
 ; Find end of r0 string
 ; ========================== STRLEN CODE START ==========================
 
-; If address is 4 byte aligned, we can just directly read 4 bytes
-bmsk.f	r3,		r0,		1
-beq.d			@.L_4B_step_dest
 
-; Store r0 for size calculation when returning
-MOVP	r13,	r0
+; Preserve r0 for size calculation when returning
+	movl	r13, r0
+	xorl	r6, r6, r6
 
-subl	r3,		r3,		1		; [0]
-asl		r3,		r3,		2		; [1]
+; Setup byte detector (more information bellow) [1]
+	vpack2wl	r8, NULL_32DT_1, NULL_32DT_1
+	asll	r9, r8, 7
 
-; Jump depending on the alignment.
-bi	    [r3]
-; Read 3 bytes
-ldb.ab	r10,	[r13,	+1]
-cmp		r10,	0
-beq 			@.L_string_end_found
-nop
-; Read 2 bytes
-ldb.ab	r10,	[r13,	+1]
-cmp		r10,	0
-beq				@.L_string_end_found
-nop
-; Read 1 byte
-ldb.ab	r10,	[r13,	+1]
-cmp		r10,	0
-beq				@.L_string_end_found
-nop
 
-; By this point, r13 is either 4 or 8 byte aligned
-.L_4B_step_dest:
+.L_4_8B_search:
 
-; If aligned to 8 bytes, just jump ahead
-andl.f	0,		r13,	0b111
-beq.d			@.L_start_4_8B_search_dest
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
 
-; Always reset bit mask that will encode NULL byte location
-xorl	r6,		r6,		r6
+	lddl.ab r2r3, [r13, +16]
+	lddl.ab r4r5, [r13, +16]
 
-ld.ab	r10,	[r13,	+4]
-sub		r11,	r10,	NULL_32DT_1
-bic		r11,	r11,	r10
-tst		r11,	NULL_32DT_2
-bne				@.L_reread_last_4bytes
+; The 64-bit crunching implementation.
+#elif defined (__ARC64_ARCH64__)
 
-.L_start_4_8B_search_dest:
-; Setup byte detector (more information bellow) [2] [4]
-movhl	r8,		NULL_32DT_1
-movhl	r9,		NULL_32DT_2
+	ldl.ab	r2, [r13, +8]
+	ldl.ab	r3, [r13, +8]
+	ldl.ab	r4, [r13, +8]
+	ldl.ab	r5, [r13, +8]
 
-orl		r8,		r8,		NULL_32DT_1
-orl		r9,		r9,		NULL_32DT_2
+#else
+# error Unknown configuration
+#endif
 
-ldl.ab	r2,		[r13,	+8]
+; NULL byte position is detected and encoded in r6 [0] [9]
+	subl	r10, r2, r8
+	subl	r11, r3, r8
+	subl	r12, r4, r8
+	subl	r7, r5, r8
 
-.L_4_8B_search_dest:
-		ldl.ab	r3,		[r13,	+8]
-		ldl.ab	r4,		[r13,	+8]
-		ldl.ab	r5,		[r13,	+8]
+	bicl	r10, r10, r2
+	bicl	r11, r11, r3
+	bicl	r12, r12, r4
+	bicl	r7, r7, r5
 
-	; NULL byte position is detected and encoded in r6 [3] [4]
-		subl	r10,	r2,		r8
-		subl	r11,	r3,		r8
-		subl	r12,	r4,		r8
-		subl	r7,		r5,		r8
+	tstl	r10, r9
+	bset.ne	r6, r6, 4
 
-		bicl	r10,	r10,	r2
-		bicl	r11,	r11,	r3
-		bicl	r12,	r12,	r4
-		bicl	r7,		r7,		r5
+	tstl	r11, r9
+	bset.ne	r6, r6, 3
 
-		tstl		r10,	r9
-		bset.ne		r6,		r6,		4
+	tstl	r12, r9
+	bset.ne	r6, r6, 2
 
-		tstl		r11,	r9
-		bset.ne		r6,		r6,		3
+	tstl	r7, r9
+	bset.ne	r6, r6, 1
 
-		tstl		r12,	r9
-		bset.ne		r6,		r6,		2
+	breq.d	r6, 0, @.L_4_8B_search
 
-		tstl		r7,		r9
-		bset.ne		r6,		r6,		1
+	fls	r6, r6 ; [2]
 
-		breq.d		r6,		0,		@.L_4_8B_search_dest
-		ldl.ab		r2,		[r13,	+8]
+; Point r13 to first NULL byte containing double word [3]
+	sub3l	r13, r13, r6
 
-; Back track only what is required [3]
-fls		r6,		r6
-asl		r6,		r6,		3
-subl	r13,	r13,	r6
+; Select appropriate register to analyze [4]
+	subl	r6, r6, 1
+	asl r6, r6, 1
 
-; Compensate writeback in the loop break
-; Should be 8 byte compensation, but if we only compensate 4 bytes we can
-; fallthrough to 4 byte reread
-subl	r13,	r13,	4
+	bi	[r6]
+	MOVP	r2, r7
+	b	@.L_fix_r13
+	MOVP	r2, r12
+	b	@.L_fix_r13
+	MOVP	r2, r11
+	b	@.L_fix_r13
+	MOVP	r2, r10
+	nop
 
-.L_reread_last_4bytes:
-subl	r13,	r13,	4
+; Point r13 to first NULL byte in selected double word
+.L_fix_r13:
+	andl	r2, r2, r9 ; [5]
 
-; Perform 1 byte search until NULL byte is found
-ldb		r10,	[r13]
-.L_search_next_1byte_chunk_dest:
-		cmp		r10,	0
-		bne.d	@.L_search_next_1byte_chunk_dest
-		ldb.aw	r10,	[r13, +1]
+	ffsl	r2, r2 ; [6]
 
-; NULL byte was found in r0 - 1
-.L_string_end_found:
-subl	r13,	r13,		1
+	xbful 	r2, r2, 0b01111000011 ; [7]
+
+	addl	r13, r13, r2 ; [8]
+
 
 ; ========================== STRLEN CODE END >|< ==========================
 
-; Compare address alignments
-bmsk.f	r10,		r13,		2
-bmsk.f	r11,		r1,		    2
-SUB.f	r10,		r10,	    r11
-
-; If alignments are different, will never match alignment
-bne		@.L_start_1byte_search_src
-
-; If address is 4 byte aligned, we can just directly read 4 bytes
-bmsk.f	r3,		r13,		1
-beq.d			@.L_4B_step_src
-
-subl	r3,		r3,		1		; [0]
-asl		r3,		r3,		2		; [1]
-
-; Jump depending on the alignment
-bi	    [r3]
-; Read 3 bytes
-ldb.ab	r10,	[r1,	+1]
-cmp		r10,	0
-beq.d			@.L_return_dest
-stb.ab	r10,	[r13,	+1]
-
-; Read 2 bytes
-ldb.ab	r10,	[r1,	+1]
-cmp		r10,	0
-beq.d			@.L_return_dest
-stb.ab	r10,	[r13,	+1]
-
-; Read 1 byte
-ldb.ab	r10,	[r1,	+1]
-cmp		r10,	0
-beq.d			@.L_return_dest
-stb.ab	r10,	[r13,	+1]
-
-
-; By this point, r13 and r1 are either 4 or 8 byte aligned, with
-; matching alignments
-.L_4B_step_src:
-
-; If aligned to 8 bytes, just jump ahead
-andl.f	0,		r1,		0b111
-beq.d			@.L_4_8B_search_src
-; Always reset bit mask that will encode NULL byte location
-xorl	r6,		r6,		r6
-
-ld.ab	r10,	[r1,	+4]
-sub		r11,	r10,	NULL_32DT_1
-bic		r11,	r11,	r10
-tst		r11,	NULL_32DT_2
-bne				@.L_reread_last_4bytes_src
-
-; NULL byte detector is already setup by strlen
-
-stl.ab	r10,	[r13,	+4]
+	xorl	r6, r6, r6
 
 .L_4_8B_search_src:
-		ldl.ab	r2,		[r1,	+8]
-		ldl.ab	r3,		[r1,	+8]
-		ldl.ab	r4,		[r1,	+8]
-		ldl.ab	r5,		[r1,	+8]
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
 
-		; NULL byte position is detected and encoded in r6 [4] [5]
-		subl	r10,	r2,		r8
-		subl	r11,	r3,		r8
-		subl	r12,	r4,		r8
-		subl	r7,		r5,		r8
+	lddl.ab	r2r3, [r1, +16]
+	lddl.ab	r4r5, [r1, +16]
 
-		bicl	r10,	r10,	r2
-		bicl	r11,	r11,	r3
-		bicl	r12,	r12,	r4
-		bicl	r7,		r7,		r5
+; The 64-bit crunching implementation.
+#elif defined (__ARC64_ARCH64__)
 
-		tstl	r10,	r9
-		bset.ne	r6,		r6,		4
+	ldl.ab	r2, [r1, +8]
+	ldl.ab	r3, [r1, +8]
+	ldl.ab	r4, [r1, +8]
+	ldl.ab	r5, [r1, +8]
 
-		tstl	r11,	r9
-		bset.ne	r6,		r6,		3
+#else
+	# error Unknown configuration
+#endif
 
-		tstl	r12,	r9
-		bset.ne	r6,		r6,		2
+; NULL byte position is detected and encoded in r6 [4] [5]
+	subl	r10, r2, r8
+	subl	r11, r3, r8
+	subl	r12, r4, r8
+	subl	r7, r5, r8
 
-		tstl	r7,		r9
-		bset.ne	r6,		r6,		1
+	bicl	r10, r10, r2
+	bicl	r11, r11, r3
+	bicl	r12, r12, r4
+	bicl	r7, r7, r5
 
-		brne	r6,		0,		@.L_found_in_32B
+	tstl	r10, r9
+	bset.ne	r6, r6, 4
 
-		stl.ab	r2,	[r13,	+8]
-		stl.ab	r3,	[r13,	+8]
-		stl.ab	r4,	[r13,	+8]
-		stl.ab	r5,	[r13,	+8]
+	tstl	r11, r9
+	bset.ne	r6, r6, 3
 
-		j 		@.L_4_8B_search_src
+	tstl	r12, r9
+	bset.ne	r6, r6, 2
+
+	tstl	r7, r9
+	bset.ne	r6, r6, 1
+
+	brne	r6, 0, @.L_found_in_32B
+
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
+
+	stdl.ab	r2r3, [r13, +16]
+	stdl.ab	r4r5, [r13, +16]
+
+; The 64-bit crunching implementation.
+#elif defined (__ARC64_ARCH64__)
+
+	stl.ab	r2, [r13, +8]
+	stl.ab	r3, [r13, +8]
+	stl.ab	r4, [r13, +8]
+	stl.ab	r5, [r13, +8]
+
+#else
+# error Unknown configuration
+#endif
+
+j 		@.L_4_8B_search_src
 
 .L_found_in_32B:
 
-; Back track only what is required [5]
-fls		r6,		r6
+fls	r6, r6 ; [2]
 
-asl		r5,		r6,		3
-sub		r6,		r6,		1
+; Point r13 to first NULL byte containing double word [3]
+	sub3l	r1, r1, r6
 
-subl	r1,		r1,		r5
-asl		r6,		r6,		2
+; Select appropriate register to analyze [4]
+	subl	r6, r6, 1
+; Invert so the biggest branch is at the end, and we dont need to increase
+; block size
+	subl	r6, 3, r6
 
-bi		[r6]
-stl.ab	r2,		[r13,	+8]
-stl.ab	r3,		[r13,	+8]
-stl.ab	r4,		[r13,	+8]
-b				@.L_start_1byte_search_src
+	mpyl	r6, r6, 5
 
-stl.ab	r2,		[r13,	+8]
-stl.ab	r3,		[r13,	+8]
-b				@.L_start_1byte_search_src
-nop
+; Store double words
+	bi	[r6]
 
-stl.ab	r2,		[r13,	+8]
-nop
-nop
-nop
+	MOVP	r10, r10
+	MOVP	r11, r2
+	b	@.L_fix_r1
+	nop
+	nop
 
-; Passthrough to last branch
+	stl.ab	r2, [r13, +8]
+	MOVP	r10, r11
+	MOVP	r11, r3
+	b	@.L_fix_r1
+	nop
 
-b		@.L_start_1byte_search_src
+	stl.ab	r2, [r13, +8]
+	stl.ab	r3, [r13, +8]
+	MOVP	r10, r12
+	MOVP	r11, r4
+	b	@.L_fix_r1
 
-.L_reread_last_4bytes_src:
+	stl.ab	r2, [r13, +8]
+	stl.ab	r3, [r13, +8]
+	stl.ab	r4, [r13, +8]
+	MOVP	r10, r7
+	MOVP	r11, r5
 
-subl	r1,     r1,     4
+; r10 contains 
+; r11 contains the last 64 bits to potentially write
 
-; Perform 1 byte search until NULL byte is found
-.L_start_1byte_search_src:
+; Point r13 to first NULL byte in selected double word
+.L_fix_r1:
+	andl	r10, r10, r9 ; [5]
+; R10 now has only the highest bit in each byte set, for NULL bytes.
+; So, we find the rightmost bit, which will belong to the first NULL byte, counting from the right.
+; r10 will be 0 to 7
 
-		; Look for NULL byte
-		ldb.ab	r11,	[r1, 	+1]
-		cmp		r11,	0
+	ffsl	r12, r10 ; [6]
 
-		bne.d   		@.L_start_1byte_search_src
-		stb.ab	r11,	[r13, 	+1]
+	addl	r12, r12, 1 ; [6]
 
-.L_return_dest:
-j_s	[blink]
+	xbful 	r12, r12, 0b00111000011 ; [7]
+
+; r12 now contains which byte the last NULL byte is
+; If r12 is 0, the NULL byte is the last one and we need to copy 7 bytes,
+; if it is 7, we need to copy 0 bytes
+
+;ldl.ab	r2, [r13, +8]
+
+; How many bytes to copy is in r10 now
+
+	subl	r12, 8, r12
+
+	asl		r12, r12, 1
+
+	bi [r12]
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	lsrl	r11, r11, 8
+
+	stb.ab	r11, [r13, +1]
+	nop
+
+	j_s.d	[blink]
 
 
 ENDFUNC (strcat)
@@ -395,6 +391,3 @@ ENDFUNC (strcat)
 ; The nops are very important to keep the alignment of the jump
 ;
 ;
-
-
-#endif
