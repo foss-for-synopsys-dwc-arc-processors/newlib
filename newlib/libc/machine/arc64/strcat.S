@@ -53,6 +53,218 @@
 ;		- char* (destiantion string)
 ;
 
+#if defined (__ARC64_ARCH32__)
+
+
+ENTRY (strcat)
+; Find end of r0 string
+; ========================== STRLEN CODE START ==========================
+
+; Preserve r0 for size calculation when returning
+	mov	r13, r0
+	xor	r6, r6, r6
+
+; Setup byte detector (more information below) [1]
+	mov	r8, NULL_32DT_1
+	asl	r9, r8, 7
+
+
+.L_4_4B_search:
+
+	ld.ab	r2, [r13, +4]
+	ld.ab	r3, [r13, +4]
+	ld.ab	r4, [r13, +4]
+	ld.ab	r5, [r13, +4]
+
+; NULL byte position is detected and encoded in r6 [0] [9]
+	sub	r10, r2, r8
+	sub	r11, r3, r8
+	sub	r12, r4, r8
+	sub	r7, r5, r8
+
+	bic	r10, r10, r2
+	bic	r11, r11, r3
+	bic	r12, r12, r4
+	bic	r7, r7, r5
+
+	tst	r10, r9
+	bset.ne	r6, r6, 4
+
+	tst	r11, r9
+	bset.ne	r6, r6, 3
+
+	tst	r12, r9
+	bset.ne	r6, r6, 2
+
+	tst	r7, r9
+	bset.ne	r6, r6, 1
+
+	breq.d	r6, 0, @.L_4_4B_search
+
+	fls	r6, r6 ; [2]
+
+; Point r13 to first NULL byte containing double word [3]
+	sub2	r13, r13, r6
+
+; Select appropriate register to analyze [4]
+	sub	r6, r6, 1
+	asl r6, r6, 1
+
+	bi	[r6]
+	mov	r2, r7
+	b	@.L_fix_r13
+	mov	r2, r12
+	b	@.L_fix_r13
+	mov	r2, r11
+	b	@.L_fix_r13
+	mov	r2, r10
+	nop
+
+; Point r13 to first NULL byte in selected double word
+.L_fix_r13:
+	and	r2, r2, r9 ; [5]
+
+	ffs	r2, r2 ; [6]
+
+	xbfu 	r2, r2, 0b0111000011 ; [7]
+
+	add	r13, r13, r2 ; [8]
+
+
+; ========================== STRLEN CODE END >|< ==========================
+
+	xor	r6, r6, r6
+
+.L_4_4B_search_src:
+
+	ld.ab	r2, [r1, +4]
+	ld.ab	r3, [r1, +4]
+	ld.ab	r4, [r1, +4]
+	ld.ab	r5, [r1, +4]
+
+; NULL byte position is detected and encoded in r6 [0] [9]
+	sub	r10, r2, r8
+	sub	r11, r3, r8
+	sub	r12, r4, r8
+	sub	r7, r5, r8
+
+	bic	r10, r10, r2
+	bic	r11, r11, r3
+	bic	r12, r12, r4
+	bic	r7, r7, r5
+
+	tst	r10, r9
+	bset.ne	r6, r6, 4
+
+	tst	r11, r9
+	bset.ne	r6, r6, 3
+
+	tst	r12, r9
+	bset.ne	r6, r6, 2
+
+	tst	r7, r9
+	bset.ne	r6, r6, 1
+
+	brne	r6, 0, @.L_found_in_32B
+
+	st.ab	r2, [r13, +4]
+	st.ab	r3, [r13, +4]
+	st.ab	r4, [r13, +4]
+	st.ab	r5, [r13, +4]
+
+	j	@.L_4_4B_search_src
+
+.L_found_in_32B:
+
+	fls	r6, r6 ; [2]
+
+; Point r1 to first NULL byte containing double word [3]
+	sub2	r1, r1, r6
+
+;; Store the already loaded data
+
+	; 4 -> 1 to 3 -> 0
+	;subl	r6, r6, 1
+
+; Invert so the biggest branch is at the end, and we dont need to increase
+; block size
+	; 3 -> 0 to 0 -> 3
+	;subl	r6, 3, r6
+
+	; Condense the two subs here
+	sub	r6, 4, r6
+
+	mpy	r6, r6, 5
+
+; Store double words
+	bi	[r6]
+
+	mov	r10, r10
+	mov	r11, r2
+	b	@.L_store_lastL32bits
+	nop
+	nop
+
+	st.ab	r2, [r13, +4]
+	mov	r10, r11
+	mov	r11, r3
+	b	@.L_store_lastL32bits
+	nop
+
+	st.ab	r2, [r13, +4]
+	st.ab	r3, [r13, +4]
+	mov	r10, r12
+	mov	r11, r4
+	b	@.L_store_lastL32bits
+
+	st.ab	r2, [r13, +4]
+	st.ab	r3, [r13, +4]
+	st.ab	r4, [r13, +4]
+	mov	r10, r7
+	mov	r11, r5
+
+; r11 now contains the data to write
+; r10 contains most of the NULL byte detector operation
+.L_store_lastL32bits:
+
+	and	r10, r10, r9 ; [5]
+
+	ffs	r2, r10 ; [6]
+	add	r2, r2, 1
+
+	xbfu 	r2, r2, 0b0111000011 ; [7]
+
+	mov	r3, 0xffffffffffffffff	; Bitmask setup
+
+	; If the NULL byte is in byte 3 (starting from the right)
+	; we want to store 8-3 bytes
+	sub	r2, 8, r2
+	asl		r2, r2, 3
+
+	; According to the target byte, setup masks
+	lsr	r3, r3, r2
+	not	r4, r3
+
+	; Obtain relevant data from destination
+	ld	r10, [r13]
+
+	; Get which data from dest is not to be overwritten and OR it
+	; with the relevant data to write
+	and	r3, r3, r11
+	and	r4, r4, r10
+
+	or		r3, r3, r4
+
+	st.ab	r3, [r13, +4]
+
+	j_s.d	[blink]
+
+
+ENDFUNC (strcat)
+
+
+#else
+
 ENTRY (strcat)
 ; Find end of r0 string
 ; ========================== STRLEN CODE START ==========================
@@ -298,6 +510,7 @@ ENTRY (strcat)
 
 ENDFUNC (strcat)
 
+#endif
 
 ;; This code uses a common technique for NULL byte detection inside a word.
 ;; Details on this technique can be found in:
