@@ -4,35 +4,134 @@
 ; r1 const void* src
 ; r2 size_t count
 
-
-
-; Using 128-bit memory operations
-
-
 ; The 64-bit crunching implementation.
 
-ENTRY (memmove)
-	; If the source plus count is greater than the destination
-	; There is an overlap, and a backwards copy must be performed
-	;add		r4, r1, r2
-	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
-	
-	; Dst is less than src, can safely perform normal memcpy
-	BRLO.d		r0, r1, @.L_normal_memcpy
-	addl		r4, r1, r2
+#if defined (__ARC64_ARCH32__) && !defined(__ARC64_LL64__)
 
-	BRLO.d		r4, r0, @.L_normal_memcpy
-	; Only relevant when not taking the branch, but might as well
-	; use the delay slot (after the branch, this will be redone
-	addl	r3, r0, r2
+ENTRY (memmove)
+
+; If the source plus count is greater than the destination
+; There is an overlap, and a backwards copy must be performed
+	lsr.f	r11, r2, 4		; counter for 16-byte chunks
+	
+; Dst is less than src, can safely perform normal memcpy
+	BRLO.d	r0, r1, @.L_normal_memcpy
+	ADDP	r4, r1, r2
+
+	BRLO.d	r4, r0, @.L_normal_memcpy
+; Only relevant when not taking the branch, but might as well
+; use the delay slot (after the branch, this will be redone
+	ADDP	r3, r0, r2
+
 ; Backwards search
 ; The only thing that changes between memcpy and memmove is copy direction
 ; in case the dest and src address memory locations overlap
 ; More detailed information is in the forwards copy and at the end of
 ; this document
 
-	; Set both r0 and r1 to point to the end of eahc memory location
-	addl	r1, r1, r2
+	ADDP	r1, r1, r2
+	bmsk_s	r2, r2, 3
+
+	bbit0.d	r2, 1, @1f
+	lsr	r11, r2, 2
+	ldh.ab	r4, [r1, -2]
+	sth.ab	r4, [r3, -2]
+1:
+	bbit0.d	r2, 0, @1f
+	xor	r11, r11, 3
+	ldb.ab	r4, [r1, -1]
+	stb.ab	r4, [r3, -1]
+1:
+	asl	r11, r11, 1
+	bi	[r11]
+	ld.ab	r4,[r1, -4]
+	st.ab	r4,[r3, -4]
+	ld.ab	r4,[r1, -4]
+	st.ab	r4,[r3, -4]
+	ld	r4,[r1]
+	st	r4,[r3]
+
+; Jump if there are no 16 byte chunks
+
+	jeq	[blink]
+
+.L_write_backwards_16_bytes:
+	ld.ab	r4, [r1, 4]
+	ld.ab	r5, [r1, 4]
+	ld.ab	r6, [r1, 4]
+	ld.ab	r7, [r1, 4]
+	st.ab	r4, [r3, 4]
+	st.ab	r5, [r3, 4]
+	st.ab	r6, [r3, 4]
+	dbnz.d	r11, @.L_write_backwards_16_bytes
+	st.ab	r7, [r3, 4]
+	bmsk_s	r2, r2, 3
+
+	j_s	[blink]
+
+.L_normal_memcpy:
+	beq.d	@.L_write_forwards_15_bytes
+	mov	r3, r0			; work on a copy of "r0"
+
+.L_write_forwards_16_bytes:
+	ld.ab	r4, [r1, 4]
+	ld.ab	r5, [r1, 4]
+	ld.ab	r6, [r1, 4]
+	ld.ab	r7, [r1, 4]
+	st.ab	r4, [r3, 4]
+	st.ab	r5, [r3, 4]
+	st.ab	r6, [r3, 4]
+	dbnz.d	r11, @.L_write_forwards_16_bytes
+	st.ab	r7, [r3, 4]
+	bmsk_s	r2, r2, 3
+
+.L_write_forwards_15_bytes:
+	bbit0.d	r2, 1, @1f
+	lsr	r11, r2, 2
+	ldh.ab	r4, [r1, 2]
+	sth.ab	r4, [r3, 2]
+1:
+	bbit0.d	r2, 0, @1f
+	xor	r11, r11, 3
+	ldb.ab	r4, [r1, 1]
+	stb.ab	r4, [r3, 1]
+1:
+	asl	r11, r11, 1
+	bi	[r11]
+	ld.ab	r4,[r1, 4]
+	st.ab	r4,[r3, 4]
+	ld.ab	r4,[r1, 4]
+	st.ab	r4,[r3, 4]
+	ld	r4,[r1]
+	st	r4,[r3]
+
+	j_s	[blink]
+
+ENDFUNC (memmove)
+
+#else
+
+ENTRY (memmove)
+; If the source plus count is greater than the destination
+; There is an overlap, and a backwards copy must be performed
+	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
+	
+; Dst is less than src, can safely perform normal memcpy
+	BRLO.d	r0, r1, @.L_normal_memcpy
+	ADDP	r4, r1, r2
+
+	BRLO.d	r4, r0, @.L_normal_memcpy
+; Only relevant when not taking the branch, but might as well
+; use the delay slot (after the branch, this will be redone
+	ADDP	r3, r0, r2
+; Backwards search
+; The only thing that changes between memcpy and memmove is copy direction
+; in case the dest and src address memory locations overlap
+; More detailed information is in the forwards copy and at the end of
+; this document
+
+; Set both r0 and r1 to point to the end of eahc memory location
+	ADDP	r1, r1, r2
 	bmsk_s	r2, r2, 4
 
 	bbit0.d	r2, 0, @1f
@@ -58,6 +157,7 @@ ENTRY (memmove)
 	LD64.aw	r4, [r1, -8]
 	ST64.aw	r4, [r3, -8]
 
+; Jump if there are no 32 byte chunks
 	jeq	[blink]
 
 .L_write_backwards_32_bytes:			; Take care of 32 byte chunks
@@ -70,12 +170,13 @@ ENTRY (memmove)
 	stdl.aw	r6r7, [r3, -16]
 	dbnz	r12, @.L_write_backwards_32_bytes
 
-#elif defined (__ARC64_ARCH64__)
+#elif defined (__ARC64_ARCH64__) || (  defined (__ARC64_ARCH32__) && defined (__ARC64_LL64__) )
 
 	LD64.aw	r4, [r1, -8]
 	LD64.aw	r6, [r1, -8]
 	LD64.aw	r8, [r1, -8]
 	LD64.aw	r10,[r1, -8]
+
 	ST64.aw	r4, [r3, -8]
 	ST64.aw	r6, [r3, -8]
 	ST64.aw	r8, [r3, -8]
@@ -90,9 +191,11 @@ ENTRY (memmove)
 
 ; Normal memcpy
 .L_normal_memcpy:
-	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
+	;LSRP.f	r12, r2, 5		; Moved up
+
 	beq.d	@.L_write_forwards_31_bytes
 	MOVP	r3, r0			; do not clobber the "dest"
+
 .L_write_forwards_32_bytes:			; Take care of 32 byte chunks
 #if defined (__ARC64_M128__)
 
@@ -103,7 +206,7 @@ ENTRY (memmove)
 	stdl.ab	r6r7, [r3, +16]
 	dbnz	r12, @.L_write_forwards_32_bytes
 
-#elif defined (__ARC64_ARCH64__)
+#elif defined (__ARC64_ARCH64__) || (  defined (__ARC64_ARCH32__) && defined (__ARC64_LL64__) )
 
 	LD64.ab	r4, [r1, +8]
 	LD64.ab	r6, [r1, +8]
@@ -118,7 +221,6 @@ ENTRY (memmove)
 #else
 # error Unknown configuration
 #endif
-
 
 	bmsk_s	r2, r2, 4		; From now on, we only care for the remainder % 32
 
@@ -178,4 +280,5 @@ ENTRY (memmove)
 
 ENDFUNC (memmove)
 
+#endif
 
