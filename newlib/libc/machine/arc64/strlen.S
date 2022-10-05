@@ -43,6 +43,85 @@
 ;		- unsigned (string size)
 ;
 
+#if defined (__ARC64_ARCH32__)
+
+ENTRY (strlen)
+
+; Preserve r0 for size calculation when returning
+	mov	r13, r0
+	xor	r6, r6, r6
+
+; Setup byte detector (more information bellow) [1]
+	mov	r8, NULL_32DT_1
+	asl	r9, r8, 7
+
+.L_4_4B_search:
+	
+	ld.ab	r2, [r13, +4]
+	ld.ab	r3, [r13, +4]
+	ld.ab	r4, [r13, +4]
+	ld.ab	r5, [r13, +4]
+
+; NULL byte position is detected and encoded in r6 [0] [9]
+	sub	r10, r2, r8
+	sub	r11, r3, r8
+	sub	r12, r4, r8
+	sub	r7, r5, r8
+
+	bic	r10, r10, r2
+	bic	r11, r11, r3
+	bic	r12, r12, r4
+	bic	r7, r7, r5
+
+	tst	r10, r9
+	bset.ne	r6, r6, 4
+
+	tst	r11, r9
+	bset.ne	r6, r6, 3
+
+	tst	r12, r9
+	bset.ne	r6, r6, 2
+
+	tst	r7, r9
+	bset.ne	r6, r6, 1
+
+	breq.d	r6, 0, @.L_4_4B_search
+
+	fls	r5, r6 ; [2]
+
+; Point r13 to first NULL byte containing double word [3]
+	sub2	r13, r13, r5
+
+; Select appropriate register to analyze [4]
+	mov	r2, r7
+
+	asr.f	r6, r6, 3
+	mov.c	r2, r12
+
+	asr.f	r6, r6, 1
+	mov.c	r2, r11
+
+	asr.f	r6, r6, 1
+	mov.c	r2, r10
+
+; Point r13 to first NULL byte in selected double word
+.L_fix_r13:
+	and	r9, r2, r9 ; [5]
+
+	ffs	r9, r9 ; [6]
+
+	xbfu 	r9, r9, 0b0111000011 ; [7]
+
+	add r13, r13, r9 ; [8]
+
+	j_s.d	[blink]
+	sub	r0, r13, r0
+
+
+ENDFUNC (strlen)
+
+#else
+
 ENTRY (strlen)
 
 ; Preserve r0 for size calculation when returning
@@ -131,6 +210,7 @@ ENTRY (strlen)
 
 ENDFUNC (strlen)
       
+#endif
 
 ;; This code uses a common technique for NULL byte detection inside a word.
 ;; Details on this technique can be found in:
