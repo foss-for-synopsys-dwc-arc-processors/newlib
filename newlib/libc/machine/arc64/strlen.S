@@ -57,10 +57,19 @@ ENTRY (strlen)
 
 .L_4_4B_search:
 	
+#if defined (__ARC64_LL64__)
+
+	ldd.ab	r2r3, [r13, +8]
+	ldd.ab	r4r5, [r13, +8]
+
+#else
+
 	ld.ab	r2, [r13, +4]
 	ld.ab	r3, [r13, +4]
 	ld.ab	r4, [r13, +4]
 	ld.ab	r5, [r13, +4]
+
+#endif
 
 ; NULL byte position is detected and encoded in r6 [0] [9]
 	sub	r10, r2, r8
