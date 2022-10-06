@@ -33,39 +33,38 @@ ENTRY (memmove)
 	bmsk_s	r2, r2, 3
 
 	bbit0.d	r2, 1, @1f
-	lsr	r11, r2, 2
-	ldh.ab	r4, [r1, -2]
-	sth.ab	r4, [r3, -2]
+	lsr	r5, r2, 2
+	ldh.aw	r4, [r1, -2]
+	sth.aw	r4, [r3, -2]
 1:
 	bbit0.d	r2, 0, @1f
-	xor	r11, r11, 3
-	ldb.ab	r4, [r1, -1]
-	stb.ab	r4, [r3, -1]
+	xor	r5, r5, 3
+	ldb.aw	r4, [r1, -1]
+	stb.aw	r4, [r3, -1]
 1:
-	asl	r11, r11, 1
-	bi	[r11]
-	ld.ab	r4,[r1, -4]
-	st.ab	r4,[r3, -4]
-	ld.ab	r4,[r1, -4]
-	st.ab	r4,[r3, -4]
-	ld	r4,[r1]
-	st	r4,[r3]
+	asl	r5, r5, 1
+	bi	[r5]
+	ld.aw	r4,[r1, -4]
+	st.aw	r4,[r3, -4]
+	ld.aw	r4,[r1, -4]
+	st.aw	r4,[r3, -4]
+	ld.aw	r4,[r1, -4]
+	st.aw	r4,[r3, -4]
 
 ; Jump if there are no 16 byte chunks
 
 	jeq	[blink]
 
 .L_write_backwards_16_bytes:
-	ld.ab	r4, [r1, 4]
-	ld.ab	r5, [r1, 4]
-	ld.ab	r6, [r1, 4]
-	ld.ab	r7, [r1, 4]
-	st.ab	r4, [r3, 4]
-	st.ab	r5, [r3, 4]
-	st.ab	r6, [r3, 4]
+	ld.aw	r4, [r1, -4]
+	ld.aw	r5, [r1, -4]
+	ld.aw	r6, [r1, -4]
+	ld.aw	r7, [r1, -4]
+	st.aw	r4, [r3, -4]
+	st.aw	r5, [r3, -4]
+	st.aw	r6, [r3, -4]
 	dbnz.d	r11, @.L_write_backwards_16_bytes
-	st.ab	r7, [r3, 4]
-	bmsk_s	r2, r2, 3
+	st.aw	r7, [r3, -4]
 
 	j_s	[blink]
 
