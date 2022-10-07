@@ -49,11 +49,14 @@ ENTRY (strlen)
 
 ; Preserve r0 for size calculation when returning
 	mov	r13, r0
-	xor	r6, r6, r6
+	xor	r12, r12, r12
 
 ; Setup byte detector (more information bellow) [1]
 	mov	r8, NULL_32DT_1
-	asl	r9, r8, 7
+; Set r9 as a copy of r8 for vectorized sub
+	mov	r9, r8
+	
+	asl	r1, r8, 7
 
 .L_4_4B_search:
 	
@@ -71,32 +74,31 @@ ENTRY (strlen)
 
 #endif
 
-; NULL byte position is detected and encoded in r6 [0] [9]
-	sub	r10, r2, r8
-	sub	r11, r3, r8
-	sub	r12, r4, r8
-	sub	r7, r5, r8
+; NULL byte position is detected and encoded in r12 [0] [9]
+
+	vsub2	r10, r2, r8
+	vsub2	r6, r4, r8
 
 	bic	r10, r10, r2
 	bic	r11, r11, r3
-	bic	r12, r12, r4
+	bic	r6, r6, r4
 	bic	r7, r7, r5
 
-	tst	r10, r9
-	bset.ne	r6, r6, 4
+	tst	r10, r1
+	bset.ne	r12, r12, 4
 
-	tst	r11, r9
-	bset.ne	r6, r6, 3
+	tst	r11, r1
+	bset.ne	r12, r12, 3
 
-	tst	r12, r9
-	bset.ne	r6, r6, 2
+	tst	r6, r1
+	bset.ne	r12, r12, 2
 
-	tst	r7, r9
-	bset.ne	r6, r6, 1
+	tst	r7, r1
+	bset.ne	r12, r12, 1
 
-	breq.d	r6, 0, @.L_4_4B_search
+	breq.d	r12, 0, @.L_4_4B_search
 
-	fls	r5, r6 ; [2]
+	fls	r5, r12 ; [2]
 
 ; Point r13 to first NULL byte containing double word [3]
 	sub2	r13, r13, r5
@@ -104,24 +106,24 @@ ENTRY (strlen)
 ; Select appropriate register to analyze [4]
 	mov	r2, r7
 
-	asr.f	r6, r6, 3
-	mov.c	r2, r12
+	asr.f	r12, r12, 3
+	mov.c	r2, r6
 
-	asr.f	r6, r6, 1
+	asr.f	r12, r12, 1
 	mov.c	r2, r11
 
-	asr.f	r6, r6, 1
+	asr.f	r12, r12, 1
 	mov.c	r2, r10
 
 ; Point r13 to first NULL byte in selected double word
 .L_fix_r13:
-	and	r9, r2, r9 ; [5]
+	and	r1, r2, r1 ; [5]
 
-	ffs	r9, r9 ; [6]
+	ffs	r1, r1 ; [6]
 
-	xbfu 	r9, r9, 0b0111000011 ; [7]
+	xbfu 	r1, r1, 0b0111000011 ; [7]
 
-	add r13, r13, r9 ; [8]
+	add r13, r13, r1 ; [8]
 
 	j_s.d	[blink]
 	sub	r0, r13, r0
@@ -135,11 +137,12 @@ ENTRY (strlen)
 
 ; Preserve r0 for size calculation when returning
 	movl	r13, r0
-	xorl	r6, r6, r6
+	xor	r12, r12, r12
 
 ; Setup byte detector (more information bellow) [1]
 	vpack2wl	r8, NULL_32DT_1, NULL_32DT_1
-	asll	r9, r8, 7
+	
+	asll	r1, r8, 7
 
 .L_4_8B_search:
 
@@ -164,29 +167,29 @@ ENTRY (strlen)
 ; NULL byte position is detected and encoded in r6 [0] [9]
 	subl	r10, r2, r8
 	subl	r11, r3, r8
-	subl	r12, r4, r8
+	subl	r6, r4, r8
 	subl	r7, r5, r8
 
 	bicl	r10, r10, r2
 	bicl	r11, r11, r3
-	bicl	r12, r12, r4
+	bicl	r6, r6, r4
 	bicl	r7, r7, r5
 
-	tstl	r10, r9
-	bset.ne	r6, r6, 4
+	tstl	r10, r1
+	bset.ne	r12, r12, 4
 
-	tstl	r11, r9
-	bset.ne	r6, r6, 3
+	tstl	r11, r1
+	bset.ne	r12, r12, 3
 
-	tstl	r12, r9
-	bset.ne	r6, r6, 2
+	tstl	r6, r1
+	bset.ne	r12, r12, 2
 
-	tstl	r7, r9
-	bset.ne	r6, r6, 1
+	tstl	r7, r1
+	bset.ne	r12, r12, 1
 
-	breq.d	r6, 0, @.L_4_8B_search
+	breq.d	r12, 0, @.L_4_8B_search
 
-	fls	r5, r6 ; [2]
+	flsl	r5, r12 ; [2]
 
 ; Point r13 to first NULL byte containing double word [3]
 	sub3l	r13, r13, r5
@@ -194,24 +197,24 @@ ENTRY (strlen)
 ; Select appropriate register to analyze [4]
 	movl	r2, r7
 
-	asr.f	r6, r6, 3
-	movl.c	r2, r12
+	asr.f	r12, r12, 3
+	movl.c	r2, r6
 
-	asr.f	r6, r6, 1
+	asr.f	r12, r12, 1
 	movl.c	r2, r11
 
-	asr.f	r6, r6, 1
+	asr.f	r12, r12, 1
 	movl.c	r2, r10
 
 ; Point r13 to first NULL byte in selected double word
 .L_fix_r13:
-	andl	r9, r2, r9 ; [5]
+	andl	r1, r2, r1 ; [5]
 
-	ffsl	r9, r9 ; [6]
+	ffsl	r1, r1 ; [6]
 
-	xbful 	r9, r9, 0b0111000011 ; [7]
+	xbful 	r1, r1, 0b0111000011 ; [7]
 
-	addl r13, r13, r9 ; [8]
+	addl r13, r13, r1 ; [8]
 
 	j_s.d	[blink]
 	subl	r0, r13, r0
@@ -230,33 +233,33 @@ ENDFUNC (strlen)
 ; 		DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080) [0]
 ;
 ; The code above implements this by setting r8 to a 0x01010101... sequence and
-; r9 to a 0x80808080... sequence of appropriate length
+; r1 to a 0x80808080... sequence of appropriate length
 ; As LIMM are 32 bit only, we need to perform MOVHL and ORL [1] operations to
 ; have the appropriate 64 bit values in place
 ;
 ;; Search is done 32 bytes at a time, either with 64 bit loads or 128 bit loads
 ;; If a NULL byte is detected, the position of the double word is encoded
-;; in r6, which is then used to adjust r13
+;; in r12, which is then used to adjust r13
 ;
-; r6 is set via bset, which means we can simply use a fls to obtain the first
+; r12 is set via bset, which means we can simply use a fls to obtain the first
 ; match (or ffs depending on the values in bset) [2].
-; The reason for starting at 1 and not 0 is so r6 encodes how many double
+; The reason for starting at 1 and not 0 is so r12 encodes how many double
 ; words to go back, and it wouldnt make sense to go back 0 (the NULL would be
 ; in the next loop iteration).
 ; 
 ; The first step to take is point r13 to the appropriate double word.
 ; As the chosen encoded information is how many double words to go back,
-; we can simply multiply r6 by 8 and reduce r13 by that amount [3]
+; we can simply multiply r12 by 8 and reduce r13 by that amount [3]
 ; 
 ; Then, we need to place the loaded double word containing the first NULL byte
 ; into a "common" register we can operate on later [4].
 ; 
-; To do this without any jumps, we can shift r6 and perform a conditional mov
+; To do this without any jumps, we can shift r12 and perform a conditional mov
 ; based on the carry flag value.
 ; The order is very important because the NULL byte can appear in several
 ; double words, so we want to analyze from last to first.
 ; 
-; We can ignore the first asr (which would be asr.f 2, as we started r6 on 1)
+; We can ignore the first asr (which would be asr.f 2, as we started r12 on 1)
 ; because if r7 isnt the NULL byte, r2 will always be overwritten so we can
 ; just decide to start at r7, and overwrite it if needed.
 ; 
