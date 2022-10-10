@@ -71,10 +71,19 @@ ENTRY (strcat)
 
 .L_4_4B_search:
 
+#if defined (__ARC64_LL64__)
+
+	ldd.ab	r2r3, [r13, +8]
+	ldd.ab	r4r5, [r13, +8]
+
+#else
+
 	ld.ab	r2, [r13, +4]
 	ld.ab	r3, [r13, +4]
 	ld.ab	r4, [r13, +4]
 	ld.ab	r5, [r13, +4]
+
+#endif
 
 ; NULL byte position is detected and encoded in r6 [0] [9]
 	sub	r10, r2, r8
@@ -137,10 +146,19 @@ ENTRY (strcat)
 
 .L_4_4B_search_src:
 
+#if defined (__ARC64_LL64__)
+
+	ldd.ab	r2r3, [r1, +8]
+	ldd.ab	r4r5, [r1, +8]
+
+#else
+
 	ld.ab	r2, [r1, +4]
 	ld.ab	r3, [r1, +4]
 	ld.ab	r4, [r1, +4]
 	ld.ab	r5, [r1, +4]
+
+#endif
 
 ; NULL byte position is detected and encoded in r6 [0] [9]
 	sub	r10, r2, r8
@@ -194,42 +212,38 @@ ENTRY (strcat)
 	; Condense the two subs here
 	sub	r6, 4, r6
 
-	mpy	r6, r6, 5
+	asl	r6, r6, 2
 
 ; Store double words
 	bi	[r6]
 
-	mov	r10, r10
 	mov	r11, r2
 	b	@.L_store_lastL32bits
 	nop
 	nop
 
 	st.ab	r2, [r13, +4]
-	mov	r10, r11
 	mov	r11, r3
 	b	@.L_store_lastL32bits
 	nop
 
 	st.ab	r2, [r13, +4]
 	st.ab	r3, [r13, +4]
-	mov	r10, r12
 	mov	r11, r4
 	b	@.L_store_lastL32bits
 
 	st.ab	r2, [r13, +4]
 	st.ab	r3, [r13, +4]
 	st.ab	r4, [r13, +4]
-	mov	r10, r7
 	mov	r11, r5
 
 ; r11 now contains the data to write
-; r10 contains most of the NULL byte detector operation
 .L_store_lastL32bits:
-
+	sub r10, r11, r8
+	bic	r10, r10, r11
 	and	r10, r10, r9 ; [5]
 
-	ffs	r2, r10 ; [6]
+	ffs	r2, r11 ; [6]
 	add	r2, r2, 1
 
 	xbfu 	r2, r2, 0b0111000011 ; [7]
@@ -442,38 +456,35 @@ ENTRY (strcat)
 	; Condense the two subs here
 	subl	r6, 4, r6
 
-	mpyl	r6, r6, 5
+	asll		r6, r6, 2
 
 ; Store double words
 	bi	[r6]
 
-	MOVP	r10, r10
 	MOVP	r11, r2
 	b	@.L_store_lastL64bits
 	nop
 	nop
 
 	stl.ab	r2, [r13, +8]
-	MOVP	r10, r11
 	MOVP	r11, r3
 	b	@.L_store_lastL64bits
 	nop
 
 	stl.ab	r2, [r13, +8]
 	stl.ab	r3, [r13, +8]
-	MOVP	r10, r12
 	MOVP	r11, r4
 	b	@.L_store_lastL64bits
 
 	stl.ab	r2, [r13, +8]
 	stl.ab	r3, [r13, +8]
 	stl.ab	r4, [r13, +8]
-	MOVP	r10, r7
 	MOVP	r11, r5
 
 ; r11 now contains the data to write
-; r10 contains most of the NULL byte detector operation
 .L_store_lastL64bits:
+	subl	r10, r11, r8
+	bicl	r10, r10, r11
 
 	andl	r10, r10, r9 ; [5]
 
