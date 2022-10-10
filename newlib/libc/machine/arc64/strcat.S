@@ -243,17 +243,17 @@ ENTRY (strcat)
 	bic	r10, r10, r11
 	and	r10, r10, r9 ; [5]
 
-	ffs	r2, r11 ; [6]
+	ffs	r2, r10 ; [6]
 	add	r2, r2, 1
 
-	xbfu 	r2, r2, 0b0111000011 ; [7]
+	xbfu	r2, r2, 0b0111000011 ; [7]
 
 	mov	r3, 0xffffffffffffffff	; Bitmask setup
 
 	; If the NULL byte is in byte 3 (starting from the right)
 	; we want to store 8-3 bytes
 	sub	r2, 8, r2
-	asl		r2, r2, 3
+	asl	r2, r2, 3
 
 	; According to the target byte, setup masks
 	lsr	r3, r3, r2
@@ -267,7 +267,7 @@ ENTRY (strcat)
 	and	r3, r3, r11
 	and	r4, r4, r10
 
-	or		r3, r3, r4
+	or	r3, r3, r4
 
 	st.ab	r3, [r13, +4]
 
