@@ -14,6 +14,7 @@ lib_a_SOURCES =                 \
         memset.S                \
         memset-stub.c           \
         strlen.S                \
+        memmove.S               \
         setjmp.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
