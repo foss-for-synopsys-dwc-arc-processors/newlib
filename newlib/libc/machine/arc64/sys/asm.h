@@ -54,6 +54,8 @@
 # error Please use either 32-bit or 64-bit version of arc64 compiler
 #endif
 
+# define NULL_32DT_1 0x01010101
+
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
 #define FUNC(name)         .type name,@function
