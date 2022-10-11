@@ -110,27 +110,24 @@ ENTRY (strcat)
 
 	breq.d	r6, 0, @.L_4_4B_search
 
-	fls	r6, r6 ; [2]
+	fls	r5, r6 ; [2]
 
 ; Point r13 to first NULL byte containing double word [3]
-	sub2	r13, r13, r6
+	sub2	r13, r13, r5
 
-; Select appropriate register to analyze [4]
-	sub	r6, r6, 1
-	asl r6, r6, 1
-
-	bi	[r6]
+	; Select appropriate register to analyze [4]
 	mov	r2, r7
-	b	@.L_fix_r13
-	mov	r2, r12
-	b	@.L_fix_r13
-	mov	r2, r11
-	b	@.L_fix_r13
-	mov	r2, r10
-	nop
+
+	asr.f	r6, r6, 3
+	mov.c	r2, r12
+
+	asr.f	r6, r6, 1
+	mov.c	r2, r11
+
+	asr.f	r6, r6, 1
+	mov.c	r2, r10
 
 ; Point r13 to first NULL byte in selected double word
-.L_fix_r13:
 	and	r2, r2, r9 ; [5]
 
 	ffs	r2, r2 ; [6]
@@ -185,10 +182,19 @@ ENTRY (strcat)
 
 	brne	r6, 0, @.L_found_in_32B
 
+#if defined (__ARC64_LL64__)
+
+	std.ab	r2r3, [r13, +8]
+	std.ab	r4r5, [r13, +8]
+
+#else
+
 	st.ab	r2, [r13, +4]
 	st.ab	r3, [r13, +4]
 	st.ab	r4, [r13, +4]
 	st.ab	r5, [r13, +4]
+
+#endif
 
 	j	@.L_4_4B_search_src
 
@@ -248,7 +254,7 @@ ENTRY (strcat)
 
 	xbfu	r2, r2, 0b0111000011 ; [7]
 
-	mov	r3, 0xffffffffffffffff	; Bitmask setup
+	mov	r3, -1; Bitmask setup
 
 	; If the NULL byte is in byte 3 (starting from the right)
 	; we want to store 8-3 bytes
@@ -338,24 +344,22 @@ ENTRY (strcat)
 
 	breq.d	r6, 0, @.L_4_8B_search
 
-	fls	r6, r6 ; [2]
+	fls	r5, r6 ; [2]
 
 ; Point r13 to first NULL byte containing double word [3]
-	sub3l	r13, r13, r6
+	sub3l	r13, r13, r5
 
-; Select appropriate register to analyze [4]
-	subl	r6, r6, 1
-	asl r6, r6, 1
-
-	bi	[r6]
+	; Select appropriate register to analyze [4]
 	MOVP	r2, r7
-	b	@.L_fix_r13
-	MOVP	r2, r12
-	b	@.L_fix_r13
-	MOVP	r2, r11
-	b	@.L_fix_r13
-	MOVP	r2, r10
-	nop
+
+	asr.f	r6, r6, 3
+	MOVP.c	r2, r12
+
+	asr.f	r6, r6, 1
+	MOVP.c	r2, r11
+
+	asr.f	r6, r6, 1
+	MOVP.c	r2, r10
 
 ; Point r13 to first NULL byte in selected double word
 .L_fix_r13:
@@ -373,13 +377,11 @@ ENTRY (strcat)
 	xorl	r6, r6, r6
 
 .L_4_8B_search_src:
-; Using 128-bit memory operations
 #if defined (__ARC64_M128__)
 
 	lddl.ab	r2r3, [r1, +16]
 	lddl.ab	r4r5, [r1, +16]
 
-; The 64-bit crunching implementation.
 #elif defined (__ARC64_ARCH64__)
 
 	ldl.ab	r2, [r1, +8]
@@ -416,13 +418,11 @@ ENTRY (strcat)
 
 	brne	r6, 0, @.L_found_in_32B
 
-; Using 128-bit memory operations
 #if defined (__ARC64_M128__)
 
 	stdl.ab	r2r3, [r13, +16]
 	stdl.ab	r4r5, [r13, +16]
 
-; The 64-bit crunching implementation.
 #elif defined (__ARC64_ARCH64__)
 
 	stl.ab	r2, [r13, +8]
@@ -456,7 +456,7 @@ ENTRY (strcat)
 	; Condense the two subs here
 	subl	r6, 4, r6
 
-	asll		r6, r6, 2
+	asll	r6, r6, 2
 
 ; Store double words
 	bi	[r6]
@@ -493,7 +493,7 @@ ENTRY (strcat)
 
 	xbful 	r2, r2, 0b0111000011 ; [7]
 
-	movl	r3, 0xffffffffffffffff	; Bitmask setup
+	movl	r3, -1; Bitmask setup
 
 	; If the NULL byte is in byte 3 (starting from the right)
 	; we want to store 8-3 bytes
