@@ -10,17 +10,17 @@
 
 ENTRY (memmove)
 
-; If the source plus count is greater than the destination
-; There is an overlap, and a backwards copy must be performed
-	lsr.f	r11, r2, 4		; counter for 16-byte chunks
-	
-; Dst is less than src, can safely perform normal memcpy
-	BRLO.d	r0, r1, @.L_normal_memcpy
+; If the destination is greater than the source
+	cmp	r0, r1
 	ADDP	r4, r1, r2
+; or if the source plus count is smaller than the destination
+	cmp.eq r4, r0
 
-	BRLO.d	r4, r0, @.L_normal_memcpy
-; Only relevant when not taking the branch, but might as well
-; use the delay slot (after the branch, this will be redone
+; We can safely perform a normal memcpy. Otherwise, we need to perform it
+; backwards
+	blo.d	@.L_normal_memcpy
+	lsr.f	r11, r2, 4		; counter for 16-byte chunks
+
 	ADDP	r3, r0, r2
 
 ; Backwards search
@@ -111,25 +111,26 @@ ENDFUNC (memmove)
 #else
 
 ENTRY (memmove)
-; If the source plus count is greater than the destination
-; There is an overlap, and a backwards copy must be performed
-	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
-	
-; Dst is less than src, can safely perform normal memcpy
-	BRLO.d	r0, r1, @.L_normal_memcpy
+; If the destination is greater than the source
+	cmp	r0, r1
 	ADDP	r4, r1, r2
+; or if the source plus count is smaller than the destination
+	cmp.eq r4, r0
 
-	BRLO.d	r4, r0, @.L_normal_memcpy
-; Only relevant when not taking the branch, but might as well
-; use the delay slot (after the branch, this will be redone
+; We can safely perform a normal memcpy. Otherwise, we need to perform it
+; backwards
+	blo.d	@.L_normal_memcpy
+	LSRP.f	r12, r2, 5		; counter for 32-byte chunks
+
 	ADDP	r3, r0, r2
+
 ; Backwards search
 ; The only thing that changes between memcpy and memmove is copy direction
 ; in case the dest and src address memory locations overlap
 ; More detailed information is in the forwards copy and at the end of
 ; this document
 
-; Set both r0 and r1 to point to the end of eahc memory location
+; Set both r0 and r1 to point to the end of each memory location
 	ADDP	r1, r1, r2
 	bmsk_s	r2, r2, 4
 
