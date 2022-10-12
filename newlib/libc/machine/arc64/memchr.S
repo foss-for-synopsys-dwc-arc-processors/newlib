@@ -41,6 +41,8 @@ ENTRY (memchr)
 	LSRP.f	0, r2, 4			; counter for 16-byte chunks
 	beq.d	@.L_search_1_byte
 
+	; Filter for 1 byte
+	bmsk	r1, r1, 7
 	LSL8	r9, r1
 
 	OR	r9, r9, r1
@@ -175,6 +177,8 @@ ENTRY (memchr)
 	lsrl.f	0, r2, 5			; counter for 32-byte chunks
 	beq.d	@.L_search_1_byte
 
+	; Filter for 1 byte
+	bmsk	r1, r1, 7
 	lsl8	r9, r1
 
 	or	r9, r9, r1
