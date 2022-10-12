@@ -33,105 +33,145 @@
 ; r1 int ch
 ; r2 size_t count
 
+#if defined (__ARC64_ARCH32__)
+
 ENTRY (memchr)
-	; If any input is aligned to 1 or 2 bytes, search 1 byte at a time
-	; Possible optimization: only search 1 byte at a time until the first
-	; 4 byte alignment is reached
-	bmsk.f	0,		r0,		1
-	bne.d	.L_search_1byte_chunks
+	;MOVP	r0, 0
+	;j_s	[blink]
+	breq.d	r2, 0, @.L_byte_not_found
+	
+	LSRP.f	r12, r2, 3			; counter for 8-byte chunks
+	beq.d	@.L_search_1_byte
 
-	LSRP.f	r12,	r2,		2				; counter for 4-byte chunks
-	beq.d	@.L_search_1byte_chunks	; Less than 32 bits, go 1 byte at a time
+	LSL8	r9, r1
+	;vpack4hm	r9, r9, r9
 
-; Bootstrap magic byte detector
-
-	; First we need a 32 bit number that has the target byte repeated 4 times
-	;; Get first two bytes ready
-	MOVP	r9,		r1
-	LSL8	r9,		r9
-	OR		r9,		r9,		r1
+	OR	r9, r9, r1
 	;; Setup two rightmost bytes
-	MOVP	r10,	r9
 	;; Setup two leftmost bytes
-	LSL16	r9,		r9
-	OR		r10,	r10,	r9
+	LSL16	r1, r9
+	OR	r1, r1, r9
 
-	; r10 is now setup with the special 4 byte repetition of r1
+
+	; r1 is now setup with the special 4 byte repetition of the target byte
+	; We use r1 because we dont have any more registers free inside the main loop
 	; r9 can be repurposed
 	mov		r8,		0x01010101
-	ror		r9,		r8						; Further magic byte detector setup
+	ror		r9,		r8
 
+	xor	r3, r3, r3
 
-; Handle 4 byte chunks
-.L_search4byte_chunk:
-	; Load next 4 bytes
-	ld.ab	r11,	[r0, +4]
+.L_search_16_bytes:
+
+#if defined (__ARC64_LL64__)
+
+	ldd.ab	r4r5, [r0, +8]
+	;ldd.ab	r6r7, [r0, +8]
+
+#else
+
+	ld.ab	r4, [r0, +4]
+	ld.ab	r5, [r0, +4]
+	;ld.ab	r6, [r0, +4]
+	;ld.ab	r7, [r0, +4]
+
+#endif
+
+	xor	r4, r4, r1
+	xor	r5, r5, r1
+	;xor	r6, r6, r1
+	;xor	r7, r7, r1
+
+	sub	r10, r4, r8
+	sub	r11, r5, r8
+	;sub	r12, r6, r8
+	;sub	r13, r7, r8
+
+	bic	r10, r10, r4
+	bic	r11, r11, r5
+	;bic	r12, r12, r6
+	;bic	r13, r13, r7
+
+	tst	r10, r9
+	bset.ne	r3, r3, 2
+
+	tst	r11, r9
+	bset.ne	r3, r3, 1
+
+	;tst	r12, r9
+	;bset.ne	r3, r3, 2
+
+	;tst	r13, r9
+	;bset.ne	r3, r3, 1
+
+	; Break if found
+	brne	r3, 0, @.L_found_in_16B
+
+	; Keep going we have more 16 byte chunks
+	dbnz	r12, @.L_search_16_bytes
+
+	; No more 16 byte chunks to search in, reduce r2 appropriately
+	bmsk.f	r2, r2, 2
+	; Check if r2 is 0 (dbnz decreases before checking)
+	beq.d	@.L_byte_not_found
 	
-	; Force the read 4 byte value to have a NULL byte if chr is present
-	xor		r13,	r11,	r10
-	; Look for the NULL byte
-	sub		r2,		r13,	r8
-	bic		r2,		r2,		r13
-	tst		r2,		r9
+.L_start_1_byte_search:
+	; Reset byte repetition of r1 to 1 single byte
+	bmsk	r1, r1, 7
 
-	; Found byte!
-	bne		@.L_found_inside_4bytes
+.L_search_1_byte:
 
-	; Still have 4 byte chunks to find!
-	dbnz	r12,	@.L_search4byte_chunk
+	ldb.ab	r10, [r0, +1]
 
-	; Nothing found, no more 4 byte chunks
-	bmsk_s	r2,		r2,		2
-	j		@.L_search_1byte_chunks
+	breq	r10, r1, @.L_found_byte
 
-; Backtrack 4 bytes and let 1 byte search do its' thing
-.L_found_inside_4bytes:
-	SUBP	r0,		r0,		4
+	dbnz	r2, @.L_search_1_byte
 
-; Load next byte and enter loop
-.L_search_1byte_chunks:
-	ldb		r10,	[r0]
-	cmp		r10,	r1
 
-; Check if matching byte was found
-; iterate read next byte until it is found, or end of data
-.L_search_next_1byte_chunk:
+; Byte not found
+.L_byte_not_found:
+	j.d	[blink]
+	MOVP	r0, 0
 
-	beq.d	@.L_return_ptr
-	ldb.aw	r10,	[r0, +1]
+.L_found_byte:
+	j_s.d [blink]
+	SUBP	r0, r0, 1
 
-	dbnz.d	r2,		@.L_search_next_1byte_chunk
-	cmp		r10,	r1
 
+
+.L_found_in_16B:
+
+	fls	r5, r3 ; [2]
+
+; Point r13 to first NULL byte containing double word [3]
+	sub2	r0, r0, r5
+
+; Select appropriate register to analyze [4]
+	;mov	r2, r13
+
+	;asr.f	r3, r3, 3
+	;mov.c	r2, r12
+
+	;asr.f	r3, r3, 1
+	;mov.c	r2, r11
+	mov	r2, r11
+
+	asr.f	r3, r3, 3
+	mov.c	r2, r10
+
+	and	r2, r2, r9 ; [5]
+
+	ffs	r2, r2 ; [6]
+
+	xbfu 	r2, r2, 0b0111000011 ; [7]
+
+	add	r0, r0, r2 ; [8]
 	
-; Byte was not found, return NULL
-.L_return_nullptr:
-	MOVP	r0,		0
-	j_s	[blink]
-
-; Byte was found in r0 - 1
-.L_return_ptr:
-	SUBP	r0,		r0,		1
-	j_s	[blink]
-
-
-
-
-;	MOVP	r12, r2
-;
-;	beq.d	@.L_search_32byte_chunks
-;	LD64	r8, [r0]
-;
-;.L_search_32byte_chunks:
-;
-;	cmp		r8, r1
-;	beq		@.L_return_ptr
-	
-;	dbnz.d	r12, @.L_return_nullptr
-;	ST64.aw	r10, [r0, +8]
-
-; Exits the loop when either r12 is 0 (end of array) or char is found
+	j	[blink]
 
 
 ENDFUNC (memchr)
+
+
+#endif
 
