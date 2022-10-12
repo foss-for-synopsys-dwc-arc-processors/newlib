@@ -42,7 +42,6 @@ ENTRY (memchr)
 	beq.d	@.L_search_1_byte
 
 	LSL8	r9, r1
-	;vpack4hm	r9, r9, r9
 
 	OR	r9, r9, r1
 	;; Setup two rightmost bytes
@@ -166,6 +165,143 @@ ENTRY (memchr)
 
 
 ENDFUNC (memchr)
+
+
+#else
+
+ENTRY (memchr)
+	breq.d	r2, 0, @.L_byte_not_found
+	
+	lsrl.f	0, r2, 5			; counter for 32-byte chunks
+	beq.d	@.L_search_1_byte
+
+	lsl8	r9, r1
+
+	or	r9, r9, r1
+	;; Setup two rightmost bytes
+	;; Setup two leftmost bytes
+	lsl16	r1, r9
+	or	r1, r1, r9
+
+	vpack2wl	r1, r1, r1
+
+	; r1 is now setup with the special 4 byte repetition of the target byte
+	; We use r1 because we dont have any more registers free inside the main loop
+	; r9 can be repurposed
+	vpack2wl	r8, NULL_32DT_1, NULL_32DT_1
+	asll	r9, r8, 7
+
+	xorl	r3, r3, r3
+
+.L_search_16_bytes:
+
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
+	
+	lddl.ab	r4r5, [r0, +16]
+	lddl.ab	r6r7, [r0, +16]
+
+; The 64-bit crunching implementation.
+#elif defined (__ARC64_ARCH64__)
+	
+	ldl.ab	r4, [r0, +8]
+	ldl.ab	r5, [r0, +8]
+	ldl.ab	r6, [r0, +8]
+	ldl.ab	r7, [r0, +8]
+
+#else
+	# error Unknown configuration
+#endif
+
+	xorl	r4, r4, r1
+	xorl	r5, r5, r1
+	xorl	r6, r6, r1
+	xorl	r7, r7, r1
+
+	subl	r10, r4, r8
+	subl	r11, r5, r8
+	subl	r12, r6, r8
+	subl	r13, r7, r8
+
+	bicl	r10, r10, r4
+	bicl	r11, r11, r5
+	bicl	r12, r12, r6
+	bicl	r13, r13, r7
+
+	tstl	r10, r9
+	bset.ne	r3, r3, 4
+
+	tstl	r11, r9
+	bset.ne	r3, r3, 3
+
+	tstl	r12, r9
+	bset.ne	r3, r3, 2
+
+	tstl	r13, r9
+	bset.ne	r3, r3, 1
+
+	; Break if found
+	brne	r3, 0, @.L_found_in_16B
+
+	; Keep going we have more 16 byte chunks
+	subl	r2, r2, 32
+	lsrl.f	0, r2, 5
+	bne	@.L_search_16_bytes
+
+	; Check if r2 is 0
+	breq	r2, 0, @.L_byte_not_found
+	
+.L_start_1_byte_search:
+	; Reset byte repetition of r1 to 1 single byte
+	bmskl	r1, r1, 7
+
+.L_search_1_byte:
+
+	ldb.ab	r10, [r0, +1]
+
+	breq	r10, r1, @.L_found_byte
+
+	dbnz	r2, @.L_search_1_byte
+
+
+; Byte not found
+.L_byte_not_found:
+	j.d	[blink]
+	movl	r0, 0
+
+.L_found_byte:
+	j_s.d [blink]
+	subl	r0, r0, 1
+
+
+.L_found_in_16B:
+
+	fls	r5, r3 ; [2]
+
+; Point r13 to first NULL byte containing double word [3]
+	sub3l	r0, r0, r5
+
+; Select appropriate register to analyze [4]
+	movl	r2, r13
+
+	asr.f	r3, r3, 3
+	movl.c	r2, r12
+
+	asr.f	r3, r3, 1
+	movl.c	r2, r11
+
+	asr.f	r3, r3, 1
+	movl.c	r2, r10
+
+	andl	r2, r2, r9 ; [5]
+
+	ffsl	r2, r2 ; [6]
+
+	xbful 	r2, r2, 0b0111000011 ; [7]
+
+	addl	r0, r0, r2 ; [8]
+	
+	j	[blink]
 
 
 #endif
