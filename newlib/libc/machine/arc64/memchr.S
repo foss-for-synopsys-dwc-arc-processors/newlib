@@ -36,11 +36,9 @@
 #if defined (__ARC64_ARCH32__)
 
 ENTRY (memchr)
-	;MOVP	r0, 0
-	;j_s	[blink]
 	breq.d	r2, 0, @.L_byte_not_found
 	
-	LSRP.f	r12, r2, 3			; counter for 8-byte chunks
+	LSRP.f	0, r2, 4			; counter for 16-byte chunks
 	beq.d	@.L_search_1_byte
 
 	LSL8	r9, r1
@@ -51,7 +49,6 @@ ENTRY (memchr)
 	;; Setup two leftmost bytes
 	LSL16	r1, r9
 	OR	r1, r1, r9
-
 
 	; r1 is now setup with the special 4 byte repetition of the target byte
 	; We use r1 because we dont have any more registers free inside the main loop
@@ -66,54 +63,54 @@ ENTRY (memchr)
 #if defined (__ARC64_LL64__)
 
 	ldd.ab	r4r5, [r0, +8]
-	;ldd.ab	r6r7, [r0, +8]
+	ldd.ab	r6r7, [r0, +8]
 
 #else
 
 	ld.ab	r4, [r0, +4]
 	ld.ab	r5, [r0, +4]
-	;ld.ab	r6, [r0, +4]
-	;ld.ab	r7, [r0, +4]
+	ld.ab	r6, [r0, +4]
+	ld.ab	r7, [r0, +4]
 
 #endif
 
 	xor	r4, r4, r1
 	xor	r5, r5, r1
-	;xor	r6, r6, r1
-	;xor	r7, r7, r1
+	xor	r6, r6, r1
+	xor	r7, r7, r1
 
 	sub	r10, r4, r8
 	sub	r11, r5, r8
-	;sub	r12, r6, r8
-	;sub	r13, r7, r8
+	sub	r12, r6, r8
+	sub	r13, r7, r8
 
 	bic	r10, r10, r4
 	bic	r11, r11, r5
-	;bic	r12, r12, r6
-	;bic	r13, r13, r7
+	bic	r12, r12, r6
+	bic	r13, r13, r7
 
 	tst	r10, r9
-	bset.ne	r3, r3, 2
+	bset.ne	r3, r3, 4
 
 	tst	r11, r9
+	bset.ne	r3, r3, 3
+
+	tst	r12, r9
+	bset.ne	r3, r3, 2
+
+	tst	r13, r9
 	bset.ne	r3, r3, 1
-
-	;tst	r12, r9
-	;bset.ne	r3, r3, 2
-
-	;tst	r13, r9
-	;bset.ne	r3, r3, 1
 
 	; Break if found
 	brne	r3, 0, @.L_found_in_16B
 
 	; Keep going we have more 16 byte chunks
-	dbnz	r12, @.L_search_16_bytes
+	sub	r2, r2, 16
+	LSRP.f	0, r2, 4
+	bne	@.L_search_16_bytes
 
-	; No more 16 byte chunks to search in, reduce r2 appropriately
-	bmsk.f	r2, r2, 2
-	; Check if r2 is 0 (dbnz decreases before checking)
-	beq.d	@.L_byte_not_found
+	; Check if r2 is 0
+	breq	r2, 0, @.L_byte_not_found
 	
 .L_start_1_byte_search:
 	; Reset byte repetition of r1 to 1 single byte
@@ -138,7 +135,6 @@ ENTRY (memchr)
 	SUBP	r0, r0, 1
 
 
-
 .L_found_in_16B:
 
 	fls	r5, r3 ; [2]
@@ -147,16 +143,15 @@ ENTRY (memchr)
 	sub2	r0, r0, r5
 
 ; Select appropriate register to analyze [4]
-	;mov	r2, r13
-
-	;asr.f	r3, r3, 3
-	;mov.c	r2, r12
-
-	;asr.f	r3, r3, 1
-	;mov.c	r2, r11
-	mov	r2, r11
+	mov	r2, r13
 
 	asr.f	r3, r3, 3
+	mov.c	r2, r12
+
+	asr.f	r3, r3, 1
+	mov.c	r2, r11
+
+	asr.f	r3, r3, 1
 	mov.c	r2, r10
 
 	and	r2, r2, r9 ; [5]
