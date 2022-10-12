@@ -105,8 +105,8 @@ ENTRY (memchr)
 
 	; Keep going we have more 16 byte chunks
 	sub	r2, r2, 16
-	LSRP.f	0, r2, 4
-	bne	@.L_search_16_bytes
+
+	brge	r2, 16, @.L_search_16_bytes
 
 	; Reset byte repetition of r1 to 1 single byte
 	bmsk	r1, r1, 7
@@ -138,11 +138,12 @@ ENTRY (memchr)
 
 	fls	r5, r3 ; [2]
 
+; Select appropriate register to analyze [4]
+	mov	r2, r13
+
 ; Point r13 to first NULL byte containing double word [3]
 	sub2	r0, r0, r5
 
-; Select appropriate register to analyze [4]
-	mov	r2, r13
 
 	asr.f	r3, r3, 3
 	mov.c	r2, r12
@@ -241,12 +242,11 @@ ENTRY (memchr)
 	bset.ne	r3, r3, 1
 
 	; Break if found
-	brne	r3, 0, @.L_found_in_32B
+	brne.d	r3, 0, @.L_found_in_32B
 
 	; Keep going we have more 16 byte chunks
 	subl	r2, r2, 32
-	lsrl.f	0, r2, 5
-	bne	@.L_search_32_bytes
+	brge	r2, 32,	@.L_search_32_bytes
 
 	; Reset byte repetition of r1 to 1 single byte
 	bmskl	r1, r1, 7
@@ -278,11 +278,11 @@ ENTRY (memchr)
 
 	fls	r5, r3 ; [2]
 
-; Point r13 to first NULL byte containing double word [3]
-	sub3l	r0, r0, r5
-
 ; Select appropriate register to analyze [4]
 	movl	r2, r13
+
+; Point r13 to first NULL byte containing double word [3]
+	sub3l	r0, r0, r5
 
 	asr.f	r3, r3, 3
 	movl.c	r2, r12
@@ -304,5 +304,6 @@ ENTRY (memchr)
 	j	[blink]
 
 
+ENDFUNC (memchr)
 #endif
 
