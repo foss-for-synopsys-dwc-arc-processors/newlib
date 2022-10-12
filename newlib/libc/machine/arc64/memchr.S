@@ -197,7 +197,7 @@ ENTRY (memchr)
 
 	xorl	r3, r3, r3
 
-.L_search_16_bytes:
+.L_search_32_bytes:
 
 ; Using 128-bit memory operations
 #if defined (__ARC64_M128__)
@@ -245,12 +245,12 @@ ENTRY (memchr)
 	bset.ne	r3, r3, 1
 
 	; Break if found
-	brne	r3, 0, @.L_found_in_16B
+	brne	r3, 0, @.L_found_in_32B
 
 	; Keep going we have more 16 byte chunks
 	subl	r2, r2, 32
 	lsrl.f	0, r2, 5
-	bne	@.L_search_16_bytes
+	bne	@.L_search_32_bytes
 
 	; Check if r2 is 0
 	breq	r2, 0, @.L_byte_not_found
@@ -278,7 +278,7 @@ ENTRY (memchr)
 	subl	r0, r0, 1
 
 
-.L_found_in_16B:
+.L_found_in_32B:
 
 	fls	r5, r3 ; [2]
 
