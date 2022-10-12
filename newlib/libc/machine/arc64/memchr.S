@@ -36,10 +36,8 @@
 #if defined (__ARC64_ARCH32__)
 
 ENTRY (memchr)
-	breq.d	r2, 0, @.L_byte_not_found
-	
 	LSRP.f	0, r2, 4			; counter for 16-byte chunks
-	beq.d	@.L_search_1_byte
+	beq.d	@.L_start_1_byte_search
 
 	; Filter for 1 byte
 	bmsk	r1, r1, 7
@@ -110,12 +108,12 @@ ENTRY (memchr)
 	LSRP.f	0, r2, 4
 	bne	@.L_search_16_bytes
 
-	; Check if r2 is 0
-	breq	r2, 0, @.L_byte_not_found
-	
-.L_start_1_byte_search:
 	; Reset byte repetition of r1 to 1 single byte
 	bmsk	r1, r1, 7
+
+.L_start_1_byte_search:
+	; Check if r2 is 0
+	breq	r2, 0, @.L_byte_not_found
 
 .L_search_1_byte:
 
@@ -172,10 +170,8 @@ ENDFUNC (memchr)
 #else
 
 ENTRY (memchr)
-	breq.d	r2, 0, @.L_byte_not_found
-	
 	lsrl.f	0, r2, 5			; counter for 32-byte chunks
-	beq.d	@.L_search_1_byte
+	beq.d	@.L_start_1_byte_search
 
 	; Filter for 1 byte
 	bmsk	r1, r1, 7
@@ -252,13 +248,13 @@ ENTRY (memchr)
 	lsrl.f	0, r2, 5
 	bne	@.L_search_32_bytes
 
-	; Check if r2 is 0
-	breq	r2, 0, @.L_byte_not_found
-	
-.L_start_1_byte_search:
 	; Reset byte repetition of r1 to 1 single byte
 	bmskl	r1, r1, 7
 
+.L_start_1_byte_search:
+	; Check if r2 is 0
+	breq	r2, 0, @.L_byte_not_found
+	
 .L_search_1_byte:
 
 	ldb.ab	r10, [r0, +1]
