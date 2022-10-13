@@ -60,6 +60,7 @@ proc newlib_target_compile { source dest type options } {
     verbose "In newlib_target_compile...\n"
 
     lappend options "libs=-I$srcdir/include"
+    lappend options "additional_flags=-fno-builtin"
     verbose "srcdir is $srcdir"
 	
     if {[target_info needs_status_wrapper] != "" && \
