@@ -92,7 +92,7 @@ ENTRY (strcmp)
 	breq	r12, 0, @.L_4_4B_search
 
 .L_found_in_4B:
-	
+; Setup r0, r1, r3 r5 with the relevant loaded and intermediate values
 	mov r0, r11
 	mov r1, r7
 	mov	r3, r3
@@ -182,78 +182,150 @@ ENDFUNC(strcmp)
 
 ENTRY (strcmp)
 
-; r13 is now either 4 or 8 byte aligned
-.L_start_4byte_search:
+	xorl	r12, r12, r12
 
-	xorl	r6,		r6,		r6	; reset mask showing NULL byte location
+; Setup byte detector (more information bellow) [1]
+	vpack2wl	r8, NULL_32DT_1, NULL_32DT_1
+; Set r9 as a copy of r8 for vectorized sub
+	asll	r9, r8, 7
 
-; Setup byte detector (more information bellow) [2]
-	movhl	r8,		NULL_32DT_1
-	orl		r8,		r8,		NULL_32DT_1
+.L_4_4B_search:
 
-	movhl	r9,		NULL_32DT_2
-	orl		r9,		r9,		NULL_32DT_2
+; Using 128-bit memory operations
+#if defined (__ARC64_M128__)
+	
+	lddl.ab	r2r3, [r0, +16]
+	lddl.ab	r4r5, [r1, +16]
 
-; If there is a 0 in any of the read 32 bytes, its location is encoded
-; in r6 as a bit mask
-; This bitmask can be used to calculate the appropriate regression in the pointer [3]
-.L_search_8bytes:
-	ldl.ab	  r3,	[r1, +8]
-	;r4 r5
-	ldl.ab	  r10,	[r13, +8]
+; The 64-bit crunching implementation.
+#elif defined (__ARC64_ARCH64__)
+	
+	ldl.ab	r2, [r0, +8]
+	ldl.ab	r3, [r0, +8]
 
-; Look for a zero
-	subl	r12,	r3,		r8
-	bicl	r12,	r12,	r3
-	tstl	r12,	r9
-	bne.d	@.L_found_difference_in_8B
+	ldl.ab	r4, [r1, +8]
+	ldl.ab	r5, [r1, +8]
 
-	subl	r12,	r10,	r8
-	bicl	r12,	r12,	r10
-	tstl	r12,	r9
-	bne.d	@.L_found_difference_in_8B
-; Look for difference
-	subl.f	0,		r3,		r10
-	bne		@.L_found_difference_in_8B
+#else
+	# error Unknown configuration
+#endif
+	subl	r10, r2, r8
+	subl	r11, r3, r8
+	subl	r6, r4, r8
+	subl	r7, r5, r8
+
+	bicl	r10, r10, r2
+	bicl	r11, r11, r3
+	bicl	r6, r6, r4
+	bicl	r7, r7, r5
+
+	; Look for difference
+	subl.f	0, r2, r4
+	bset.ne r12, r12, 2
+	
+	subl.f	0, r3, r5
+	bset.ne r12, r12, 1
 
 
+	; Look for NULL byte
+	andl.f	r10, r10, r9
+	bset.ne	r12, r12, 2
 
-	j		@.L_search_8bytes
+	andl.f	r11, r11, r9
+	bset.ne	r12, r12, 1
 
+	andl.f	r6, r6, r9
+	bset.ne	r12, r12, 2
 
-.L_found_difference_in_8B:
-subl	r1,		r1,		4
-subl	r13,	r13,	4
+	andl.f	r7, r7, r9
+	bset.ne	r12, r12, 1
 
-.L_found_difference_in_4B:
-; Need to make sure the 1B search takes a 4B chunk into consideration
-subl	r1,		r1,		4
-subl	r13,	r13,	4
+	breq	r12, 0, @.L_4_4B_search
 
-; 1 Byte search
-.L_start_1byte_search:
+.L_found_in_4B:
+; Setup r0, r1, r3 r5 with the relevant loaded and intermediate values
+	movl	r0, r11
+	movl	r1, r7
+	movl	r3, r3
+	movl	r5, r5
 
-ldb.ab		r11,		[r13,	+1]
-ldb.ab		r12,		[r1,	+1]
+	asr.f	r12, r12, 3
+	
+	movl.c	r0, r10
+	movl.c	r1, r6
+	movl.c	r3, r2
+	movl.c	r5, r4
 
-.L_search_1byte_chunks:
-	; Check for end of string. Do sub either way to provide appropriate difference
-	cmp			0,		r11
-	cmp			0,		r12
-	beq.d		@.L_return
-	subl.f		r0,		r11,		r12
+	ffsl.f	r10, r0
+	movl.z	r10, 64
 
-	; Load next r10
-	ldb.ab		r11,		[r13,	+1]
+	ffsl.f	r11, r1
+	movl.z	r11, 64
 
-	; If the current bytes are different, SUB will return non zero
-	beq.d		@.L_search_1byte_chunks
-	; Load next r1
-	ldb.ab		r12,		[r1,	+1]
+	xbful 	r10, r10, 0b0111000011
+	xbful 	r11, r11, 0b0111000011
 
+	; Get difference position in r6
+	;; Force difference to 0
+	xorl	r12, r3, r5
+
+	vpack2wl	r7, NULL_32DT_3, NULL_32DT_3
+
+	andl	r6, r12, r7
+	addl	r6, r6, r7
+	orl	r6, r6, r12
+	orl	r6, r6, r7
+	xorl	r6, r6, -1
+	
+	subl	r12, r6, r8
+	bicl	r12, r12, r6
+	andl	r12, r12, r9
+
+	ffsl.f	r12, r12
+	; If r12 is empty, all bytes are different (and turned to 0)
+	movl.z	r12, 0
+	
+	xbful 	r12, r12, 0b0111000011
+
+; r12 contains position of difference, r10 and r11 the position of NULL bytes
+; r3 and r5 contain the differing 4 bytes
+
+; Depending on r10, r11 and r12, set the first byte of r3 and r5 to their
+; difference
+
+; Move r12 into r4 not to clobber r12
+	movl	r4, r11
+; Is the difference located before or on top of a NULL byte?
+	subl.f	0, r10, r12
+	subl.ne.f	r4, r4, r12
+	asll.ge	r12, r12, 3
+
+; Difference is first
+	lsrl.ge	r3, r3, r12
+	lsrl.ge	r5, r5, r12
+	bge.d	@.L_return
+
+; If one NULL byte is first. Which one?
+	subl.f	0, r10, r11
+	
+; r2 is first
+	asll.le	r10, r10, 3
+	asll.gt	r11, r11, 3
+
+	lsrl.le	r3, r3, r10
+	lsrl.le	r5, r5, r10
+
+; r3 is first
+	lsrl.gt	r3, r3, r11
+	lsrl.gt	r5, r5, r11
 
 .L_return:
-	j_s	[blink]
+	bmskl	r3, r3, 7
+	bmskl	r5, r5, 7
+
+	j_s.d	[blink]
+	subl	r0, r3, r5
+
 
 ENDFUNC (strcmp)
 
