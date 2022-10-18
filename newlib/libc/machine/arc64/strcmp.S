@@ -118,21 +118,7 @@ ENTRY (strcmp)
 	;; Force difference to 0
 	xor	r12, r3, r5
 
-	mov	r7, NULL_32DT_3
-
-	and	r6, r12, r7
-	add	r6, r6, r7
-	or	r6, r6, r12
-	or	r6, r6, r7
-	xor	r6, r6, -1
-	
-	sub	r12, r6, r8
-	bic r12, r12, r6
-	and r12, r12, r13
-
-	ffs.f r12, r12
-	; If r12 is empty, all bytes are different (and turned to 0)
-	mov.z	r12, 0
+	ffs r12, r12
 	
 	xbfu 	r12, r12, 0b0111000011
 
