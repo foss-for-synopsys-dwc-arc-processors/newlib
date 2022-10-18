@@ -54,6 +54,7 @@ ENTRY (strcmp)
 
 	ld.ab	r2, [r0, +4]
 	ld.ab	r3, [r0, +4]
+
 	ld.ab	r4, [r1, +4]
 	ld.ab	r5, [r1, +4]
 
@@ -69,95 +70,110 @@ ENTRY (strcmp)
 
 	; Look for difference
 	sub.f	0, r2, r4
-	bset.ne r12, r12, 6
+	bset.ne r12, r12, 2
 	
 	sub.f	0, r3, r5
-	bset.ne r12, r12, 5
+	bset.ne r12, r12, 1
 
 
 	; Look for NULL byte
-	tst	r10, r13
-	bset.ne	r12, r12, 4
-
-	tst	r11, r13
-	bset.ne	r12, r12, 3
-
-	tst	r6, r13
+	and.f	r10, r10, r13
 	bset.ne	r12, r12, 2
 
-	tst	r7, r13
+	and.f	r11, r11, r13
 	bset.ne	r12, r12, 1
 
-	breq.d	r12, 0, @.L_4_4B_search
+	and.f	r6, r6, r13
+	bset.ne	r12, r12, 2
 
-	; Did we find a difference?
-	lsr.f	0, r12, 5
-	bne	@.L_found_in_4B
+	and.f	r7, r7, r13
+	bset.ne	r12, r12, 1
 
-	; Nope, means we just found a NULL byte
-	j.d	[blink]
-	mov	r0, 0
+	breq	r12, 0, @.L_4_4B_search
 
 .L_found_in_4B:
 	
-	mov	r10, r3
-	mov	r11, r5
+	mov r0, r11
+	mov r1, r7
+	mov	r3, r3
+	mov	r5, r5
 
-	;mov r8, r11
-	;mov r9, r7
-
-	asr.f	r12, r12, 7
+	asr.f	r12, r12, 3
 	
-	mov.c	r10, r2
-	mov.c	r11, r4
+	mov.c	r0, r10
+	mov.c	r1, r6
+	mov.c	r3, r2
+	mov.c	r5, r4
+
+	ffs.f	r10, r0
+	mov.z	r10, 32
+
+	ffs.f	r11, r1
+	mov.z	r11, 32
+
+	xbfu 	r10, r10, 0b0111000011
+	xbfu 	r11, r11, 0b0111000011
+
+	; Get difference position in r6
+	;; Force difference to 0
+	xor	r12, r3, r5
+
+	mov	r7, NULL_32DT_3
+
+	and	r6, r12, r7
+	add	r6, r6, r7
+	or	r6, r6, r12
+	or	r6, r6, r7
+	xor	r6, r6, -1
 	
-	;mov.c	r8, r10
-	;mov.c	r9, r6
+	sub	r12, r6, r8
+	bic r12, r12, r6
+	and r12, r12, r13
 
-	;rol8	r10, r10
-.L_search_next_byte:
-
-	;rol8	r11, r11
-
-	; Extract byte
-	bmsk	r2, r10, 7
-	bmsk.f	r3, r11, 7
-	cmp.ne	r2, 0
-
-	; Return if one of them is NULL byte
-	beq.d	@.L_return
-
-	sub.f		r0, r2, r3
-	lsr8	r10, r10
-	;sub.f	r0, r10, r11
-	; Return if the difference is not 0
-	beq.d	@.L_search_next_byte
-	lsr8	r11, r11
+	ffs.f r12, r12
+	; If r12 is empty, all bytes are different (and turned to 0)
+	mov.z	r12, 0
 	
+	xbfu 	r12, r12, 0b0111000011
+
+; r12 contains position of difference, r10 and r11 the position of NULL bytes
+; r3 and r5 contain the differing 4 bytes
+
+; Depending on r10, r11 and r12, set the first byte of r3 and r5 to their
+; difference
+
+; Move r12 into r4 not to clobber r12
+	mov	r4, r11
+; Is the difference located before or on top of a NULL byte?
+	sub.f	0, r10, r12
+	sub.ne.f	r4, r4, r12
+	asl.ge	r12, r12, 3
+
+; Difference is first
+	lsr.ge	r3, r3, r12
+	lsr.ge	r5, r5, r12
+	bge.d	@.L_return
+
+; If one NULL byte is first. Which one?
+	sub.f	0, r10, r11
 	
+; r2 is first
+	asl.le	r10, r10, 3
+	asl.gt	r11, r11, 3
+
+	lsr.le	r3, r3, r10
+	lsr.le	r5, r5, r10
+
+; r3 is first
+	lsr.gt	r3, r3, r11
+	lsr.gt	r5, r5, r11
+
 .L_return:
-	j_s	[blink]
+	bmsk	r3, r3, 7
+	bmsk	r5, r5, 7
 
-
-; r0 and r1 contain the 4B from r0 and r1 that differ
-; Now we can xor and invert to force a NULL in the different byte
-
-; Make all bytes that match, equal to 0
-	;xor	r2, r0, r1
-; Invert. Only differing bytes are NULL now
-	;not	r2, r2
-; Detect and find NULL byte
-	;sub	r3, r2, r8
-	;bic r3, r3, r2
-	;and r3, r13
-
-	;ffs	r1, r1 ; [6]
-
-	;xbfu 	r1, r1, 0b0111000011 ; [7]
-
-
-
-
+	j_s.d	[blink]
+	sub	r0, r3, r5
 
 
 ENDFUNC(strcmp)
