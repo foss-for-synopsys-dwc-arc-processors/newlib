@@ -243,7 +243,8 @@ ENTRY (strcmp)
 	breq	r12, 0, @.L_4_4B_search
 
 .L_found_in_4B:
-; Setup r0, r1, r3 r5 with the relevant loaded and intermediate values
+; Setup r0, r1, r3 r5 with the relevant loaded and intermediate values [2]
+	; [3]
 	movl	r0, r11
 	movl	r1, r7
 	movl	r3, r3
@@ -256,34 +257,20 @@ ENTRY (strcmp)
 	movl.c	r3, r2
 	movl.c	r5, r4
 
-	ffsl.f	r10, r0
-	movl.z	r10, 64
+	ffsl.f	r10, r0		; [5]
+	movl.z	r10, 64		; [6]
 
 	ffsl.f	r11, r1
 	movl.z	r11, 64
 
-	xbful 	r10, r10, 0b0111000011
+	xbful 	r10, r10, 0b0111000011	; [7]
 	xbful 	r11, r11, 0b0111000011
 
 	; Get difference position in r6
-	;; Force difference to 0
+	;; Force similarities to 0
 	xorl	r12, r3, r5
 
-	vpack2wl	r7, NULL_32DT_3, NULL_32DT_3
-
-	andl	r6, r12, r7
-	addl	r6, r6, r7
-	orl	r6, r6, r12
-	orl	r6, r6, r7
-	xorl	r6, r6, -1
-	
-	subl	r12, r6, r8
-	bicl	r12, r12, r6
-	andl	r12, r12, r9
-
-	ffsl.f	r12, r12
-	; If r12 is empty, all bytes are different (and turned to 0)
-	movl.z	r12, 0
+	ffsl	r12, r12 ; [8]
 	
 	xbful 	r12, r12, 0b0111000011
 
@@ -331,4 +318,88 @@ ENDFUNC (strcmp)
 
 #endif
 
+;; This code uses a common technique for NULL byte detection inside a word.
+;; Details on this technique can be found in:
+;; (https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord)
+;
+; In sum, this technique allows for detecting a NULL byte inside any given 
+; amount of bits by performing the following operation
+; 		DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080) [0]
+;
+; The code above implements this by setting r8 to a 0x01010101... sequence and
+; r1 to a 0x80808080... sequence of appropriate length
+; As LIMM are 32 bit only, we need to perform MOVHL and ORL [1] operations to
+; have the appropriate 64 bit values in place
+;
+;; Comparison is done 16 bytes at a time, either with 64 bit loads or 128 bit
+;; loads.
+;; If either a NULL byte or a difference between the strings is found, r12 is
+;; used to know in which word the NULL/difference is found
+;
+; With the carry bit from r12, we can use mov.c to only move the appropriate
+; registers into the ones we will operate on [2]. We can safely directly move
+; the last set of registers without looking at r12, because if they aren't the
+; appropriate ones, they will be rewritten afterwards. [3]
+;
+; Now comes the tricky part. In order to obtain the position of the first NULL
+; bytes, we need to understand the NULL byte detection operation.
+; It is explained in depth in the link above but in short, it works by first
+; setting the highest bit of each byte to 1, if the corresponding byte is either
+; 0 or more than 0x80
+; Then, separately, it makes the highest bit of each byte 1, if the byte is
+; less than 0x80. The last step is to AND these two values (this operation is
+; simplified with the SUB, BIC and TST instructions).
+; 
+; This means that the evaluated equation result value has zeros for all non
+; zero bytes, except for the NULL bytes. Therefore, we can simply find the
+; first non zero bit (counting from bit 0) which will be inside the position of
+; the first NULL byte. [5]
+; 
+; One thing to note, is that ffs oddly returns 31/63 if no bit is found, setting
+; the zero flag. As there can be that no NULL byte is present on one or both
+; strings at this point, we must set r10 and r11 to 32/64 when appropriate. [6]
+; 
+; We can then convert the bit position into the last byte position by looking
+; into bits 3 to 5, and shifting 3 bits to the right. This can be combined into
+; a single xbful operation. The bottom 000011 represent shift by 3 and the top
+; 0111 represents the mask (3 to 5 shifted by 3 is 0 to 2).
+;
+; So far, we discussed how to obtain the position of the NULL bytes in each
+; string, but what about the difference?
+; If we xor the two values, everything will become a zero except the different
+; bytes. This means we can perform the same procedure as before, and obtain the
+; position of the first different byte!
+; One thing to note is that we dont need to check the ffs for r12 because if
+; it is 0, it means there is no difference so any operation will return 0 [8]
+; 
+; There is one optimization that is being overlooked, which is returning 0 if
+; there is no difference, but there are NULL bytes anywhere. The reason for this
+; is because the only way this can happen is if the strings have the same length
+; and either are a multiple of 16 bytes, or the bytes that follow the NULL bytes
+; also match. As this is extremely unlikely, it isnt worth it to perform this
+; optimization (as it would also add a branch to all runs)
+;
+; However, the used formula is actually a simplification that has a nasty edge
+; case. If the byte that follows a NULL is 0x01, it will appear as NULL as well.
+; For NULL byte detection this isnt problematic because we don't care about what
+; comes after the first NULL byte.
+; 
+; 
+;
+;
+;
+;
+
+
+
+
+; Finally, we can add the NULL byte position inside the loaded double word to
+; r13 and subtract r0 from r13 to obtain the string size [8]
+; 
+; 
+;
+; Some operations are re-ordered such that register dependency is reduced,
+; allowing the CPU to run more instructions in parallel [9]
+;
+;
 
