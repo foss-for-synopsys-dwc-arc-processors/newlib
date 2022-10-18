@@ -58,7 +58,6 @@
 
 # define NULL_32DT_1 0x01010101
 # define NULL_32DT_2 0x80808080
-# define NULL_32DT_3 0x7F7F7F7F
 
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
