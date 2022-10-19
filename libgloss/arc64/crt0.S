@@ -124,11 +124,12 @@ __start:
 	.weak	__setup_argv_and_call_main
 	.type	__setup_argv_and_call_main, @function
 	.align 4
+
 __setup_argv_and_call_main:
 	PUSHR	blink
-;;; Call main() with empty argc/argv/envp
-	MOVR_S	r0, 0
-	MOVR_S	r1, 0
+;;; Call main() with argv[0] set to "baremetal", argv[1] to NULL and empty envp
+	MOVR_S	r0, 1		; Set argc to 1
+	ADDPCL	r1,@.argv_data	; Set argv to the appropriate pointer
 	MOVR_S	r2, 0
 	MOVR_S	r3, 0
 
@@ -138,6 +139,14 @@ __setup_argv_and_call_main:
 	POPR	blink
 	j_s	[blink]
 
+	.align 4
+	;; Dummy program name
+.prog_name:
+	.string		"baremetal"
+;; argv data
+.argv_data:
+	 WORD		@.prog_name
+	 WORD		0x00
 	.size	__setup_argv_and_call_main, .-__setup_argv_and_call_main
 
 	.section .text._exit_halt,"ax",@progbits
