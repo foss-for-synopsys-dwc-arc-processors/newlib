@@ -7,4 +7,5 @@ libc_a_SOURCES +=	                \
         %D%/memset-stub.c           \
         %D%/setjmp.S		    \
 	%D%/strlen.S		    \
-	%D%/strcat.S
+	%D%/strcat.S		    \
+	%D%/memmove.S
