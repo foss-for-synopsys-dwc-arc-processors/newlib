@@ -52,10 +52,10 @@ ENTRY (memchr)
 	; r1 is now setup with the special 4 byte repetition of the target byte
 	; We use r1 because we dont have any more registers free inside the main loop
 	; r9 can be repurposed
-	mov		r8,		0x01010101
-	ror		r9,		r8
+	mov	r8, 0x01010101
+	ror	r9, r8
 
-	xor	r3, r3, r3
+	xor r3, r3, r3
 
 .L_search_16_bytes:
 
