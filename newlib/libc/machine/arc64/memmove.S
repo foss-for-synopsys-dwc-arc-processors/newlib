@@ -51,8 +51,7 @@ ENTRY (memmove)
 	ld.aw	r4,[r1, -4]
 	st.aw	r4,[r3, -4]
 
-; Jump if there are no 16 byte chunks
-
+; Return if there are no 16 byte chunks
 	jeq	[blink]
 
 .L_write_backwards_16_bytes:
