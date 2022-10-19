@@ -41,13 +41,13 @@ ENTRY (memchr)
 
 	; Filter for 1 byte
 	bmsk	r1, r1, 7
-	LSL8	r9, r1
+	lsl8	r9, r1
 
-	OR	r9, r9, r1
+	or	r9, r9, r1
 	;; Setup two rightmost bytes
 	;; Setup two leftmost bytes
-	LSL16	r1, r9
-	OR	r1, r1, r9
+	lsl16	r1, r9
+	or	r1, r1, r9
 
 	; r1 is now setup with the special 4 byte repetition of the target byte
 	; We use r1 because we dont have any more registers free inside the main loop
@@ -113,15 +113,16 @@ ENTRY (memchr)
 
 .L_start_1_byte_search:
 	; Check if r2 is 0
-	breq	r2, 0, @.L_byte_not_found
-
-.L_search_1_byte:
+	breq.d	r2, 0, @.L_byte_not_found
 
 	ldb.ab	r10, [r0, +1]
+.L_search_1_byte:
+
 
 	breq	r10, r1, @.L_found_byte
 
-	dbnz	r2, @.L_search_1_byte
+	dbnz.d	r2, @.L_search_1_byte
+	ldb.ab	r10, [r0, +1]
 
 
 ; Byte not found
@@ -253,15 +254,15 @@ ENTRY (memchr)
 
 .L_start_1_byte_search:
 	; Check if r2 is 0
-	breq	r2, 0, @.L_byte_not_found
+	breq.d	r2, 0, @.L_byte_not_found
+	ldb.ab	r10, [r0, +1]
 	
 .L_search_1_byte:
 
-	ldb.ab	r10, [r0, +1]
-
 	breq	r10, r1, @.L_found_byte
 
-	dbnz	r2, @.L_search_1_byte
+	dbnz.d	r2, @.L_search_1_byte
+	ldb.ab	r10, [r0, +1]
 
 
 ; Byte not found
