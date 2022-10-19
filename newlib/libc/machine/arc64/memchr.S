@@ -52,7 +52,7 @@ ENTRY (memchr)
 	; r1 is now setup with the special 4 byte repetition of the target byte
 	; We use r1 because we dont have any more registers free inside the main loop
 	; r9 can be repurposed
-	mov	r8, 0x01010101
+	mov	r8, NULL_32DT_1
 	ror	r9, r8
 
 	xor r3, r3, r3
@@ -158,9 +158,8 @@ ENTRY (memchr)
 
 	xbfu 	r2, r2, 0b0111000011 ; [7]
 
+	j.d	[blink]
 	add	r0, r0, r2 ; [8]
-	
-	j	[blink]
 
 ENDFUNC (memchr)
 
@@ -293,9 +292,8 @@ ENTRY (memchr)
 
 	xbful 	r2, r2, 0b0111000011 ; [7]
 
+	j.d	[blink]
 	addl	r0, r0, r2 ; [8]
-	
-	j	[blink]
 
 ENDFUNC (memchr)
 #endif
