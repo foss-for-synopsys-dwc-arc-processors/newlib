@@ -55,7 +55,6 @@
 
 #if defined (__ARC64_ARCH32__)
 
-
 ENTRY (strcat)
 ; Find end of r0 string
 ; ========================== STRLEN CODE START ==========================
@@ -67,7 +66,6 @@ ENTRY (strcat)
 ; Setup byte detector (more information below) [1]
 	mov	r8, NULL_32DT_1
 	asl	r9, r8, 7
-
 
 .L_4_4B_search:
 
@@ -196,7 +194,7 @@ ENTRY (strcat)
 
 #endif
 
-	j	@.L_4_4B_search_src
+	b	@.L_4_4B_search_src
 
 .L_found_in_32B:
 
@@ -216,27 +214,27 @@ ENTRY (strcat)
 	;subl	r6, 3, r6
 
 	; Condense the two subs here
-	sub	r6, 4, r6
+	rsub	r6, r6, 4
 
 	asl	r6, r6, 2
 
 ; Store double words
 	bi	[r6]
 
+	b.d	@.L_store_lastL32bits
 	mov	r11, r2
-	b	@.L_store_lastL32bits
 	nop
 	nop
 
 	st.ab	r2, [r13, +4]
+	b.d	@.L_store_lastL32bits
 	mov	r11, r3
-	b	@.L_store_lastL32bits
 	nop
 
 	st.ab	r2, [r13, +4]
 	st.ab	r3, [r13, +4]
+	b.d	@.L_store_lastL32bits
 	mov	r11, r4
-	b	@.L_store_lastL32bits
 
 	st.ab	r2, [r13, +4]
 	st.ab	r3, [r13, +4]
@@ -258,7 +256,7 @@ ENTRY (strcat)
 
 	; If the NULL byte is in byte 3 (starting from the right)
 	; we want to store 8-3 bytes
-	sub	r2, 8, r2
+	rsub	r2, r2, 8
 	asl	r2, r2, 3
 
 	; According to the target byte, setup masks
@@ -275,20 +273,18 @@ ENTRY (strcat)
 
 	or	r3, r3, r4
 
+	j_s.d	[blink]
 	st.ab	r3, [r13, +4]
 
-	j_s.d	[blink]
 
 
 ENDFUNC (strcat)
-
 
 #else
 
 ENTRY (strcat)
 ; Find end of r0 string
 ; ========================== STRLEN CODE START ==========================
-
 
 ; Preserve r0 for size calculation when returning
 	movl	r13, r0
@@ -297,7 +293,6 @@ ENTRY (strcat)
 ; Setup byte detector (more information below) [1]
 	vpack2wl	r8, NULL_32DT_1, NULL_32DT_1
 	asll	r9, r8, 7
-
 
 .L_4_8B_search:
 
@@ -362,7 +357,6 @@ ENTRY (strcat)
 	MOVP.c	r2, r10
 
 ; Point r13 to first NULL byte in selected double word
-.L_fix_r13:
 	andl	r2, r2, r9 ; [5]
 
 	ffsl	r2, r2 ; [6]
@@ -434,7 +428,7 @@ ENTRY (strcat)
 # error Unknown configuration
 #endif
 
-	j	@.L_4_8B_search_src
+	b	@.L_4_8B_search_src
 
 .L_found_in_32B:
 
@@ -454,27 +448,27 @@ ENTRY (strcat)
 	;subl	r6, 3, r6
 
 	; Condense the two subs here
-	subl	r6, 4, r6
+	rsubl	r6, r6, 4
 
 	asll	r6, r6, 2
 
 ; Store double words
 	bi	[r6]
 
+	b.d	@.L_store_lastL64bits
 	MOVP	r11, r2
-	b	@.L_store_lastL64bits
 	nop
 	nop
 
 	stl.ab	r2, [r13, +8]
+	b.d	@.L_store_lastL64bits
 	MOVP	r11, r3
-	b	@.L_store_lastL64bits
 	nop
 
 	stl.ab	r2, [r13, +8]
 	stl.ab	r3, [r13, +8]
+	b.d	@.L_store_lastL64bits
 	MOVP	r11, r4
-	b	@.L_store_lastL64bits
 
 	stl.ab	r2, [r13, +8]
 	stl.ab	r3, [r13, +8]
@@ -497,8 +491,8 @@ ENTRY (strcat)
 
 	; If the NULL byte is in byte 3 (starting from the right)
 	; we want to store 8-3 bytes
-	subl	r2, 8, r2
-	asl		r2, r2, 3
+	rsubl	r2, r2, 8
+	asl	r2, r2, 3
 
 	; According to the target byte, setup masks
 	lsrl	r3, r3, r2
@@ -512,11 +506,10 @@ ENTRY (strcat)
 	andl	r3, r3, r11
 	andl	r4, r4, r10
 
-	orl		r3, r3, r4
-
-	stl.ab	r3, [r13, +8]
+	orl	r3, r3, r4
 
 	j_s.d	[blink]
+	stl.ab	r3, [r13, +8]
 
 
 ENDFUNC (strcat)
