@@ -39,11 +39,14 @@ ENTRY (strcmp)
 	xor	r12, r12, r12
 
 	mov	r8, NULL_32DT_1
-	mov	r9, r8
 	
-	asl	r13, r8, 7
+	asl	r9, r8, 7
 
-.L_2_4B_comparison:
+.L_3_4B_comparison:
+
+	ld.ab	r6, [r0, +4]
+
+	ld.ab	r7, [r1, +4]
 
 #if defined (__ARC64_LL64__)
 
@@ -61,15 +64,18 @@ ENTRY (strcmp)
 
 #endif
 
-	vsub2	r10, r2, r8
-	vsub2	r6, r4, r8
+	sub	r13, r6, r8
+	sub	r10, r2, r8
+	sub	r11, r3, r8
 
+	bic	r13, r13, r6
 	bic	r10, r10, r2
 	bic	r11, r11, r3
-	bic	r6, r6, r4
-	bic	r7, r7, r5
 
 	; Look for difference
+	sub.f	0, r6, r7
+	bset.ne r12, r12, 3
+
 	sub.f	0, r2, r4
 	bset.ne r12, r12, 2
 	
@@ -78,19 +84,16 @@ ENTRY (strcmp)
 
 
 	; Look for NULL byte
-	and.f	r10, r10, r13
+	and.f	r13, r13, r9
+	bset.ne	r12, r12, 3
+
+	and.f	r10, r10, r9
 	bset.ne	r12, r12, 2
 
-	and.f	r11, r11, r13
+	and.f	r11, r11, r9
 	bset.ne	r12, r12, 1
 
-	and.f	0, r6, r13
-	bset.ne	r12, r12, 2
-
-	and.f	0, r7, r13
-	bset.ne	r12, r12, 1
-
-	breq	r12, 0, @.L_2_4B_comparison
+	breq	r12, 0, @.L_3_4B_comparison
 
 ; Setup r0, r3 and r5 with the relevant loaded and intermediate values
 	mov r0, r11
@@ -102,6 +105,13 @@ ENTRY (strcmp)
 	mov.c	r0, r10
 	mov.c	r3, r2
 	mov.c	r5, r4
+
+	asr.f	r12, r12, 1
+
+	mov.c	r0, r13
+	mov.c	r3, r6
+	mov.c	r5, r7
+
 
 	ffs.f	r10, r0
 	xor	r12, r3, r5
@@ -194,7 +204,6 @@ ENTRY (strcmp)
 
 	andl.f	r11, r11, r9
 	bset.ne	r12, r12, 1
-
 
 	breq	r12, 0, @.L_3_8B_comparison
 
