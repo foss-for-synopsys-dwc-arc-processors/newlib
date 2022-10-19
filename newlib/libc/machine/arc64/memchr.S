@@ -101,7 +101,7 @@ ENTRY (memchr)
 	bset.ne	r3, r3, 1
 
 	; Break if found
-	brne	r3, 0, @.L_found_in_16B
+	brne.d	r3, 0, @.L_found_in_16B
 
 	; Keep going we have more 16 byte chunks
 	sub	r2, r2, 16
@@ -114,16 +114,14 @@ ENTRY (memchr)
 .L_start_1_byte_search:
 	; Check if r2 is 0
 	breq.d	r2, 0, @.L_byte_not_found
-
 	ldb.ab	r10, [r0, +1]
-.L_search_1_byte:
 
+.L_search_1_byte:
 
 	breq	r10, r1, @.L_found_byte
 
 	dbnz.d	r2, @.L_search_1_byte
 	ldb.ab	r10, [r0, +1]
-
 
 ; Byte not found
 .L_byte_not_found:
@@ -133,7 +131,6 @@ ENTRY (memchr)
 .L_found_byte:
 	j_s.d [blink]
 	SUBP	r0, r0, 1
-
 
 .L_found_in_16B:
 
@@ -165,9 +162,7 @@ ENTRY (memchr)
 	
 	j	[blink]
 
-
 ENDFUNC (memchr)
-
 
 #else
 
@@ -264,7 +259,6 @@ ENTRY (memchr)
 	dbnz.d	r2, @.L_search_1_byte
 	ldb.ab	r10, [r0, +1]
 
-
 ; Byte not found
 .L_byte_not_found:
 	j.d	[blink]
@@ -273,7 +267,6 @@ ENTRY (memchr)
 .L_found_byte:
 	j_s.d [blink]
 	subl	r0, r0, 1
-
 
 .L_found_in_32B:
 
@@ -303,7 +296,6 @@ ENTRY (memchr)
 	addl	r0, r0, r2 ; [8]
 	
 	j	[blink]
-
 
 ENDFUNC (memchr)
 #endif
