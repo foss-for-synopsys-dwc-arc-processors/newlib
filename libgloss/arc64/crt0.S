@@ -121,15 +121,13 @@ __start:
 
 ;;; Setup fake argc and argv
 
-;; Fake argv[0] data
 	.align		4
-	.section	.rodata
+	.section	 .text
+;; Dummy program name
 .prog_name:
 	.string		"baremetal"
 
-;; Fake argv data
-	.align		4
-	.section	.data
+;; argv data
 	.global		argv_data
 	.type		argv_data, @object
 argv_data:
@@ -137,13 +135,12 @@ argv_data:
 	 WORD		0x00
 	.size		argv_data, .-argv_data
 
-;; Fake argv
-	.global		dummy_argv
-	.align		4
-	.type		dummy_argv, @object
-dummy_argv:
+;; argv
+	.global		argv
+	.type		argv, @object
+argv:
 	WORD		@argv_data
-	.size		dummy_argv, .-dummy_argv
+	.size		argv, .-argv
 
 ;;; arc-main-helper.o object can be used to replace this function
 ;;; and properly set up arguments and/or other low-level stuff.
@@ -154,9 +151,9 @@ dummy_argv:
 
 __setup_argv_and_call_main:
 	PUSHR	blink
-;;; Call main() with dummy argv[0], argc of 1 and empty envp
+;;; Call main() with argv[0] set to "baremetal", argv[1] to NULL and empty envp
 	MOVR_S	r0, 1					; Set argc to 1
-	ld	r1, [pcl, @dummy_argv@pcl]		; Set argv to the dummy_argv pointer
+	ld	r1, [pcl, @argv@pcl]		; Set argv to the appropriate pointer
 	MOVR_S	r2, 0
 	MOVR_S	r3, 0
 
