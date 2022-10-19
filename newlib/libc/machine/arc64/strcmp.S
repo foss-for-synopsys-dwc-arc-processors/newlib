@@ -141,7 +141,11 @@ ENTRY (strcmp)
 ; Set r9 as a copy of r8 for vectorized sub
 	asll	r9, r8, 7
 
-.L_2_8B_comparison:
+.L_3_8B_comparison:
+
+	ldl.ab	r6, [r0, +8]
+
+	ldl.ab	r7, [r1, +8]
 
 ; Using 128-bit memory operations
 #if defined (__ARC64_M128__)
@@ -163,38 +167,36 @@ ENTRY (strcmp)
 	# error Unknown configuration
 #endif
 
+	subl	r13, r6, r8
 	subl	r10, r2, r8
 	subl	r11, r3, r8
-	subl	r6, r4, r8
-	subl	r7, r5, r8
 
+	bicl	r13, r13, r6
 	bicl	r10, r10, r2
 	bicl	r11, r11, r3
-	bicl	r6, r6, r4
-	bicl	r7, r7, r5
 
-	; Look for difference
+; Look for difference
+	subl.f	0, r6, r7
+	bset.ne r12, r12, 3
+
 	subl.f	0, r2, r4
 	bset.ne r12, r12, 2
 	
 	subl.f	0, r3, r5
 	bset.ne r12, r12, 1
 
+; Look for NULL byte
+	andl.f	r13, r13, r9
+	bset.ne	r12, r12, 3
 
-	; Look for NULL byte
 	andl.f	r10, r10, r9
 	bset.ne	r12, r12, 2
 
 	andl.f	r11, r11, r9
 	bset.ne	r12, r12, 1
 
-	andl.f	0, r6, r9
-	bset.ne	r12, r12, 2
 
-	andl.f	0, r7, r9
-	bset.ne	r12, r12, 1
-
-	breq	r12, 0, @.L_2_8B_comparison
+	breq	r12, 0, @.L_3_8B_comparison
 
 ; Setup r0, r3 and r5 with the relevant loaded and intermediate values [2]
 	; [3]
@@ -207,6 +209,12 @@ ENTRY (strcmp)
 	movl.c	r0, r10
 	movl.c	r3, r2
 	movl.c	r5, r4
+
+	asr.f	r12, r12, 1
+
+	movl.c	r0, r13
+	movl.c	r3, r6
+	movl.c	r5, r7
 
 	ffsl.f	r10, r0		; [5]
 	xorl	r12, r3, r5
@@ -241,6 +249,13 @@ ENDFUNC (strcmp)
 
 #endif
 
+;; One important thing to note, is that we look for the first byte difference on
+;; both strings but we only look for the NULL byte in one string.
+;; This is because if a NULL byte appears first, it will be the first different
+;; byte. If it doesnt, the difference is what matters either way. If there is no
+;; difference, the NULL bytes will coincide!
+;
+;
 ;; This code uses a common technique for NULL byte detection inside a word.
 ;; Details on this technique can be found in:
 ;; (https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord)
@@ -254,8 +269,8 @@ ENDFUNC (strcmp)
 ; As LIMM are 32 bit only, we need to perform MOVHL and ORL [1] operations to
 ; have the appropriate 64 bit values in place
 ;
-;; Comparison is done 16 bytes at a time, either with 64 bit loads or 128 bit
-;; loads.
+;; Comparison is done 24 bytes at a time, either with 3 64 bit loads or 1 128 bit
+;; load and 1 64 bit.
 ;; If either a NULL byte or a difference between the strings is found, r12 is
 ;; used to know in which word the NULL/difference is found
 ;
