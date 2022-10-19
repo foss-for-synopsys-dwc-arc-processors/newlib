@@ -127,21 +127,22 @@ __start:
 .prog_name:
 	.string		"baremetal"
 
-;; Fake argv[0]
+;; Fake argv data
 	.align		4
 	.section	.data
-	.global		dummy_string
-	.type		dummy_string, @object
-dummy_string:
+	.global		argv_data
+	.type		argv_data, @object
+argv_data:
 	 WORD		@.prog_name
-	.size		dummy_string, .-dummy_string
+	 WORD		0x00
+	.size		argv_data, .-argv_data
 
 ;; Fake argv
 	.global		dummy_argv
 	.align		4
 	.type		dummy_argv, @object
 dummy_argv:
-	WORD		@dummy_string
+	WORD		@argv_data
 	.size		dummy_argv, .-dummy_argv
 
 ;;; arc-main-helper.o object can be used to replace this function
@@ -155,7 +156,7 @@ __setup_argv_and_call_main:
 	PUSHR	blink
 ;;; Call main() with dummy argv[0], argc of 1 and empty envp
 	MOVR_S	r0, 1					; Set argc to 1
-	LDL		r1,[@dummy_argv]		; Set argv to the dummy_argv pointer
+	ld	r1,[@dummy_argv]		; Set argv to the dummy_argv pointer
 	MOVR_S	r2, 0
 	MOVR_S	r3, 0
 
