@@ -156,7 +156,7 @@ __setup_argv_and_call_main:
 	PUSHR	blink
 ;;; Call main() with dummy argv[0], argc of 1 and empty envp
 	MOVR_S	r0, 1					; Set argc to 1
-	ld	r1,[@dummy_argv]		; Set argv to the dummy_argv pointer
+	ld	r1, [pcl, @dummy_argv@pcl]		; Set argv to the dummy_argv pointer
 	MOVR_S	r2, 0
 	MOVR_S	r3, 0
 
