@@ -16,6 +16,7 @@ lib_a_SOURCES =                 \
         strlen.S                \
         memmove.S               \
         strcat.S                \
+        strcmp.S                \
         setjmp.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
