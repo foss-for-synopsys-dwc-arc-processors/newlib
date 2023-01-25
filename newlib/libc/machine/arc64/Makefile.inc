@@ -8,4 +8,5 @@ libc_a_SOURCES +=	                \
         %D%/setjmp.S		    \
 	%D%/strlen.S		    \
 	%D%/strcat.S		    \
-	%D%/memmove.S
+	%D%/memmove.S		    \
+	%D%/strcmp.S
