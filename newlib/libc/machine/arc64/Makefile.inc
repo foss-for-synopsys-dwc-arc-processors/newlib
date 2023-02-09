@@ -9,4 +9,5 @@ libc_a_SOURCES +=	                \
 	%D%/strlen.S		    \
 	%D%/strcat.S		    \
 	%D%/memmove.S		    \
-	%D%/strcmp.S
+	%D%/strcmp.S		    \
+	%D%/memchr.S
