@@ -68,6 +68,11 @@
   sub	  \r1, \r2, \r3
 .endm
 
+/* Add PCL-rel: r:reg, symb: symbol */
+.macro ADDPCL r,symb
+  add	  \r, pcl, \symb
+.endm
+
 #elif defined (__ARC64_ARCH64__)
 
 /* Define 64-bit word.  */
@@ -104,6 +109,11 @@
 /* Subtract register: r1(reg), r2(reg), r3(reg)  */
 .macro SUBR r1, r2, r3
   subl	  \r1, \r2, \r3
+.endm
+
+/* Add PCL-rel: r:reg, symb: symbol */
+.macro ADDPCL r, symb
+  addl	  \r, pcl, \symb@pcl
 .endm
 
 #else /* !__ARC64_ARC32__  && !__ARC64_ARC64__  */
