@@ -55,7 +55,6 @@
 #define __ARCHS__ 1
 #endif
 
-	.file	"crt0.S"
 	.extern main
 
 #if defined (__ARCEM__) || defined (__ARCHS__)
