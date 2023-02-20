@@ -47,7 +47,6 @@
 	.endif
 	.endm
 
-	.file	"crt0.S"
 	.extern main
 
 	.section .text.__startup, "ax", @progbits
