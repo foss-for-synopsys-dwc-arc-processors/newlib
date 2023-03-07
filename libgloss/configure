@@ -652,6 +652,8 @@ CONFIG_BFIN_FALSE
 CONFIG_BFIN_TRUE
 CONFIG_ARM_FALSE
 CONFIG_ARM_TRUE
+CONFIG_ARC64_FALSE
+CONFIG_ARC64_TRUE
 CONFIG_ARC_FALSE
 CONFIG_ARC_TRUE
 CONFIG_AARCH64_FALSE
@@ -2771,9 +2773,7 @@ case "${target}" in
   	config_arc=true
 	;;
   arc[6432]*-*-*)
-	ac_config_files="$ac_config_files arc64/Makefile"
-
-	subdirs="$subdirs arc64"
+  	config_arc64=true
 	;;
   csky*-*-*)
 	config_csky=true
@@ -3017,6 +3017,14 @@ fi
 else
   CONFIG_ARC_TRUE='#'
   CONFIG_ARC_FALSE=
+fi
+
+   if test x$config_arc64 = xtrue; then
+  CONFIG_ARC64_TRUE=
+  CONFIG_ARC64_FALSE='#'
+else
+  CONFIG_ARC64_TRUE='#'
+  CONFIG_ARC64_FALSE=
 fi
 
    if test x$config_arm = xtrue; then
@@ -5336,6 +5344,10 @@ if test -z "${CONFIG_ARC_TRUE}" && test -z "${CONFIG_ARC_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_ARC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CONFIG_ARC64_TRUE}" && test -z "${CONFIG_ARC64_FALSE}"; then
+  as_fn_error $? "conditional \"CONFIG_ARC64\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${CONFIG_ARM_TRUE}" && test -z "${CONFIG_ARM_FALSE}"; then
   as_fn_error $? "conditional \"CONFIG_ARM\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -6000,7 +6012,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "arc64/Makefile") CONFIG_FILES="$CONFIG_FILES arc64/Makefile" ;;
     "epiphany/Makefile") CONFIG_FILES="$CONFIG_FILES epiphany/Makefile" ;;
     "i386/Makefile") CONFIG_FILES="$CONFIG_FILES i386/Makefile" ;;
     "m32r/Makefile") CONFIG_FILES="$CONFIG_FILES m32r/Makefile" ;;
