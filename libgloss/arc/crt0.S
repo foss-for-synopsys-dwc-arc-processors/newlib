@@ -178,28 +178,12 @@ __start:
 
 #endif /* !__ARC601__ */
 
-; Some  targets use the .init and .fini sections to create constructors and
-; destructors, and for these targets we need to call the _init function and
-; arrange for _fini to be called at program exit.
-	mov_s	r13, r0
-	mov_s	r14, r1
-	; calling atexit drags in malloc, so instead poke the function
-	; address directly into the reent structure
-	ld	r1, [@_impure_ptr]
-	mov_s	r0, @_fini
-	add	r1, r1, 0x14c		; &_GLOBAL_REENT->atexit0
-	st	r1, [r1, -4]		; _GLOBAL_REENT->atexit
-	st_s	r0, [r1, 8]		; _GLOBAL_REENT->atexit0._fns[0]
-	mov_s	r0, 1
-	st_s	r0, [r1, 4]		; __atexit0._ind = 1
-	mov_s	r0, @_fini
-	st_s	r0, [r1, 8]		; __atexit0._fns[0] = _fini
-; branch to _init
-#if defined (__ARCEM__) || defined (__ARCHS__)
+	;; Call constructors
 	jl	@_init
-#else
-	bl	@_init
-#endif /* __ARCEM__ || __ARCHS__ */
+
+;;; Setup fini routines to be called from exit
+	mov_s	r0, @_fini
+	jl	@atexit
 
 #ifdef PROFILE_SUPPORT /* Defined in gcrt0.S.  */
 	mov	r0,@__start
@@ -207,16 +191,9 @@ __start:
 	jl	@_monstartup
 #endif /* PROFILE_SUPPORT */
 
-	mov_s	r0, r13
-	mov_s	r1, r14
 ; branch to main
-#if defined (__ARCEM__) || defined (__ARCHS__)
 	mov	fp,0			; initialize frame pointer
 	jl	@__setup_argv_and_call_main
-#else
-	bl.d	@__setup_argv_and_call_main
-	mov	fp, 0			; initialize frame pointer
-#endif /* __ARCEM__ || __ARCHS__ */
 
 #ifdef PROFILE_SUPPORT
 	mov	r13, r0		; Save return code
@@ -226,23 +203,21 @@ __start:
 
 	; r0 contains exit code
 	j	@exit
+	.size	__start, .-__start
 
-; arc-main-helper.o object can be used to replace this function
-; and properly set up arguments and/or other low-level stuff.
-.section .text.__setup_argv_and_call_main,"ax",@progbits
-.weak	__setup_argv_and_call_main
-.type	__setup_argv_and_call_main, @function
+;;; arc-main-helper.o object can be used to replace this function and
+;;; properly set up arguments and/or other low-level stuff.
+	.section .text.__setup_argv_and_call_main,"ax",@progbits
+	.weak	__setup_argv_and_call_main
+	.type	__setup_argv_and_call_main, @function
 	.align 4
+
 __setup_argv_and_call_main:
 	push_s	blink
 ; Call main with argc = 0 and *argv[] = 0
 	mov	r0, 0
 	mov	r1, 0
-#if defined (__ARCEM__) || defined (__ARCHS__)
 	jl	@main
-#else
-	bl	@main
-#endif /* __ARCEM__ || __ARCHS__ */
 	pop_s	blink
 	j_s	[blink]
 
