@@ -43,7 +43,7 @@ multilibtool_LIBRARIES += %D%/libdw_uart.a
 	%D%/write.c \
 	%D%/read.c \
 	%D%/stub.c \
-	%D%/sbrk.c
+	%D%/sbrk.c \
 	%D%/dw_uart/arc/arc_exc_asm.S \
         %D%/dw_uart/arc/arc_exception.S \
         %D%/dw_uart/board/board.c \
