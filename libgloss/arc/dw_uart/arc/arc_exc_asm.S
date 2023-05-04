@@ -31,6 +31,8 @@
  * \author Wayne Ren(Wei.Ren@synopsys.com)
 --------------------------------------------- */
 
+#ifdef __ARCEM__
+
 /**
  * \file
  * \ingroup ARC_HAL_EXCEPTION_CPU
@@ -197,3 +199,5 @@ firq_return:
 	rtie
 
 /** @endcond */
+
+#endif /* __ARCEM__ */

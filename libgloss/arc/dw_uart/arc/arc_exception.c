@@ -31,6 +31,8 @@
  * \author Wayne Ren(Wei.Ren@synopsys.com)
 --------------------------------------------- */
 
+#ifdef __ARCEM__
+
 /**
  * \file
  * \ingroup ARC_HAL_EXCEPTION_CPU ARC_HAL_EXCEPTION_INTERRUPT
@@ -191,3 +193,5 @@ int32_t int_handler_install(const uint32_t intno, INT_HANDLER handler)
 }
 
 #endif /* EMBARC_OVERRIDE_ARC_INTERRUPT_MANAGEMENT */
+
+#endif /* __ARCEM__ */
