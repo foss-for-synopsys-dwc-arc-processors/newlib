@@ -300,7 +300,13 @@ arc_libdw_uart_a_LIBADD =
 @CONFIG_ARC_TRUE@	arc/arc_libdw_uart_a-write.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/arc_libdw_uart_a-read.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/arc_libdw_uart_a-stub.$(OBJEXT) \
-@CONFIG_ARC_TRUE@	arc/arc_libdw_uart_a-sbrk.$(OBJEXT)
+@CONFIG_ARC_TRUE@	arc/arc_libdw_uart_a-sbrk.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/dw_uart/board/arc_libdw_uart_a-board.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/dw_uart/common/arc_libdw_uart_a-console_io.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.$(OBJEXT)
 arc_libdw_uart_a_OBJECTS = $(am_arc_libdw_uart_a_OBJECTS)
 arc_libhl_a_AR = $(AR) $(ARFLAGS)
 arc_libhl_a_LIBADD =
@@ -878,7 +884,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -1017,7 +1022,13 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_ARC_TRUE@	arc/write.c \
 @CONFIG_ARC_TRUE@	arc/read.c \
 @CONFIG_ARC_TRUE@	arc/stub.c \
-@CONFIG_ARC_TRUE@	arc/sbrk.c
+@CONFIG_ARC_TRUE@	arc/sbrk.c \
+@CONFIG_ARC_TRUE@	arc/dw_uart/arc/arc_exc_asm.S \
+@CONFIG_ARC_TRUE@	arc/dw_uart/arc/arc_exception.c \
+@CONFIG_ARC_TRUE@	arc/dw_uart/board/board.c \
+@CONFIG_ARC_TRUE@	arc/dw_uart/board/emsk/uart/dw_uart_obj.c \
+@CONFIG_ARC_TRUE@	arc/dw_uart/common/console_io.c \
+@CONFIG_ARC_TRUE@	arc/dw_uart/device/designware/uart/dw_uart.c
 
 @CONFIG_ARC64_TRUE@arc64_libnsim_a_SOURCES = \
 @CONFIG_ARC64_TRUE@	arc64/libcfunc.c \
@@ -1468,6 +1479,54 @@ arc/arc_libdw_uart_a-stub.$(OBJEXT): arc/$(am__dirstamp) \
 	arc/$(DEPDIR)/$(am__dirstamp)
 arc/arc_libdw_uart_a-sbrk.$(OBJEXT): arc/$(am__dirstamp) \
 	arc/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/arc/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/arc
+	@: > arc/dw_uart/arc/$(am__dirstamp)
+arc/dw_uart/arc/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/arc/$(DEPDIR)
+	@: > arc/dw_uart/arc/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.$(OBJEXT):  \
+	arc/dw_uart/arc/$(am__dirstamp) \
+	arc/dw_uart/arc/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.$(OBJEXT):  \
+	arc/dw_uart/arc/$(am__dirstamp) \
+	arc/dw_uart/arc/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/board/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/board
+	@: > arc/dw_uart/board/$(am__dirstamp)
+arc/dw_uart/board/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/board/$(DEPDIR)
+	@: > arc/dw_uart/board/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/board/arc_libdw_uart_a-board.$(OBJEXT):  \
+	arc/dw_uart/board/$(am__dirstamp) \
+	arc/dw_uart/board/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/board/emsk/uart/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/board/emsk/uart
+	@: > arc/dw_uart/board/emsk/uart/$(am__dirstamp)
+arc/dw_uart/board/emsk/uart/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/board/emsk/uart/$(DEPDIR)
+	@: > arc/dw_uart/board/emsk/uart/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.$(OBJEXT):  \
+	arc/dw_uart/board/emsk/uart/$(am__dirstamp) \
+	arc/dw_uart/board/emsk/uart/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/common/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/common
+	@: > arc/dw_uart/common/$(am__dirstamp)
+arc/dw_uart/common/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/common/$(DEPDIR)
+	@: > arc/dw_uart/common/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/common/arc_libdw_uart_a-console_io.$(OBJEXT):  \
+	arc/dw_uart/common/$(am__dirstamp) \
+	arc/dw_uart/common/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/device/designware/uart/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/device/designware/uart
+	@: > arc/dw_uart/device/designware/uart/$(am__dirstamp)
+arc/dw_uart/device/designware/uart/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) arc/dw_uart/device/designware/uart/$(DEPDIR)
+	@: > arc/dw_uart/device/designware/uart/$(DEPDIR)/$(am__dirstamp)
+arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.$(OBJEXT):  \
+	arc/dw_uart/device/designware/uart/$(am__dirstamp) \
+	arc/dw_uart/device/designware/uart/$(DEPDIR)/$(am__dirstamp)
 
 arc/libdw_uart.a: $(arc_libdw_uart_a_OBJECTS) $(arc_libdw_uart_a_DEPENDENCIES) $(EXTRA_arc_libdw_uart_a_DEPENDENCIES) arc/$(am__dirstamp)
 	$(AM_V_at)-rm -f arc/libdw_uart.a
@@ -2185,6 +2244,11 @@ mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f aarch64/*.$(OBJEXT)
 	-rm -f arc/*.$(OBJEXT)
+	-rm -f arc/dw_uart/arc/*.$(OBJEXT)
+	-rm -f arc/dw_uart/board/*.$(OBJEXT)
+	-rm -f arc/dw_uart/board/emsk/uart/*.$(OBJEXT)
+	-rm -f arc/dw_uart/common/*.$(OBJEXT)
+	-rm -f arc/dw_uart/device/designware/uart/*.$(OBJEXT)
 	-rm -f arc/hl/*.$(OBJEXT)
 	-rm -f arc64/*.$(OBJEXT)
 	-rm -f arc64/hl/*.$(OBJEXT)
@@ -2231,6 +2295,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/qemu-stub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/qemu-write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_api.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_argc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/hl/$(DEPDIR)/arc_libhl_a-hl_argv.Po@am__quote@
@@ -2471,6 +2541,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
+arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.o: arc/dw_uart/arc/arc_exc_asm.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.o -MD -MP -MF arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Tpo -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.o `test -f 'arc/dw_uart/arc/arc_exc_asm.S' || echo '$(srcdir)/'`arc/dw_uart/arc/arc_exc_asm.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Tpo arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arc/dw_uart/arc/arc_exc_asm.S' object='arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.o `test -f 'arc/dw_uart/arc/arc_exc_asm.S' || echo '$(srcdir)/'`arc/dw_uart/arc/arc_exc_asm.S
+
+arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.obj: arc/dw_uart/arc/arc_exc_asm.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.obj -MD -MP -MF arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Tpo -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.obj `if test -f 'arc/dw_uart/arc/arc_exc_asm.S'; then $(CYGPATH_W) 'arc/dw_uart/arc/arc_exc_asm.S'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/arc/arc_exc_asm.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Tpo arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exc_asm.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='arc/dw_uart/arc/arc_exc_asm.S' object='arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exc_asm.obj `if test -f 'arc/dw_uart/arc/arc_exc_asm.S'; then $(CYGPATH_W) 'arc/dw_uart/arc/arc_exc_asm.S'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/arc/arc_exc_asm.S'; fi`
+
 arm/arm_librdimon_v2m_a-trap.o: arm/trap.S
 @am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arm_librdimon_v2m_a_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arm/arm_librdimon_v2m_a-trap.o -MD -MP -MF arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Tpo -c -o arm/arm_librdimon_v2m_a-trap.o `test -f 'arm/trap.S' || echo '$(srcdir)/'`arm/trap.S
 @am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Tpo arm/$(DEPDIR)/arm_librdimon_v2m_a-trap.Po
@@ -2696,6 +2780,76 @@ arc/arc_libdw_uart_a-sbrk.obj: arc/sbrk.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/sbrk.c' object='arc/arc_libdw_uart_a-sbrk.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc_libdw_uart_a-sbrk.obj `if test -f 'arc/sbrk.c'; then $(CYGPATH_W) 'arc/sbrk.c'; else $(CYGPATH_W) '$(srcdir)/arc/sbrk.c'; fi`
+
+arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.o: arc/dw_uart/arc/arc_exception.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.o -MD -MP -MF arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Tpo -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.o `test -f 'arc/dw_uart/arc/arc_exception.c' || echo '$(srcdir)/'`arc/dw_uart/arc/arc_exception.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Tpo arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/arc/arc_exception.c' object='arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.o `test -f 'arc/dw_uart/arc/arc_exception.c' || echo '$(srcdir)/'`arc/dw_uart/arc/arc_exception.c
+
+arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.obj: arc/dw_uart/arc/arc_exception.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.obj -MD -MP -MF arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Tpo -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.obj `if test -f 'arc/dw_uart/arc/arc_exception.c'; then $(CYGPATH_W) 'arc/dw_uart/arc/arc_exception.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/arc/arc_exception.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Tpo arc/dw_uart/arc/$(DEPDIR)/arc_libdw_uart_a-arc_exception.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/arc/arc_exception.c' object='arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/arc/arc_libdw_uart_a-arc_exception.obj `if test -f 'arc/dw_uart/arc/arc_exception.c'; then $(CYGPATH_W) 'arc/dw_uart/arc/arc_exception.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/arc/arc_exception.c'; fi`
+
+arc/dw_uart/board/arc_libdw_uart_a-board.o: arc/dw_uart/board/board.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/board/arc_libdw_uart_a-board.o -MD -MP -MF arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Tpo -c -o arc/dw_uart/board/arc_libdw_uart_a-board.o `test -f 'arc/dw_uart/board/board.c' || echo '$(srcdir)/'`arc/dw_uart/board/board.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Tpo arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/board/board.c' object='arc/dw_uart/board/arc_libdw_uart_a-board.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/board/arc_libdw_uart_a-board.o `test -f 'arc/dw_uart/board/board.c' || echo '$(srcdir)/'`arc/dw_uart/board/board.c
+
+arc/dw_uart/board/arc_libdw_uart_a-board.obj: arc/dw_uart/board/board.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/board/arc_libdw_uart_a-board.obj -MD -MP -MF arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Tpo -c -o arc/dw_uart/board/arc_libdw_uart_a-board.obj `if test -f 'arc/dw_uart/board/board.c'; then $(CYGPATH_W) 'arc/dw_uart/board/board.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/board/board.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Tpo arc/dw_uart/board/$(DEPDIR)/arc_libdw_uart_a-board.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/board/board.c' object='arc/dw_uart/board/arc_libdw_uart_a-board.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/board/arc_libdw_uart_a-board.obj `if test -f 'arc/dw_uart/board/board.c'; then $(CYGPATH_W) 'arc/dw_uart/board/board.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/board/board.c'; fi`
+
+arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.o: arc/dw_uart/board/emsk/uart/dw_uart_obj.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.o -MD -MP -MF arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Tpo -c -o arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.o `test -f 'arc/dw_uart/board/emsk/uart/dw_uart_obj.c' || echo '$(srcdir)/'`arc/dw_uart/board/emsk/uart/dw_uart_obj.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Tpo arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/board/emsk/uart/dw_uart_obj.c' object='arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.o `test -f 'arc/dw_uart/board/emsk/uart/dw_uart_obj.c' || echo '$(srcdir)/'`arc/dw_uart/board/emsk/uart/dw_uart_obj.c
+
+arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.obj: arc/dw_uart/board/emsk/uart/dw_uart_obj.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.obj -MD -MP -MF arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Tpo -c -o arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.obj `if test -f 'arc/dw_uart/board/emsk/uart/dw_uart_obj.c'; then $(CYGPATH_W) 'arc/dw_uart/board/emsk/uart/dw_uart_obj.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/board/emsk/uart/dw_uart_obj.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Tpo arc/dw_uart/board/emsk/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart_obj.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/board/emsk/uart/dw_uart_obj.c' object='arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/board/emsk/uart/arc_libdw_uart_a-dw_uart_obj.obj `if test -f 'arc/dw_uart/board/emsk/uart/dw_uart_obj.c'; then $(CYGPATH_W) 'arc/dw_uart/board/emsk/uart/dw_uart_obj.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/board/emsk/uart/dw_uart_obj.c'; fi`
+
+arc/dw_uart/common/arc_libdw_uart_a-console_io.o: arc/dw_uart/common/console_io.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/common/arc_libdw_uart_a-console_io.o -MD -MP -MF arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Tpo -c -o arc/dw_uart/common/arc_libdw_uart_a-console_io.o `test -f 'arc/dw_uart/common/console_io.c' || echo '$(srcdir)/'`arc/dw_uart/common/console_io.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Tpo arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/common/console_io.c' object='arc/dw_uart/common/arc_libdw_uart_a-console_io.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/common/arc_libdw_uart_a-console_io.o `test -f 'arc/dw_uart/common/console_io.c' || echo '$(srcdir)/'`arc/dw_uart/common/console_io.c
+
+arc/dw_uart/common/arc_libdw_uart_a-console_io.obj: arc/dw_uart/common/console_io.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/common/arc_libdw_uart_a-console_io.obj -MD -MP -MF arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Tpo -c -o arc/dw_uart/common/arc_libdw_uart_a-console_io.obj `if test -f 'arc/dw_uart/common/console_io.c'; then $(CYGPATH_W) 'arc/dw_uart/common/console_io.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/common/console_io.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Tpo arc/dw_uart/common/$(DEPDIR)/arc_libdw_uart_a-console_io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/common/console_io.c' object='arc/dw_uart/common/arc_libdw_uart_a-console_io.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/common/arc_libdw_uart_a-console_io.obj `if test -f 'arc/dw_uart/common/console_io.c'; then $(CYGPATH_W) 'arc/dw_uart/common/console_io.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/common/console_io.c'; fi`
+
+arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.o: arc/dw_uart/device/designware/uart/dw_uart.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.o -MD -MP -MF arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Tpo -c -o arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.o `test -f 'arc/dw_uart/device/designware/uart/dw_uart.c' || echo '$(srcdir)/'`arc/dw_uart/device/designware/uart/dw_uart.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Tpo arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/device/designware/uart/dw_uart.c' object='arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.o `test -f 'arc/dw_uart/device/designware/uart/dw_uart.c' || echo '$(srcdir)/'`arc/dw_uart/device/designware/uart/dw_uart.c
+
+arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.obj: arc/dw_uart/device/designware/uart/dw_uart.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.obj -MD -MP -MF arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Tpo -c -o arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.obj `if test -f 'arc/dw_uart/device/designware/uart/dw_uart.c'; then $(CYGPATH_W) 'arc/dw_uart/device/designware/uart/dw_uart.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/device/designware/uart/dw_uart.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Tpo arc/dw_uart/device/designware/uart/$(DEPDIR)/arc_libdw_uart_a-dw_uart.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/dw_uart/device/designware/uart/dw_uart.c' object='arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libdw_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/dw_uart/device/designware/uart/arc_libdw_uart_a-dw_uart.obj `if test -f 'arc/dw_uart/device/designware/uart/dw_uart.c'; then $(CYGPATH_W) 'arc/dw_uart/device/designware/uart/dw_uart.c'; else $(CYGPATH_W) '$(srcdir)/arc/dw_uart/device/designware/uart/dw_uart.c'; fi`
 
 arc/arc_libhl_a-arc-timer.o: arc/arc-timer.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libhl_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc_libhl_a-arc-timer.o -MD -MP -MF arc/$(DEPDIR)/arc_libhl_a-arc-timer.Tpo -c -o arc/arc_libhl_a-arc-timer.o `test -f 'arc/arc-timer.c' || echo '$(srcdir)/'`arc/arc-timer.c
@@ -5223,6 +5377,16 @@ distclean-generic:
 	-rm -f aarch64/$(am__dirstamp)
 	-rm -f arc/$(DEPDIR)/$(am__dirstamp)
 	-rm -f arc/$(am__dirstamp)
+	-rm -f arc/dw_uart/arc/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc/dw_uart/arc/$(am__dirstamp)
+	-rm -f arc/dw_uart/board/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc/dw_uart/board/$(am__dirstamp)
+	-rm -f arc/dw_uart/board/emsk/uart/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc/dw_uart/board/emsk/uart/$(am__dirstamp)
+	-rm -f arc/dw_uart/common/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc/dw_uart/common/$(am__dirstamp)
+	-rm -f arc/dw_uart/device/designware/uart/$(DEPDIR)/$(am__dirstamp)
+	-rm -f arc/dw_uart/device/designware/uart/$(am__dirstamp)
 	-rm -f arc/hl/$(DEPDIR)/$(am__dirstamp)
 	-rm -f arc/hl/$(am__dirstamp)
 	-rm -f arc64/$(DEPDIR)/$(am__dirstamp)
@@ -5261,7 +5425,7 @@ clean-am: clean-aminfo clean-binPROGRAMS clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/hl/$(DEPDIR) arc64/$(DEPDIR) arc64/hl/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/dw_uart/arc/$(DEPDIR) arc/dw_uart/board/$(DEPDIR) arc/dw_uart/board/emsk/uart/$(DEPDIR) arc/dw_uart/common/$(DEPDIR) arc/dw_uart/device/designware/uart/$(DEPDIR) arc/hl/$(DEPDIR) arc64/$(DEPDIR) arc64/hl/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-local distclean-tags
@@ -5404,7 +5568,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/hl/$(DEPDIR) arc64/$(DEPDIR) arc64/hl/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) aarch64/$(DEPDIR) arc/$(DEPDIR) arc/dw_uart/arc/$(DEPDIR) arc/dw_uart/board/$(DEPDIR) arc/dw_uart/board/emsk/uart/$(DEPDIR) arc/dw_uart/common/$(DEPDIR) arc/dw_uart/device/designware/uart/$(DEPDIR) arc/hl/$(DEPDIR) arc64/$(DEPDIR) arc64/hl/$(DEPDIR) arm/$(DEPDIR) bfin/$(DEPDIR) csky/$(DEPDIR) d30v/$(DEPDIR) iq2000/$(DEPDIR) libnosys/$(DEPDIR) lm32/$(DEPDIR) nios2/$(DEPDIR) riscv/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
 	maintainer-clean-generic maintainer-clean-local
@@ -5509,12 +5673,6 @@ maintainer-clean-local: maintainer-clean-multi
 
 @CONFIG_AARCH64_TRUE@aarch64/cpu-init/rdimon-aem-v8-r.$(OBJEXT): aarch64/cpu-init/rdimon-aem-el3.S aarch64/cpu-init/$(am__dirstamp)
 @CONFIG_AARCH64_TRUE@	$(AM_V_CC)$(COMPILE) $(aarch64_cpu_init_CPPFLAGS) -DARM_RDI_MONITOR -DBUILD_FOR_R_PROFILE -o $@ -c $<
-@CONFIG_ARC_TRUE@	arc/dw_uart/arc/arc_exc_asm.S \
-@CONFIG_ARC_TRUE@        arc/dw_uart/arc/arc_exception.S \
-@CONFIG_ARC_TRUE@        arc/dw_uart/board/board.c \
-@CONFIG_ARC_TRUE@	arc/dw_uart/board/emsk/uart/dw_uart_obj.c \
-@CONFIG_ARC_TRUE@        arc/dw_uart/common/console_io.c \
-@CONFIG_ARC_TRUE@        arc/dw_uart/device/designware/uart/dw_uart.c
 
 @CONFIG_ARM_TRUE@arm/redboot-syscalls.o: arm/redboot-syscalls.c
 @CONFIG_ARM_TRUE@	$(AM_V_CC)$(COMPILE) -DSEMIHOST_V2 -o $@ -c $<
