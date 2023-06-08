@@ -64,10 +64,13 @@ multilibtool_DATA += \
 	%D%/nsim.specs \
 	%D%/hl.specs \
 	%D%/qemu.specs \
-	%D%/emsk_em9d.specs \
-	%D%/emsk_em11d.specs \
-	%D%/emsk_em9d.x \
-	%D%/emsk_em11d.x \
+	%D%/emsk.specs \
+	%D%/emsk1_em4.x \
+	%D%/emsk1_em6.x \
+	%D%/emsk2.1_em5d.x \
+	%D%/emsk2.1_em7d.x \
+	%D%/emsk2.2_em9d.x \
+	%D%/emsk2.2_em11d.x \
 	%D%/hsdk.specs \
 	%D%/hsdk.x \
 	%D%/iotdk.specs \
