@@ -36,20 +36,6 @@ multilibtool_LIBRARIES += %D%/libhl.a
 	%D%/hl/hl_argv.c \
 	%D%/hl/hl_exit.c
 
-multilibtool_LIBRARIES += %D%/libdw_uart.a
-%C%_libdw_uart_a_CPPFLAGS = -I$(srcdir)/%D% -I$(srcdir)/%D%/dw_uart/
-%C%_libdw_uart_a_SOURCES = \
-	%D%/write.c \
-	%D%/read.c \
-	%D%/stub.c \
-	%D%/sbrk.c \
-	%D%/dw_uart/arc/arc_exc_asm.S \
-	%D%/dw_uart/arc/arc_exception.S \
-	%D%/dw_uart/board/board.c \
-	%D%/dw_uart/board/emsk/uart/dw_uart_obj.c \
-	%D%/dw_uart/common/console_io.c \
-	%D%/dw_uart/device/designware/uart/dw_uart.c
-
 multilibtool_LIBRARIES += %D%/libuart_8250.a
 %C%_libuart_8250_a_CPPFLAGS = -I$(srcdir)/%D%
 %C%_libuart_8250_a_SOURCES = \
