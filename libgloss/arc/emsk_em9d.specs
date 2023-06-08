@@ -1,14 +1,18 @@
-%rename link old-link
+%rename link emsk_link
 %rename link_gcc_c_sequence emsk_link_gcc_c_sequence
+%rename startfile emsk_startfile
 
 *link:
-%(old-link) -L emsk_em9d%s
+%(emsk_link) -L emsk_em9d%s
 
 *emsk_libgloss:
--ldw_uart
+-luart_8250 -lemsk_uart
 
 *emsk_libc:
 %{!specs=nano.specs:-lc} %{specs=nano.specs:-lc_nano}
 
 *link_gcc_c_sequence:
 %(emsk_link_gcc_c_sequence) --start-group %G %(emsk_libc) %(emsk_libgloss) --end-group
+
+*startfile:
+%(emsk_startfile) arc-main-helper%O%s
