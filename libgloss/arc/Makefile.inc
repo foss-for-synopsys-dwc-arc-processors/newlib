@@ -66,6 +66,10 @@ multilibtool_LIBRARIES += %D%/libhsdk_uart.a
 %C%_libhsdk_uart_a_CPPFLAGS = -I$(srcdir)/%D%
 %C%_libhsdk_uart_a_SOURCES = %D%/hsdk-uart-setup.c
 
+multilibtool_LIBRARIES += %D%/libemsk_uart.a
+%C%_libemsk_uart_a_CPPFLAGS = -I$(srcdir)/%D%
+%C%_libemsk_uart_a_SOURCES = %D%/emsk-uart-setup.c
+
 multilibtool_DATA += \
 	%D%/crt0.o \
 	%D%/gcrt0.o \
