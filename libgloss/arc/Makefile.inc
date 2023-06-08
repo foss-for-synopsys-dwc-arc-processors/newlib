@@ -50,6 +50,22 @@ multilibtool_LIBRARIES += %D%/libdw_uart.a
 	%D%/dw_uart/common/console_io.c \
 	%D%/dw_uart/device/designware/uart/dw_uart.c
 
+multilibtool_LIBRARIES += %D%/libuart_8250.a
+%C%_libuart_8250_a_CPPFLAGS = -I$(srcdir)/%D%
+%C%_libuart_8250_a_SOURCES = \
+	%D%/uart-8250.c \
+	%D%/uart-8250-stub.c \
+	%D%/sbrk.c \
+	%D%/mcount.c
+
+multilibtool_LIBRARIES += %D%/libiotdk_uart.a
+%C%_libiotdk_uart_a_CPPFLAGS = -I$(srcdir)/%D%
+%C%_libiotdk_uart_a_SOURCES = %D%/iotdk-uart-setup.c
+
+multilibtool_LIBRARIES += %D%/libhsdk_uart.a
+%C%_libhsdk_uart_a_CPPFLAGS = -I$(srcdir)/%D%
+%C%_libhsdk_uart_a_SOURCES = %D%/hsdk-uart-setup.c
+
 multilibtool_DATA += \
 	%D%/crt0.o \
 	%D%/gcrt0.o \
@@ -60,7 +76,11 @@ multilibtool_DATA += \
 	%D%/qemu.specs \
 	%D%/emsk_em9d.specs \
 	%D%/emsk_em11d.specs \
+	%D%/emsk_em9d.x \
 	%D%/emsk_em11d.x \
-	%D%/emsk_em9d.x
+	%D%/hsdk.specs \
+	%D%/hsdk.x \
+	%D%/iotdk.specs \
+	%D%/iotdk.x
 
 libobjs_a_SOURCES += %D%/crt0.S %D%/gcrt0.S %D%/arc-main-helper.c
