@@ -56,6 +56,10 @@ multilibtool_LIBRARIES += %D%/libemsk_uart.a
 %C%_libemsk_uart_a_CPPFLAGS = -I$(srcdir)/%D%
 %C%_libemsk_uart_a_SOURCES = %D%/emsk-uart-setup.c
 
+multilibtool_LIBRARIES += %D%/libemsdp_uart.a
+%C%_libemsdp_uart_a_CPPFLAGS = -I$(srcdir)/%D%
+%C%_libemsdp_uart_a_SOURCES = %D%/emsdp-uart-setup.c
+
 multilibtool_DATA += \
 	%D%/crt0.o \
 	%D%/gcrt0.o \
@@ -74,6 +78,7 @@ multilibtool_DATA += \
 	%D%/hsdk.specs \
 	%D%/hsdk.x \
 	%D%/iotdk.specs \
-	%D%/iotdk.x
+	%D%/iotdk.x \
+	%D%/emsdp.specs
 
 libobjs_a_SOURCES += %D%/crt0.S %D%/gcrt0.S %D%/arc-main-helper.c
