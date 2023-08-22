@@ -69,16 +69,8 @@ multilibtool_DATA += \
 	%D%/hl.specs \
 	%D%/qemu.specs \
 	%D%/emsk.specs \
-	%D%/emsk1_em4.x \
-	%D%/emsk1_em6.x \
-	%D%/emsk2.1_em5d.x \
-	%D%/emsk2.1_em7d.x \
-	%D%/emsk2.2_em9d.x \
-	%D%/emsk2.2_em11d.x \
 	%D%/hsdk.specs \
-	%D%/hsdk.x \
 	%D%/iotdk.specs \
-	%D%/iotdk.x \
 	%D%/emsdp.specs
 
 libobjs_a_SOURCES += %D%/crt0.S %D%/gcrt0.S %D%/arc-main-helper.c

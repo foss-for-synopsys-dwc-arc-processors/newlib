@@ -3,7 +3,7 @@
 %rename startfile iotdk_startfile
 
 *link:
-%(iotdk_link) -marcv2elfx --defsym=ivtbase_addr=0x20000000
+%(iotdk_link)
 
 *iotdk_libgloss:
 -luart_8250 -liotdk_uart

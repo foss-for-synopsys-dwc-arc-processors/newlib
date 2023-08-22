@@ -1,10 +1,9 @@
-
 %rename link hsdk_link
 %rename link_gcc_c_sequence hsdk_link_gcc_c_sequence
 %rename startfile hsdk_startfile
 
 *link:
-%(hsdk_link) -marcv2elfx --defsym=ivtbase_addr=0x90000000
+%(hsdk_link)
 
 *hsdk_libgloss:
 -luart_8250 -lhsdk_uart
