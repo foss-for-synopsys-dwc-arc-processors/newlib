@@ -104,7 +104,7 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_ARC_TRUE@am__append_5 = arc/libnsim.a arc/libqemu.a \
 @CONFIG_ARC_TRUE@	arc/libhl.a arc/libuart_8250.a \
 @CONFIG_ARC_TRUE@	arc/libiotdk_uart.a arc/libhsdk_uart.a \
-@CONFIG_ARC_TRUE@	arc/libemsk_uart.a
+@CONFIG_ARC_TRUE@	arc/libemsk_uart.a arc/libemsdp_uart.a
 @CONFIG_ARC_TRUE@am__append_6 = \
 @CONFIG_ARC_TRUE@	arc/crt0.o \
 @CONFIG_ARC_TRUE@	arc/gcrt0.o \
@@ -114,16 +114,9 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @CONFIG_ARC_TRUE@	arc/hl.specs \
 @CONFIG_ARC_TRUE@	arc/qemu.specs \
 @CONFIG_ARC_TRUE@	arc/emsk.specs \
-@CONFIG_ARC_TRUE@	arc/emsk1_em4.x \
-@CONFIG_ARC_TRUE@	arc/emsk1_em6.x \
-@CONFIG_ARC_TRUE@	arc/emsk2.1_em5d.x \
-@CONFIG_ARC_TRUE@	arc/emsk2.1_em7d.x \
-@CONFIG_ARC_TRUE@	arc/emsk2.2_em9d.x \
-@CONFIG_ARC_TRUE@	arc/emsk2.2_em11d.x \
 @CONFIG_ARC_TRUE@	arc/hsdk.specs \
-@CONFIG_ARC_TRUE@	arc/hsdk.x \
 @CONFIG_ARC_TRUE@	arc/iotdk.specs \
-@CONFIG_ARC_TRUE@	arc/iotdk.x
+@CONFIG_ARC_TRUE@	arc/emsdp.specs
 
 @CONFIG_ARC_TRUE@am__append_7 = arc/crt0.S arc/gcrt0.S arc/arc-main-helper.c
 @CONFIG_ARC64_TRUE@am__append_8 = arc64/libnsim.a arc64/libqemu.a \
@@ -303,6 +296,10 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @CONFIG_AARCH64_TRUE@	aarch64/aarch64_librdimon_a-syscalls.$(OBJEXT) \
 @CONFIG_AARCH64_TRUE@	aarch64/aarch64_librdimon_a-truncate.$(OBJEXT)
 aarch64_librdimon_a_OBJECTS = $(am_aarch64_librdimon_a_OBJECTS)
+arc_libemsdp_uart_a_AR = $(AR) $(ARFLAGS)
+arc_libemsdp_uart_a_LIBADD =
+@CONFIG_ARC_TRUE@am_arc_libemsdp_uart_a_OBJECTS = arc/arc_libemsdp_uart_a-emsdp-uart-setup.$(OBJEXT)
+arc_libemsdp_uart_a_OBJECTS = $(am_arc_libemsdp_uart_a_OBJECTS)
 arc_libemsk_uart_a_AR = $(AR) $(ARFLAGS)
 arc_libemsk_uart_a_LIBADD =
 @CONFIG_ARC_TRUE@am_arc_libemsk_uart_a_OBJECTS = arc/arc_libemsk_uart_a-emsk-uart-setup.$(OBJEXT)
@@ -690,7 +687,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(aarch64_librdimon_a_SOURCES) $(arc_libemsk_uart_a_SOURCES) \
+SOURCES = $(aarch64_librdimon_a_SOURCES) \
+	$(arc_libemsdp_uart_a_SOURCES) $(arc_libemsk_uart_a_SOURCES) \
 	$(arc_libhl_a_SOURCES) $(arc_libhsdk_uart_a_SOURCES) \
 	$(arc_libiotdk_uart_a_SOURCES) $(arc_libnsim_a_SOURCES) \
 	$(arc_libqemu_a_SOURCES) $(arc_libuart_8250_a_SOURCES) \
@@ -1046,6 +1044,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_ARC_TRUE@arc_libhsdk_uart_a_SOURCES = arc/hsdk-uart-setup.c
 @CONFIG_ARC_TRUE@arc_libemsk_uart_a_CPPFLAGS = -I$(srcdir)/arc
 @CONFIG_ARC_TRUE@arc_libemsk_uart_a_SOURCES = arc/emsk-uart-setup.c
+@CONFIG_ARC_TRUE@arc_libemsdp_uart_a_CPPFLAGS = -I$(srcdir)/arc
+@CONFIG_ARC_TRUE@arc_libemsdp_uart_a_SOURCES = arc/emsdp-uart-setup.c
 @CONFIG_ARC64_TRUE@arc64_libnsim_a_SOURCES = \
 @CONFIG_ARC64_TRUE@	arc64/libcfunc.c \
 @CONFIG_ARC64_TRUE@	arc64/nsim-syscall.c \
@@ -1487,6 +1487,13 @@ arc/$(am__dirstamp):
 arc/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) arc/$(DEPDIR)
 	@: > arc/$(DEPDIR)/$(am__dirstamp)
+arc/arc_libemsdp_uart_a-emsdp-uart-setup.$(OBJEXT):  \
+	arc/$(am__dirstamp) arc/$(DEPDIR)/$(am__dirstamp)
+
+arc/libemsdp_uart.a: $(arc_libemsdp_uart_a_OBJECTS) $(arc_libemsdp_uart_a_DEPENDENCIES) $(EXTRA_arc_libemsdp_uart_a_DEPENDENCIES) arc/$(am__dirstamp)
+	$(AM_V_at)-rm -f arc/libemsdp_uart.a
+	$(AM_V_AR)$(arc_libemsdp_uart_a_AR) arc/libemsdp_uart.a $(arc_libemsdp_uart_a_OBJECTS) $(arc_libemsdp_uart_a_LIBADD)
+	$(AM_V_at)$(RANLIB) arc/libemsdp_uart.a
 arc/arc_libemsk_uart_a-emsk-uart-setup.$(OBJEXT): arc/$(am__dirstamp) \
 	arc/$(DEPDIR)/$(am__dirstamp)
 
@@ -2261,6 +2268,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-truncate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc-main-helper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libemsk_uart_a-emsk-uart-setup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libhl_a-arc-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc_libhl_a-hl-setup.Po@am__quote@
@@ -2691,6 +2699,20 @@ aarch64/aarch64_librdimon_a-truncate.obj: aarch64/truncate.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='aarch64/truncate.c' object='aarch64/aarch64_librdimon_a-truncate.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aarch64_librdimon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o aarch64/aarch64_librdimon_a-truncate.obj `if test -f 'aarch64/truncate.c'; then $(CYGPATH_W) 'aarch64/truncate.c'; else $(CYGPATH_W) '$(srcdir)/aarch64/truncate.c'; fi`
+
+arc/arc_libemsdp_uart_a-emsdp-uart-setup.o: arc/emsdp-uart-setup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libemsdp_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc_libemsdp_uart_a-emsdp-uart-setup.o -MD -MP -MF arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Tpo -c -o arc/arc_libemsdp_uart_a-emsdp-uart-setup.o `test -f 'arc/emsdp-uart-setup.c' || echo '$(srcdir)/'`arc/emsdp-uart-setup.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Tpo arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/emsdp-uart-setup.c' object='arc/arc_libemsdp_uart_a-emsdp-uart-setup.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libemsdp_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc_libemsdp_uart_a-emsdp-uart-setup.o `test -f 'arc/emsdp-uart-setup.c' || echo '$(srcdir)/'`arc/emsdp-uart-setup.c
+
+arc/arc_libemsdp_uart_a-emsdp-uart-setup.obj: arc/emsdp-uart-setup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libemsdp_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc_libemsdp_uart_a-emsdp-uart-setup.obj -MD -MP -MF arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Tpo -c -o arc/arc_libemsdp_uart_a-emsdp-uart-setup.obj `if test -f 'arc/emsdp-uart-setup.c'; then $(CYGPATH_W) 'arc/emsdp-uart-setup.c'; else $(CYGPATH_W) '$(srcdir)/arc/emsdp-uart-setup.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Tpo arc/$(DEPDIR)/arc_libemsdp_uart_a-emsdp-uart-setup.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/emsdp-uart-setup.c' object='arc/arc_libemsdp_uart_a-emsdp-uart-setup.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libemsdp_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc_libemsdp_uart_a-emsdp-uart-setup.obj `if test -f 'arc/emsdp-uart-setup.c'; then $(CYGPATH_W) 'arc/emsdp-uart-setup.c'; else $(CYGPATH_W) '$(srcdir)/arc/emsdp-uart-setup.c'; fi`
 
 arc/arc_libemsk_uart_a-emsk-uart-setup.o: arc/emsk-uart-setup.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc_libemsk_uart_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc_libemsk_uart_a-emsk-uart-setup.o -MD -MP -MF arc/$(DEPDIR)/arc_libemsk_uart_a-emsk-uart-setup.Tpo -c -o arc/arc_libemsk_uart_a-emsk-uart-setup.o `test -f 'arc/emsk-uart-setup.c' || echo '$(srcdir)/'`arc/emsk-uart-setup.c
