@@ -11,6 +11,7 @@ multilibtool_LIBRARIES += %D%/libqemu.a
 	%D%/sbrk.c
 
 multilibtool_LIBRARIES += %D%/libhl.a
+%C%_libhl_a_CFLAGS = -mvolatile-di
 %C%_libhl_a_CPPFLAGS = -I$(srcdir)/%D%
 %C%_libhl_a_SOURCES = \
 	%D%/arc-timer.c \
