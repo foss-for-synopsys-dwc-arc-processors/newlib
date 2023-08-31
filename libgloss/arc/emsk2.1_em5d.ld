@@ -10,3 +10,5 @@ REGION_ALIAS("startup", ICCM)
 REGION_ALIAS("text", ICCM)
 REGION_ALIAS("data", DCCM)
 REGION_ALIAS("sdata", DCCM)
+
+INCLUDE arcv2elf-common.ld

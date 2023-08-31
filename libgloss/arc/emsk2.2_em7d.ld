@@ -1,4 +1,4 @@
-/* ARC EM Starter Kit v2.2 and 2.3 - EM7D and EM9D */
+/* Memory map for ARC EM Starter Kit v2.2 and 2.3 - EM7D and EM9D */
 
 MEMORY
 {
@@ -11,3 +11,5 @@ REGION_ALIAS("startup", ICCM)
 REGION_ALIAS("text", ICCM)
 REGION_ALIAS("data", DRAM)
 REGION_ALIAS("sdata", DRAM)
+
+INCLUDE arcv2elf-common.ld
