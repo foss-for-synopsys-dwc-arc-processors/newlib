@@ -56,6 +56,10 @@ multilibtool_LIBRARIES += %D%/libemsk_uart.a
 %C%_libemsk_uart_a_CPPFLAGS = -I$(srcdir)/%D%
 %C%_libemsk_uart_a_SOURCES = %D%/emsk-uart-setup.c
 
+multilibtool_LIBRARIES += %D%/libemsdp_uart.a
+%C%_libemsdp_uart_a_CPPFLAGS = -I$(srcdir)/%D%
+%C%_libemsdp_uart_a_SOURCES = %D%/emsdp-uart-setup.c
+
 multilibtool_DATA += \
 	%D%/crt0.o \
 	%D%/gcrt0.o \
@@ -64,16 +68,28 @@ multilibtool_DATA += \
 	%D%/nsim.specs \
 	%D%/hl.specs \
 	%D%/qemu.specs \
-	%D%/emsk.specs \
-	%D%/emsk1_em4.x \
-	%D%/emsk1_em6.x \
-	%D%/emsk2.1_em5d.x \
-	%D%/emsk2.1_em7d.x \
-	%D%/emsk2.2_em9d.x \
-	%D%/emsk2.2_em11d.x \
+	%D%/arcv2elf-common.ld \
+	%D%/emsdp1.1.specs \
+	%D%/emsdp1.1.ld \
+	%D%/emsdp1.2.specs \
+	%D%/emsdp1.2.ld \
+	%D%/emsk1_em4.specs \
+	%D%/emsk1_em4.ld \
+	%D%/emsk1_em6.specs \
+	%D%/emsk1_em6.ld \
+	%D%/emsk2.1_em5d.specs \
+	%D%/emsk2.1_em5d.ld \
+	%D%/emsk2.1_em7d.specs \
+	%D%/emsk2.1_em7d.ld \
+	%D%/emsk2.2_em7d.specs \
+	%D%/emsk2.2_em7d.ld \
+	%D%/emsk2.2_em9d.specs \
+	%D%/emsk2.2_em9d.ld \
+	%D%/emsk2.2_em11d.specs \
+	%D%/emsk2.2_em11d.ld \
 	%D%/hsdk.specs \
-	%D%/hsdk.x \
+	%D%/hsdk.ld \
 	%D%/iotdk.specs \
-	%D%/iotdk.x
+	%D%/iotdk.ld
 
 libobjs_a_SOURCES += %D%/crt0.S %D%/gcrt0.S %D%/arc-main-helper.c
