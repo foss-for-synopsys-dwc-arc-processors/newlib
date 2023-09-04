@@ -69,22 +69,36 @@ multilibtool_DATA += \
 	%D%/hl.specs \
 	%D%/qemu.specs \
 	%D%/arcv2elf-common.ld \
+	%D%/emsdp1.1_ram.specs \
+	%D%/emsdp1.1_ram.ld \
 	%D%/emsdp1.1.specs \
 	%D%/emsdp1.1.ld \
+	%D%/emsdp1.2_ram.specs \
+	%D%/emsdp1.2_ram.ld \
 	%D%/emsdp1.2.specs \
 	%D%/emsdp1.2.ld \
 	%D%/emsk1_em4.specs \
 	%D%/emsk1_em4.ld \
+	%D%/emsk1_em6_ram.specs \
+	%D%/emsk1_em6_ram.ld \
 	%D%/emsk1_em6.specs \
 	%D%/emsk1_em6.ld \
 	%D%/emsk2.1_em5d.specs \
 	%D%/emsk2.1_em5d.ld \
+	%D%/emsk2.1_em7d_ram.specs \
+	%D%/emsk2.1_em7d_ram.ld \
 	%D%/emsk2.1_em7d.specs \
 	%D%/emsk2.1_em7d.ld \
+	%D%/emsk2.2_em7d_ram.specs \
+	%D%/emsk2.2_em7d_ram.ld \
 	%D%/emsk2.2_em7d.specs \
 	%D%/emsk2.2_em7d.ld \
+	%D%/emsk2.2_em9d_ram.specs \
+	%D%/emsk2.2_em9d_ram.ld \
 	%D%/emsk2.2_em9d.specs \
 	%D%/emsk2.2_em9d.ld \
+	%D%/emsk2.2_em11d_ram.specs \
+	%D%/emsk2.2_em11d_ram.ld \
 	%D%/emsk2.2_em11d.specs \
 	%D%/emsk2.2_em11d.ld \
 	%D%/hsdk.specs \

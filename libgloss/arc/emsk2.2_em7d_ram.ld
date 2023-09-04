@@ -8,8 +8,8 @@ MEMORY
 }
 
 REGION_ALIAS("startup", ICCM)
-REGION_ALIAS("text", ICCM)
-REGION_ALIAS("data", DCCM)
-REGION_ALIAS("sdata", DCCM)
+REGION_ALIAS("text", DRAM)
+REGION_ALIAS("data", DRAM)
+REGION_ALIAS("sdata", DRAM)
 
 INCLUDE arcv2elf-common.ld
