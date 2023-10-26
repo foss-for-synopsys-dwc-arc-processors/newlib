@@ -32,8 +32,6 @@
    these are the stack mappings for the registers
    as stored in the ABI for ARC */
 
-       .file "setjmp.S"
-
 ABIr13	= 0
 ABIr14	= ABIr13 + 4
 ABIr15	= ABIr14 + 4
