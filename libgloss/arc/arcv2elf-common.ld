@@ -189,7 +189,7 @@ SECTIONS
   .stab.exclstr  0 : { *(.stab.exclstr) }
   .stab.index    0 : { *(.stab.index) }
   .stab.indexstr 0 : { *(.stab.indexstr) }
-  .comment 0 (INFO) : { *(.comment); LINKER_VERSION; }
+  .comment 0 (INFO) : { *(.comment) }
   .gnu.build.attributes : { *(.gnu.build.attributes .gnu.build.attributes.*) }
   /* DWARF debug sections.
      Symbols in the DWARF debugging sections are relative to the beginning
