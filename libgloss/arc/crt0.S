@@ -170,7 +170,7 @@ __start:
 	mov	sp, @__stack_top	; initialize stack pointer
 	mov_s	r3,0
 	; loop to zero out the bss.  Enter loop only if lp_count != 0
-	lpnz	@.Lend_zbss
+	lpnz	.Lend_zbss
 	st.ab	r3,[r2, 4]		; zero out the word
 	nop
 .Lend_zbss:
@@ -276,4 +276,4 @@ _exit_halt:
 	nop
 #endif
 	b	@_exit_halt
-.balign 4
+.align 4
