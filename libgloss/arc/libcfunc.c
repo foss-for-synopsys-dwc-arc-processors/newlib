@@ -39,6 +39,7 @@
    to provide libc functions as well.  */
 
 #include <errno.h>
+#include <string.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -50,7 +51,11 @@ alarm (unsigned seconds)
 	return 0;
 }
 
-clock_t _clock (void);
+clock_t __attribute__((weak))
+_clock (void) {
+  return 0;
+}
+
 clock_t __attribute__((weak))
 clock (void)
 {
@@ -89,4 +94,14 @@ usleep (useconds_t useconds)
 
 	while (_clock () - t0  < dt);
 	return 0;
+}
+
+int __attribute__((weak))
+_link(const char *oldpath, const char *newpath) {
+  return -1;
+}
+
+int __attribute__((weak))
+__strcmp4(const char *s1, const char *s2) {
+  return strcmp(s1,s2);
 }

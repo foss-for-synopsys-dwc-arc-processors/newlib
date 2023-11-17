@@ -10,7 +10,11 @@
 
 #define complex _Complex
 #define _Complex_I 1.0fi
+
+#ifndef _COMPLEX_I_DEFINED
+#define _COMPLEX_I_DEFINED
 #define I _Complex_I
+#endif
 
 #include <sys/cdefs.h>
 

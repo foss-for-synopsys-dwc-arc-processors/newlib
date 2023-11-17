@@ -38,16 +38,19 @@ _start:
   .weak   atexit
   la      a0, atexit
   beqz    a0, .Lweak_atexit
-  .weak   __libc_fini_array
 #endif
+  .weak   __libc_fini_array
 
   la      a0, __libc_fini_array   # Register global termination functions
+  beqz    a0, .Lweak_atexit
   call    atexit                  #  to be called upon exit
-#ifdef _LITE_EXIT
 .Lweak_atexit:
-#endif
-  call    __libc_init_array       # Run global initialization functions
 
+  .weak   __libc_init_array       # Run global initialization functions
+  beqz    a0, 1f
+  jalr    a0
+
+1:
   lw      a0, 0(sp)                  # a0 = argc
   addi    a1, sp, __SIZEOF_POINTER__ # a1 = argv
   li      a2, 0                      # a2 = envp = NULL

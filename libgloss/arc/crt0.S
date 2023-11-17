@@ -58,22 +58,22 @@
 	.extern main
 
 #if defined (__ARCEM__) || defined (__ARCHS__)
-	.section .ivt, "a", @progbits
+	.section .vectors, "a", @progbits
 
 ; Helper macro to define weak symbols to include into interrupt vector table.
 ; User code may define those functions in them, so user function will be
-; referenced in the IVT. By default all handlers point to _exit_halt - so they
+; referenced in the IVT. By default all handlers point to __ivt_halt - so they
 ; always cause application halt, because if application causes an exception or
 ; interrupt, but doesn't set a handler for it - something is wrong in
-; application. Exception is "start" entry of IVT, which points to __start
+; application. Exception is "start" entry of IVT, which points to _start
 ; function.
 #define IVT_ENTRY(name) \
     .word name `\
     .weak name `\
-    .set name, _exit_halt
+    .set name, __ivt_halt
 
 ; handler's name,          number, name,       offset in IVT (hex/dec)
-.word __start                ; 0   program entry point  0x0     0
+.word _start                ; 0   program entry point  0x0     0
 IVT_ENTRY(memory_error)      ; 1   memory_error         0x4     4
 IVT_ENTRY(instruction_error) ; 2   instruction_error    0x8     8
 IVT_ENTRY(EV_MachineCheck)   ; 3   EV_MachineCheck      0xC     12
@@ -95,22 +95,23 @@ IVT_ENTRY(IRQ_18)            ; 18                       0x48    72
 IVT_ENTRY(IRQ_19)            ; 19                       0x4C    76
 IVT_ENTRY(IRQ_20)            ; 20                       0x50    80
 
-	.section .text.__startup, "ax", @progbits
+	.section .text._startup, "ax", @progbits
 #else
 	.text
 #endif /* __ARCEM__ || __ARCHS__ */
 
-	.global	__start
-	.type	__start, @function
+	.global	_start
+	.type	_start, @function
+	.size	_start, .L.start - _start
 	.align 4
 #ifdef __ARC601__
 ; Startup code for the ARC601 processor
-__start:
-	mov	gp, @__SDATA_BEGIN__
-	mov	sp, @__stack_top	; Point to top of stack
+_start:
+	mov	gp, __SDATA_BEGIN__
+	mov	sp, __stack_top	; Point to top of stack
 	mov	r5, 0			; Zero value
-	mov_s	r2, @__sbss_start	; r2 = start of the bss section
-	sub	r3, @_end, r2		; r3 = size of the bss section in bytes
+	mov_s	r2, __sbss_start	; r2 = start of the bss section
+	sub	r3, _end, r2		; r3 = size of the bss section in bytes
 
 	asr_s	r3, r3
 	asr_s	r3, r3			; r3 = size of bss in words
@@ -134,7 +135,7 @@ __start:
 ; - loop end should be 4 instruction words away from the lp_count setting
 ;   instruction
 ; - loop body should have at least two instruction words
-__start:
+_start:
 #if defined (__ARCHS__)
 	; Allow unaligned accesses.
 	lr	r2, [0xA]
@@ -144,37 +145,31 @@ __start:
 
 #if defined (__ARC_CODE_DENSITY__)
 	;; Initialize jli_base
-	sr	@__JLI_TABLE__,[jli_base]
+	sr	__JLI_TABLE__,[jli_base]
 #endif
-	mov	gp, @__SDATA_BEGIN__
-	mov_s	r2, @__sbss_start	; r2 = start of the bss section
-	sub	r3, @_end, r2		; r3 = size of the bss section in bytes
-	; set up the loop counter register to the size (in words) of the bss section
-#if defined (__ARC_BARREL_SHIFTER__)
-	asr.f        lp_count, r3, 2
-#else
-	asr_s        r13, r3
-	asr.f        lp_count, r13
-#endif
-#if defined (__ARC600__)
-	; loop to zero out the bss.  Enter loop only if lp_count != 0
-	lpnz	@.Lend_zbss
-	add	r3, pcl, 20
-	sr	r3, [2]			; LP_END
-	; initialize stack pointer, and this instruction has 2 words
-	mov	sp, @__stack_top
-	mov_s	r3, 0
-	st.ab	r3, [r2, 4]		; zero out the word
-.Lend_zbss:
-#else
-	mov	sp, @__stack_top	; initialize stack pointer
-	mov_s	r3,0
-	; loop to zero out the bss.  Enter loop only if lp_count != 0
-	lpnz	@.Lend_zbss
-	st.ab	r3,[r2, 4]		; zero out the word
-	nop
-.Lend_zbss:
-#endif
+	.weak	_estack
+	mov	sp, _estack	; initialize stack pointer
+	.weak	_SDA_BASE_
+	mov	gp, _SDA_BASE_
+
+	.weak	_fsbss
+	.weak	_esbss
+	mov.f   r0,_fsbss
+	b.z	1f
+	mov_s   r1,0
+	sub     r2,_esbss,r0
+	jl      memset
+1:
+	.weak	_fbss
+	.weak	_ebss
+	mov.f   r0,_fbss
+	b.z	1f
+	mov_s   r1,0
+	sub     r2,_ebss,r0
+	jl      memset
+1:
+
+	;marks@08-May-2023 TODO/FIXME zero bss sections
 
 #endif /* !__ARC601__ */
 
@@ -220,31 +215,34 @@ __start:
 #endif /* ARCv2 */
 
 	;; Call constructors
-	jl	@_init
+	.weak	_init
+	jl	_init
 
 ;;; Setup fini routines to be called from exit
-	mov_s	r0, @_fini
-	jl	@atexit
+	.weak   _fini
+	mov_s	r0, _fini
+	jl	atexit
 
 #ifdef PROFILE_SUPPORT /* Defined in gcrt0.S.  */
-	mov	r0,@__start
-	mov	r1,@_etext
-	jl	@_monstartup
+	mov	r0,_start
+	mov	r1,_etext
+	jl	_monstartup
 #endif /* PROFILE_SUPPORT */
 
 ; branch to main
 	mov	fp,0			; initialize frame pointer
-	jl	@__setup_argv_and_call_main
+	jl	__setup_argv_and_call_main
 
 #ifdef PROFILE_SUPPORT
 	mov	r13, r0		; Save return code
-	jl	@_mcleanup
+	jl	_mcleanup
 	mov	r0, r13
 #endif /* PROFILE_SUPPORT */
 
 	; r0 contains exit code
-	j	@exit
-	.size	__start, .-__start
+	j	exit
+.L.start:
+	.size	_start, .-_start
 
 ;;; arc-main-helper.o object can be used to replace this function and
 ;;; properly set up arguments and/or other low-level stuff.
@@ -258,13 +256,14 @@ __setup_argv_and_call_main:
 ; Call main with argc = 0 and *argv[] = 0
 	mov	r0, 0
 	mov	r1, 0
-	jl	@main
+	jl	main
 	pop_s	blink
 	j_s	[blink]
 
-.section .text._exit_halt,"ax",@progbits
+.section .text$_startup,"ax",@progbits
 .global	 _exit_halt
 .type	 _exit_halt, @function
+.size _exit_halt, .L.exit_halt - _exit_halt
 	.align 4
 _exit_halt:
 	; r0 contains exit code
@@ -275,5 +274,21 @@ _exit_halt:
 	nop
 	nop
 #endif
-	b	@_exit_halt
-.balign 4
+	b	_exit_halt
+.L.exit_halt:
+
+.global	 __ivt_halt
+.type	 __ivt_halt, @function
+.size __ivt_halt, .L.ivt_halt - __ivt_halt
+	.align 4
+__ivt_halt:
+	; r0 contains exit code
+	flag	1
+#if defined (__ARC600__) || defined (__ARC700__)
+	; ARCompact requires 3 nops after flag 1
+	nop
+	nop
+	nop
+#endif
+	b	__ivt_halt
+.L.ivt_halt:

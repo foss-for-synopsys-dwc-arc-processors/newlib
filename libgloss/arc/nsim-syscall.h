@@ -282,9 +282,9 @@
 type _##name ()							\
 {								\
 	long __res;						\
-	__asm__ __volatile__ ("mov	r8, %1\n\t"		\
+	__asm__ __volatile__ ("mov	%%r8, %1\n\t"		\
 			SYSCALL					\
-			"mov	%0, r0"				\
+			"mov	%0, %%r0"				\
 			: "=r" (__res)				\
 			: "i" (SYS_##name)			\
 			: "cc", "r0", "r8");			\
@@ -299,10 +299,10 @@ type _##name ()							\
 type _##name (atype a)						\
 {								\
 	long __res;						\
-	__asm__ __volatile__ ("mov	r0, %2\n\t"		\
-			"mov	r8, %1\n\t"			\
+	__asm__ __volatile__ ("mov	%%r0, %2\n\t"		\
+			"mov	%%r8, %1\n\t"			\
 			SYSCALL					\
-			"mov	%0, r0"				\
+			"mov	%0, %%r0"				\
 			: "=r" (__res)				\
 			: "i" (SYS_##name),			\
 			  "r" ((long)a)				\
@@ -315,11 +315,11 @@ type _##name (atype a)						\
 }
 
 #define _naked_syscall2(__res, name, a, b)			\
-	__asm__ __volatile__ ("mov	r1, %3\n\t"		\
-			"mov	r0, %2\n\t"			\
-			"mov	r8, %1\n\t"			\
+	__asm__ __volatile__ ("mov	%%r1, %3\n\t"		\
+			"mov	%%r0, %2\n\t"			\
+			"mov	%%r8, %1\n\t"			\
 			SYSCALL					\
-			"mov	%0, r0"				\
+			"mov	%0, %%r0"				\
 			: "=r" (__res)				\
 			: "i" (SYS_##name),			\
 			  "r" ((long)a),			\
@@ -340,12 +340,12 @@ type _##name (atype a, btype b)					\
 
 #define _naked_syscall3(__res, name, a, b, c)			\
 	__asm__ __volatile__ (					\
-			"mov	r2, %4\n\t"			\
-			"mov	r1, %3\n\t"			\
-			"mov	r0, %2\n\t"			\
-			"mov	r8, %1\n\t"			\
+			"mov	%%r2, %4\n\t"			\
+			"mov	%%r1, %3\n\t"			\
+			"mov	%%r0, %2\n\t"			\
+			"mov	%%r8, %1\n\t"			\
 			SYSCALL					\
-			"mov	%0, r0"				\
+			"mov	%0, %%r0"				\
 			: "=r" (__res)				\
 			: "i" (SYS_##name),			\
 			  "r" ((long)a),			\
@@ -370,13 +370,13 @@ type _##name (atype a, btype b, ctype c, dtype d)			\
 {									\
 	long __res;							\
 	__asm__ __volatile__ (						\
-			"mov	r3, %5\n\t"				\
-			"mov	r2, %4\n\t"				\
-			"mov	r1, %3\n\t"				\
-			"mov	r0, %2\n\t"				\
-			"mov	r8, %1\n\t"				\
+			"mov	%%r3, %5\n\t"				\
+			"mov	%%r2, %4\n\t"				\
+			"mov	%%r1, %3\n\t"				\
+			"mov	%%r0, %2\n\t"				\
+			"mov	%%r8, %1\n\t"				\
 			SYSCALL						\
-			"mov	%0, r0"					\
+			"mov	%0, %%r0"					\
 			: "=r" (__res)					\
 			: "i" (SYS_##name),				\
 			  "r" ((long)a),				\
@@ -397,14 +397,14 @@ type _##name (atype a, btype b, ctype c, dtype d, etype e)		\
 {									\
 	long __res;							\
 	__asm__ __volatile__ (						\
-			"mov	r4, %6\n\t"				\
-			"mov	r3, %5\n\t"				\
-			"mov	r2, %4\n\t"				\
-			"mov	r1, %3\n\t"				\
-			"mov	r0, %2\n\t"				\
-			"mov	r8, %1\n\t"				\
+			"mov	%%r4, %6\n\t"				\
+			"mov	%%r3, %5\n\t"				\
+			"mov	%%r2, %4\n\t"				\
+			"mov	%%r1, %3\n\t"				\
+			"mov	%%r0, %2\n\t"				\
+			"mov	%%r8, %1\n\t"				\
 			SYSCALL						\
-			"mov	%0, r0"					\
+			"mov	%0, %%r0"					\
 			: "=r" (__res)					\
 			: "i" (SYS_##name),				\
 			  "r" ((long)a),				\
