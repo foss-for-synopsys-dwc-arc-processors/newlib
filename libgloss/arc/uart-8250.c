@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include "arc-specific.h"
+
 /* Transmit Holding Register.  WO, LCR_DLAB == 0.  */
 #define	THR		0x00
 /* Receive Buffer Register.  RO, LCR_DLAB == 0.  */
@@ -118,7 +120,7 @@ _uart_8250_write_reg (const struct _uart_8250 *uart, uint32_t reg,
 		      uint32_t value)
 {
   if (uart->aux_mapped)
-    __builtin_arc_sr (value, (uint32_t) uart->base + reg);
+    write_aux_reg (value, (uint32_t) uart->base + reg);
   else
     *(volatile uint32_t *)(uart->base + reg) = value;
 }
@@ -128,7 +130,7 @@ static inline uint32_t
 _uart_8250_read_reg (const struct _uart_8250 *uart, uint32_t reg)
 {
   if (uart->aux_mapped)
-    return __builtin_arc_lr ((uint32_t) uart->base + reg);
+    return read_aux_reg ((uint32_t) uart->base + reg);
   else
     return *(volatile uint32_t *)(uart->base + reg);
 }
