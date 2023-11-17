@@ -1,7 +1,7 @@
 /*
- * emsk-uart-setup.c -- provide _setup_low_level() to initialize UART.
+ * arc-specific.h -- provide ARC-specific definitions
  *
- * Copyright (c) 2021 Synopsys Inc.
+ * Copyright (c) 2023 Synopsys Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -15,20 +15,19 @@
  *
  */
 
-#include "arc-specific.h"
-#include "uart-8250.h"
+#ifndef _ARC_SPECIFIC_H
+#define _ARC_SPECIFIC_H
 
-/* Setup UART parameters.  */
-int
-_setup_low_level (void)
-{
-  const uint32_t aux_dmp_per = 0x20a;
-  void * const uart_base = (char *)read_aux_reg(aux_dmp_per) + 0x00009000;
-  const int uart_aux_mapped = 0;
-  const uint32_t uart_clock = 50000000;
-  const uint32_t uart_baud = 115200;
+/*  First check for MetaWare compiler as it also defines __GNUC__ */
+#if defined (__CCAC__)
+	#define read_aux_reg(r)		_lr(r)
+	#define write_aux_reg(r, v)	_sr((unsigned int)(v), r)
+#elif defined (__GNUC__)
+	#define read_aux_reg(r)		__builtin_arc_lr(r)
+	/* gcc builtin sr needs reg param to be long immediate */
+	#define write_aux_reg(r, v)	__builtin_arc_sr((unsigned int)(v), r)
+#else
+	#error "Unexpected compiler"
+#endif
 
-  _uart_8250_setup (uart_base, uart_aux_mapped, uart_clock, uart_baud);
-
-  return 0;
-}
+#endif /* _ARC_SPECIFIC_H */
