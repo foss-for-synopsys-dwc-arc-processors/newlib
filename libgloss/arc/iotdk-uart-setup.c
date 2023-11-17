@@ -28,7 +28,7 @@ _setup_low_level (void)
   const uint32_t uart_baud = 115200;
 
   /* For this platform we have to enable UART clock before configuring it.   */
-  __builtin_arc_sr (0x01, (uint32_t) uart_base + uart_clk_ena);
+  _sr (0x01, (uint32_t) uart_base + uart_clk_ena);
 
   _uart_8250_setup (uart_base, uart_aux_mapped, uart_clock, uart_baud);
 

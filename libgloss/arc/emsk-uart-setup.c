@@ -22,7 +22,7 @@ int
 _setup_low_level (void)
 {
   const uint32_t aux_dmp_per = 0x20a;
-  void * const uart_base = (char *)__builtin_arc_lr(aux_dmp_per) + 0x00009000;
+  void * const uart_base = (char *)_lr(aux_dmp_per) + 0x00009000;
   const int uart_aux_mapped = 0;
   const uint32_t uart_clock = 50000000;
   const uint32_t uart_baud = 115200;
