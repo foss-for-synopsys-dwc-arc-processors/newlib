@@ -31,8 +31,20 @@
 #include <sys/types.h>
 #include <sys/errno.h>
 
-extern char __start_heap;
-extern char __end_heap;
+/*  First check for MetaWare compiler as it also defines __GNUC__ */
+#if defined (__CCAC__)
+	extern char _fheap;
+	extern char _eheap;
+	#define START_HEAP _fheap
+	#define END_HEAP _eheap
+#elif defined (__GNUC__)
+	extern char __start_heap;
+	extern char __end_heap;
+	#define START_HEAP __start_heap
+	#define END_HEAP __end_heap
+#else
+	#error "Unexpected compiler"
+#endif
 
 caddr_t
 _sbrk (size_t nbytes)
@@ -42,7 +54,7 @@ _sbrk (size_t nbytes)
 
   if (heap_ptr == NULL)
     {
-      heap_ptr = &__start_heap;
+      heap_ptr = &START_HEAP;
     }
 
   /* Align the 'heap_ptr' so that memory will always be allocated at word
@@ -50,7 +62,7 @@ _sbrk (size_t nbytes)
   heap_ptr = (char *) ((((unsigned long) heap_ptr) + 7) & ~7);
   prev_heap_ptr = heap_ptr;
 
-  if ((heap_ptr + nbytes) < &__end_heap)
+  if ((heap_ptr + nbytes) < &END_HEAP)
     {
       heap_ptr += nbytes;
       return (caddr_t) prev_heap_ptr;
