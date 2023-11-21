@@ -54,7 +54,7 @@
 	.type	__start, @function
 	.align 4
 __start:
-	MOVRI_S	sp, @__stack_top	; Stack address
+	MOVRI_S	sp, __stack_top	; Stack address
 
 	; Allow unaligned accesses.
 	lr      r2, [0xA]
@@ -62,11 +62,11 @@ __start:
 	flag    r2
 
 ;;;  Clear the bss segment.
-	MOVRI_S	r0, @__sbss_start	; r0 = start of the bss section
-	MOVRI_S	r2, @_end
+	MOVRI_S	r0, __sbss_start	; r0 = start of the bss section
+	MOVRI_S	r2, _end
 	SUBR	r2, r2, r0		; r2 = size of the bss section in bytes
 	MOVR_S	r1, 0			; r1 = bytes to fill in
-	bl	@memset
+	bl	memset
 
 ;;; Clear the registers.
 	MOVR_S	r0, 0
@@ -106,15 +106,15 @@ __start:
 #endif
 
 	;; Call constructors.
-	jl	@_init
+	jl	_init
 
 ;;; Setup fini routines to be called from exit
-	MOVRI_S	r0, @_fini
-	jl	@atexit
+	MOVRI_S	r0, _fini
+	jl	atexit
 
-	jl	@__setup_argv_and_call_main
+	jl	__setup_argv_and_call_main
 
-	j	@exit
+	j	exit
 	.size	__start, .-__start
 
 ;;; arc-main-helper.o object can be used to replace this function
@@ -128,11 +128,11 @@ __setup_argv_and_call_main:
 	PUSHR	blink
 ;;; Call main() with argv[0] set to "baremetal", argv[1] to NULL and empty envp
 	MOVR_S	r0, 1		; Set argc to 1
-	ADDPCL	r1,@.argv_data	; Set argv to the appropriate pointer
+	ADDPCL	r1,.argv_data	; Set argv to the appropriate pointer
 	MOVR_S	r2, 0
 	MOVR_S	r3, 0
 
-	MOVRI_S	blink, @main
+	MOVRI_S	blink, main
 	jl	[blink]
 
 	POPR	blink
@@ -156,7 +156,7 @@ _exit_halt:
 	; r0 contains exit code
 	mov	r0, r0
 	flag	1
-	b	@_exit_halt
+	b	_exit_halt
 	.size	_exit_halt, .-_exit_halt
 
 #endif /* __ARC64__ */
