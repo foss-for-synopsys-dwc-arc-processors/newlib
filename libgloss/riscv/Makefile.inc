@@ -2,6 +2,9 @@ multilibtool_DATA += \
 	%D%/nano.specs \
 	%D%/sim.specs \
 	%D%/semihost.specs \
+	%D%/arcv.specs \
+	%D%/arcv-crt0.o \
+	%D%/arcv.ld \
 	%D%/crt0.o
 
 multilibtool_LIBRARIES += %D%/libgloss.a

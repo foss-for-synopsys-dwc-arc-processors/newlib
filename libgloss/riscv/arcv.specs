@@ -1,0 +1,7 @@
+%rename link	old_link
+
+*link:
+-T arcv.ld%s %(old_link)
+
+*startfile:
+arcv-crt0%O%s crtbegin%O%s
