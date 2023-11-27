@@ -1,0 +1,2 @@
+*startfile:
+%{-crt0=*:arcv-crt0-%*%O%s; :arcv-crt0%O%s} crtbegin%O%s arcv%O%s
