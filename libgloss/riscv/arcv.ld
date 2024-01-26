@@ -66,6 +66,16 @@ SECTIONS
   } > DCCM
   _edata = .; PROVIDE(edata = .);
 
+  PROVIDE (__preinit_array_start = .);
+  .preinit_array  : { *(.preinit_array) } >DCCM
+  PROVIDE (__preinit_array_end = .);
+  PROVIDE (__init_array_start = .);
+  .init_array     : { *(.init_array) } >DCCM
+  PROVIDE (__init_array_end = .);
+  PROVIDE (__fini_array_start = .);
+  .fini_array     : { *(.fini_array) } >DCCM
+  PROVIDE (__fini_array_end = .);
+
   /* bss segment */
   __bss_start = .;
   .sbss : {
