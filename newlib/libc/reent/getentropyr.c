@@ -45,7 +45,7 @@ _getentropy_r (struct _reent *ptr,
   int ret;
 
   errno = 0;
-  if ((ret = _getentropy (buf, buflen)) == -1 && errno != 0)
+  if ((ret = getentropy (buf, buflen)) == -1 && errno != 0)
     _REENT_ERRNO(ptr) = errno;
   return ret;
 }
