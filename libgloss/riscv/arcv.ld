@@ -94,6 +94,9 @@ SECTIONS
   /* End of uninitalized data segement */
   _end = .; PROVIDE (end = .);
 
-  __stack_pointer$ = (ORIGIN (DCCM) + LENGTH (DCCM) - 1) & -4;
+  /* It's necessary to align stack on 16-bytes boundary since it's a
+     maximum possible alignment for RISC-V targets according to
+     RISC-V ABI.  */
+  __stack_pointer$ = (ORIGIN (DCCM) + LENGTH (DCCM) - 1) & -16;
 }
 
