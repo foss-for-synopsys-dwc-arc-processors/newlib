@@ -74,6 +74,7 @@ multilibtool_LIBRARIES += %D%/libsemihost.a
 	%D%/semihost-sys_sbrk.c \
 	%D%/semihost-sys_stat.c \
 	%D%/semihost-sys_stat_common.c \
+	%D%/semihost-sys_times.c \
 	%D%/semihost-sys_unlink.c \
 	%D%/semihost-sys_write.c
 
