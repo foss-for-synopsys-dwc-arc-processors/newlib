@@ -346,9 +346,9 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_RISCV_TRUE@	riscv/nano.specs \
 @CONFIG_RISCV_TRUE@	riscv/sim.specs \
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
-@CONFIG_RISCV_TRUE@     riscv/arcv.specs \
-@CONFIG_RISCV_TRUE@     riscv/arcv-crt0.o \
-@CONFIG_RISCV_TRUE@     riscv/arcv.ld \
+@CONFIG_RISCV_TRUE@	riscv/arcv.specs \
+@CONFIG_RISCV_TRUE@	riscv/arcv-crt0.o \
+@CONFIG_RISCV_TRUE@	riscv/arcv.ld \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
 
 @CONFIG_RISCV_TRUE@am__append_98 = riscv/libgloss.a riscv/libsim.a \
