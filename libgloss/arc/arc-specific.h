@@ -25,7 +25,7 @@
 #elif defined (__GNUC__)
 	#define read_aux_reg(r)		__builtin_arc_lr(r)
 	/* gcc builtin sr needs reg param to be long immediate */
-	#define write_aux_reg(r, v)	__builtin_arc_sr((unsigned int)(v), r)
+	#define write_aux_reg(v, r)	__builtin_arc_sr((unsigned int)(v), r)
 #else
 	#error "Unexpected compiler"
 #endif
