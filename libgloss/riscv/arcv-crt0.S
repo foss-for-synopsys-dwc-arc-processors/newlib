@@ -40,6 +40,16 @@ _start:
 	addi  sp, sp, %pcrel_lo(1b)
 	.option pop
 
+	# Initialize FPU if it is presented. 8192 stands for 1 << 13 bit offset -
+	# the first bit of FS[1:0] field of mstatus CSR.
+#ifdef __riscv_flen
+	csrr    t0, mstatus
+	li      t1, 8192
+	or      t0, t1, t0
+	csrw    mstatus, t0
+	csrwi   fcsr, 0
+#endif
+
 	# Clear the bss segment
 	la      a0, __bss_start
 	la      a2, _end
