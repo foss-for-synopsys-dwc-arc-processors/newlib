@@ -1,4 +1,4 @@
-/* Copyright (c) 2023  Synopsys. All rights reserved.
+/* Copyright (c) 2024  Synopsys. All rights reserved.
 
    This copyrighted material is made available to anyone wishing to use,
    modify, copy, or redistribute it subject to the terms and conditions
@@ -24,7 +24,7 @@ _start:
 	.cfi_startproc
 
 	# Initialize global pointer.  This is done with relaxation
-        # disabled, not to end up with only "addi gp,gp,0"
+	# disabled, not to end up with only "addi gp,gp,0"
 	.option push
 	.option norelax
 1:
@@ -64,7 +64,9 @@ _start:
 
 	lw      a0, 0(sp)                  # a0 = argc
 	addi    a1, sp, __SIZEOF_POINTER__ # a1 = argv
-	li      a2, 0                      # a2 = envp = NULL
+	slli    a2, a0, 1 + __SIZEOF_POINTER__ >> 2
+	addi    a2, a2, __SIZEOF_POINTER__
+	add     a2, a2, a1                 # a2 = envp
 	call    main
 	tail    exit
 	.cfi_endproc
