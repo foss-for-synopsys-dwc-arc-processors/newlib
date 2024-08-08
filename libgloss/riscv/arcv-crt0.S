@@ -72,11 +72,25 @@ _start:
 #endif
 	call    __libc_init_array       # Run global initialization functions
 
+	# Get arguments from custom symbols if they are defined. Otherwise,
+	# get them from the stack.
+	.weak _argc
+	.weak _argv
+	la      a0, _argc
+	beqz    a0, .Largs_from_stack
+	la      a1, _argv
+	beqz    a1, .Largs_from_stack
+	lw      a0, 0(a0)
+	jal     x0, .Lmain
+
+.Largs_from_stack:
 	lw      a0, 0(sp)                  # a0 = argc
 	addi    a1, sp, __SIZEOF_POINTER__ # a1 = argv
 	slli    a2, a0, 1 + __SIZEOF_POINTER__ >> 2
 	addi    a2, a2, __SIZEOF_POINTER__
 	add     a2, a2, a1                 # a2 = envp
+
+.Lmain:
 	call    main
 	tail    exit
 	.cfi_endproc
