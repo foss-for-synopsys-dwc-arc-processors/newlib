@@ -77,20 +77,18 @@ _start:
 	.weak _argc
 	.weak _argv
 	la      a0, _argc
-	beqz    a0, .Largs_from_stack
+	beqz    a0, .Lempty_args
 	la      a1, _argv
-	beqz    a1, .Largs_from_stack
+	beqz    a1, .Lempty_args
 	lw      a0, 0(a0)
-	jal     x0, .Lmain
+	j       .Lmain
 
-.Largs_from_stack:
-	lw      a0, 0(sp)                  # a0 = argc
-	addi    a1, sp, __SIZEOF_POINTER__ # a1 = argv
-	slli    a2, a0, 1 + __SIZEOF_POINTER__ >> 2
-	addi    a2, a2, __SIZEOF_POINTER__
-	add     a2, a2, a1                 # a2 = envp
+.Lempty_args:
+	mv      a0, zero
+	mv      a1, zero
 
 .Lmain:
+	mv      a2, zero
 	call    main
 	tail    exit
 	.cfi_endproc
