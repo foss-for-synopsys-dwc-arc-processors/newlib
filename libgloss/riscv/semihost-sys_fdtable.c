@@ -25,7 +25,7 @@ static struct fdentry fdtable[RISCV_MAX_OPEN_FILES];
 
 /* Initialize fdtable.  A handle of -1 denotes an empty entry.  */
 
-static void
+static void __attribute__ ((used))
 init_semihosting_fdtable ()
 {
   int i;
@@ -67,7 +67,7 @@ init_semihosting_fdtable ()
 int _argc = 0;
 char *_argv[RISCV_MAX_ARGV_LENGTH] = { NULL };
 
-static void
+static void __attribute__ ((used))
 init_semihosting_args ()
 {
   static char cmdline[RISCV_MAX_CMDLINE_LENGTH];
@@ -113,7 +113,7 @@ init_semihosting_args ()
   }
 }
 
-void __attribute__ ((constructor))
+void __attribute__ ((constructor, used))
 init_semihosting ()
 {
   init_semihosting_fdtable();
