@@ -66,6 +66,7 @@ multilibtool_LIBRARIES += %D%/libsemihost.a
 	%D%/semihost-sys_fdtable.c \
 	%D%/semihost-sys_fstat.c \
 	%D%/semihost-sys_ftime.c \
+	%D%/semihost-sys_gettimeofday.c \
 	%D%/semihost-sys_isatty.c \
 	%D%/semihost-sys_link.c \
 	%D%/semihost-sys_lseek.c \

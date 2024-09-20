@@ -1380,6 +1380,7 @@ riscv_libsemihost_a_LIBADD =
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_fdtable.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_fstat.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_ftime.$(OBJEXT) \
+@CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_isatty.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_link.$(OBJEXT) \
 @CONFIG_RISCV_TRUE@	riscv/riscv_libsemihost_a-semihost-sys_lseek.$(OBJEXT) \
@@ -2822,6 +2823,7 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_fdtable.c \
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_fstat.c \
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_ftime.c \
+@CONFIG_RISCV_TRUE@	riscv/semihost-sys_gettimeofday.c \
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_isatty.c \
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_link.c \
 @CONFIG_RISCV_TRUE@	riscv/semihost-sys_lseek.c \
@@ -4906,6 +4908,8 @@ riscv/riscv_libsemihost_a-semihost-sys_fstat.$(OBJEXT):  \
 	riscv/$(am__dirstamp) riscv/$(DEPDIR)/$(am__dirstamp)
 riscv/riscv_libsemihost_a-semihost-sys_ftime.$(OBJEXT):  \
 	riscv/$(am__dirstamp) riscv/$(DEPDIR)/$(am__dirstamp)
+riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.$(OBJEXT):  \
+	riscv/$(am__dirstamp) riscv/$(DEPDIR)/$(am__dirstamp)
 riscv/riscv_libsemihost_a-semihost-sys_isatty.$(OBJEXT):  \
 	riscv/$(am__dirstamp) riscv/$(DEPDIR)/$(am__dirstamp)
 riscv/riscv_libsemihost_a-semihost-sys_link.$(OBJEXT):  \
@@ -6205,6 +6209,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_fdtable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_fstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_ftime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_isatty.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_link.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_lseek.Po@am__quote@
@@ -8846,6 +8851,20 @@ riscv/riscv_libsemihost_a-semihost-sys_ftime.obj: riscv/semihost-sys_ftime.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/semihost-sys_ftime.c' object='riscv/riscv_libsemihost_a-semihost-sys_ftime.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsemihost_a-semihost-sys_ftime.obj `if test -f 'riscv/semihost-sys_ftime.c'; then $(CYGPATH_W) 'riscv/semihost-sys_ftime.c'; else $(CYGPATH_W) '$(srcdir)/riscv/semihost-sys_ftime.c'; fi`
+
+riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.o: riscv/semihost-sys_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Tpo -c -o riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.o `test -f 'riscv/semihost-sys_gettimeofday.c' || echo '$(srcdir)/'`riscv/semihost-sys_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Tpo riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/semihost-sys_gettimeofday.c' object='riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.o `test -f 'riscv/semihost-sys_gettimeofday.c' || echo '$(srcdir)/'`riscv/semihost-sys_gettimeofday.c
+
+riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.obj: riscv/semihost-sys_gettimeofday.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.obj -MD -MP -MF riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Tpo -c -o riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.obj `if test -f 'riscv/semihost-sys_gettimeofday.c'; then $(CYGPATH_W) 'riscv/semihost-sys_gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/riscv/semihost-sys_gettimeofday.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Tpo riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_gettimeofday.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='riscv/semihost-sys_gettimeofday.c' object='riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsemihost_a-semihost-sys_gettimeofday.obj `if test -f 'riscv/semihost-sys_gettimeofday.c'; then $(CYGPATH_W) 'riscv/semihost-sys_gettimeofday.c'; else $(CYGPATH_W) '$(srcdir)/riscv/semihost-sys_gettimeofday.c'; fi`
 
 riscv/riscv_libsemihost_a-semihost-sys_isatty.o: riscv/semihost-sys_isatty.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsemihost_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT riscv/riscv_libsemihost_a-semihost-sys_isatty.o -MD -MP -MF riscv/$(DEPDIR)/riscv_libsemihost_a-semihost-sys_isatty.Tpo -c -o riscv/riscv_libsemihost_a-semihost-sys_isatty.o `test -f 'riscv/semihost-sys_isatty.c' || echo '$(srcdir)/'`riscv/semihost-sys_isatty.c
