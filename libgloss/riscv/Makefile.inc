@@ -5,6 +5,7 @@ multilibtool_DATA += \
 	%D%/arcv.specs \
 	%D%/arcv-crt0.o \
 	%D%/arcv.ld \
+	%D%/arcv.o \
 	%D%/crt0.o
 
 multilibtool_LIBRARIES += %D%/libgloss.a

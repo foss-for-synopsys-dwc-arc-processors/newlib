@@ -1,2 +1,2 @@
 *startfile:
-arcv-crt0%O%s crtbegin%O%s
+arcv-crt0%O%s crtbegin%O%s arcv%O%s

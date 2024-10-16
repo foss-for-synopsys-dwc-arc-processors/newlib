@@ -72,6 +72,11 @@ _start:
 #endif
 	call    __libc_init_array       # Run global initialization functions
 
+#if defined (__riscv_zicsr)
+	# ARC-V specific initialization
+	call    _arcv_cache_enable       # Enable caches
+#endif
+
 	# Get arguments from custom symbols if they are defined. Otherwise,
 	# get them from the stack.
 	.weak _argc
