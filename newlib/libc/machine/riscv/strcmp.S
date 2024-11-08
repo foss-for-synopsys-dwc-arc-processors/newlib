@@ -99,6 +99,14 @@ strcmp:
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 
+#ifdef __riscv_zbb
+  rev8  a2, a2
+  rev8  a3, a3
+  sltu  a0, a2, a3
+  neg   a0, a0
+  ori   a0, a0, 1
+  ret
+#else
 #if __riscv_xlen == 64
   sll   a4, a2, 48
   sll   a5, a3, 48
@@ -130,6 +138,7 @@ strcmp:
   and   a5, a5, 0xff
   sub   a0, a4, a5
   ret
+#endif
 
 #else
 
