@@ -18,7 +18,7 @@ ENTRY(_start)
 
 MEMORY {
   ICCM (rx) : ORIGIN = DEFINED (txtmem_addr) ? txtmem_addr : 0x0, LENGTH = DEFINED (txtmem_len) ? txtmem_len : 128K
-  DCCM (rwx) : ORIGIN = DEFINED (datamem_addr) ? datamem_addr :0x80000000, LENGTH = DEFINED (datamem_len) ? datamem_len : 128K
+  DCCM (rwx) : ORIGIN = DEFINED (datamem_addr) ? datamem_addr :0x40000000, LENGTH = DEFINED (datamem_len) ? datamem_len : 128K
 }
 
 SECTIONS
