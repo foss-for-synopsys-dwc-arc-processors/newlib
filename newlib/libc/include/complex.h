@@ -137,6 +137,18 @@ double creal(double complex);
 float crealf(float complex);
 long double creall(long double complex);
 
+#if __ISO_C_VISIBLE >= 2011
+#ifdef _HAVE_BUILTIN_COMPLEX
+#define CMPLX(r,i) __builtin_complex((double)(r), (double)(i))
+#define CMPLXF(r,i) __builtin_complex((float)(r), (float)(i))
+#define CMPLXL(r,i) __builtin_complex((long double)(r), (long double)(i))
+#else
+#define CMPLX(r,i) ((double complex) ((double) (r) + (double complex) I * (double) (i)))
+#define CMPLXF(r,i) ((float complex) ((float) (r) + (float complex) I * (float) (i)))
+#define CMPLXL(r,i) ((long double complex) ((long double) (r) + (long double complex) I * (long double) (i)))
+#endif
+#endif
+
 #if __GNU_VISIBLE
 double complex clog10(double complex);
 float complex clog10f(float complex);
