@@ -10,6 +10,7 @@
 #include <fcntl.h>
 
 extern int errno;
+extern int _close (int);
 
 #define SEMIHOST_MODE_R 0
 #define SEMIHOST_MODE_RPLUS 2
@@ -35,6 +36,23 @@ _open (const char *name, int flags, ...)
   else if ((flags & (O_WRONLY | O_CREAT | O_APPEND))
 	   == (O_WRONLY | O_CREAT | O_APPEND))
     mode = SEMIHOST_MODE_A;
+  else if ((flags & (O_WRONLY | O_CREAT | O_EXCL))
+	   == (O_WRONLY | O_CREAT | O_EXCL))
+    {
+      /* Semihosting does not support O_EXCL flag. If
+	 O_WRONLY | O_CREAT | O_EXCL combination is passed, then
+	 we need to check existence of a file manually and emit
+	 EEXIST error if it already exists. Otherwise, let
+	 semihosting to open a file in SEMIHOST_MODE_W mode.  */
+      fh = _open (name, O_RDONLY);
+      if (fh != -1)
+	{
+	  _close (fh);
+	  errno = EEXIST;
+	  return -1;
+	}
+      mode = SEMIHOST_MODE_W;
+    }
   else if ((flags & (O_RDWR | O_CREAT | O_TRUNC))
 	   == (O_RDWR | O_CREAT | O_TRUNC))
     mode = SEMIHOST_MODE_WPLUS;
