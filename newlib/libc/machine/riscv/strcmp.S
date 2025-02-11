@@ -30,15 +30,10 @@ strcmp:
 
 .size	strcmp, .-strcmp
 #else
-  li    t2, -1
-
-  # do not waste time on checking an alignment if a target
-  # supports fast misaligned access
-#ifndef __riscv_misaligned_fast
   or    a4, a0, a1
+  li    t2, -1
   and   a4, a4, SZREG-1
   bnez  a4, .Lmisaligned
-#endif
 
 #ifndef __riscv_zbb
 #if SZREG == 4
