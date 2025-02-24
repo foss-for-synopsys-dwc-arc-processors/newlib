@@ -4,9 +4,13 @@ multilibtool_DATA += \
 	%D%/semihost.specs \
 	%D%/arcv.specs \
 	%D%/arcv-crt0.o \
+	%D%/arcv-crt0-no-csr.o \
 	%D%/arcv.ld \
 	%D%/arcv.o \
 	%D%/crt0.o
+
+%D%/arcv-crt0-no-csr.$(OBJEXT): %D%/crt0.S
+	$(AM_V_CPPAS)$(CPPASCOMPILE) -DCRT0_NO_CSR -o $@ -c $<
 
 multilibtool_LIBRARIES += %D%/libgloss.a
 %C%_libgloss_a_CPPFLAGS = -I$(srcdir)/%D%

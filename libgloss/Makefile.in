@@ -406,6 +406,7 @@ multilibtool_PROGRAMS = $(am__EXEEXT_7)
 @CONFIG_RISCV_TRUE@	riscv/semihost.specs \
 @CONFIG_RISCV_TRUE@	riscv/arcv.specs \
 @CONFIG_RISCV_TRUE@	riscv/arcv-crt0.o \
+@CONFIG_RISCV_TRUE@	riscv/arcv-crt0-no-csr.o \
 @CONFIG_RISCV_TRUE@	riscv/arcv.ld \
 @CONFIG_RISCV_TRUE@	riscv/arcv.o \
 @CONFIG_RISCV_TRUE@	riscv/crt0.o
@@ -1680,7 +1681,8 @@ xtensa_libgloss_a_AR = $(AR) $(ARFLAGS)
 xtensa_libgloss_a_LIBADD =
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_44 = xtensa/boards/esp32/xtensa_libgloss_a-board.$(OBJEXT)
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP32S3_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am__objects_45 = xtensa/boards/esp32s3/xtensa_libgloss_a-board.$(OBJEXT)
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am_xtensa_libgloss_a_OBJECTS = xtensa/xtensa_libgloss_a-sleep.$(OBJEXT) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@am_xtensa_libgloss_a_OBJECTS = xtensa/xtensa_libgloss_a-clibrary_init.$(OBJEXT) \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-sleep.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-syscalls.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/xtensa_libgloss_a-window-vectors.$(OBJEXT) \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__objects_44) \
@@ -3141,7 +3143,8 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_XSTORMY16_TRUE@	-nostartfiles -T$(srcdir)/xstormy16/eva_stub.ld
 
 @CONFIG_XTENSA_TRUE@AM_CPPFLAGS_xtensa = -D_LIBGLOSS -I$(srcdir)/xtensa/include
-@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_SOURCES = xtensa/sleep.S \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@xtensa_libgloss_a_SOURCES = xtensa/clibrary_init.c \
+@CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/sleep.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/syscalls.c \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	xtensa/window-vectors.S \
 @CONFIG_XTENSA_TRUE@@HAVE_XTENSA_BOARD_ESP_TRUE@	$(am__append_146) \
@@ -5431,6 +5434,8 @@ xstormy16/libsim.a: $(xstormy16_libsim_a_OBJECTS) $(xstormy16_libsim_a_DEPENDENC
 	$(AM_V_at)-rm -f xstormy16/libsim.a
 	$(AM_V_AR)$(xstormy16_libsim_a_AR) xstormy16/libsim.a $(xstormy16_libsim_a_OBJECTS) $(xstormy16_libsim_a_LIBADD)
 	$(AM_V_at)$(RANLIB) xstormy16/libsim.a
+xtensa/xtensa_libgloss_a-clibrary_init.$(OBJEXT):  \
+	xtensa/$(am__dirstamp) xtensa/$(DEPDIR)/$(am__dirstamp)
 xtensa/xtensa_libgloss_a-sleep.$(OBJEXT): xtensa/$(am__dirstamp) \
 	xtensa/$(DEPDIR)/$(am__dirstamp)
 xtensa/xtensa_libgloss_a-syscalls.$(OBJEXT): xtensa/$(am__dirstamp) \
@@ -6468,6 +6473,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/crt1-boards.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/crt1-sim.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-sleep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@xtensa/$(DEPDIR)/xtensa_libgloss_a-window-vectors.Po@am__quote@
@@ -9492,6 +9498,20 @@ riscv/riscv_libsim_a-sys_write.obj: riscv/sys_write.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(riscv_libsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o riscv/riscv_libsim_a-sys_write.obj `if test -f 'riscv/sys_write.c'; then $(CYGPATH_W) 'riscv/sys_write.c'; else $(CYGPATH_W) '$(srcdir)/riscv/sys_write.c'; fi`
 
+xtensa/xtensa_libgloss_a-clibrary_init.o: xtensa/clibrary_init.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xtensa_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xtensa/xtensa_libgloss_a-clibrary_init.o -MD -MP -MF xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Tpo -c -o xtensa/xtensa_libgloss_a-clibrary_init.o `test -f 'xtensa/clibrary_init.c' || echo '$(srcdir)/'`xtensa/clibrary_init.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Tpo xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='xtensa/clibrary_init.c' object='xtensa/xtensa_libgloss_a-clibrary_init.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xtensa_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xtensa/xtensa_libgloss_a-clibrary_init.o `test -f 'xtensa/clibrary_init.c' || echo '$(srcdir)/'`xtensa/clibrary_init.c
+
+xtensa/xtensa_libgloss_a-clibrary_init.obj: xtensa/clibrary_init.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xtensa_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xtensa/xtensa_libgloss_a-clibrary_init.obj -MD -MP -MF xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Tpo -c -o xtensa/xtensa_libgloss_a-clibrary_init.obj `if test -f 'xtensa/clibrary_init.c'; then $(CYGPATH_W) 'xtensa/clibrary_init.c'; else $(CYGPATH_W) '$(srcdir)/xtensa/clibrary_init.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Tpo xtensa/$(DEPDIR)/xtensa_libgloss_a-clibrary_init.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='xtensa/clibrary_init.c' object='xtensa/xtensa_libgloss_a-clibrary_init.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xtensa_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xtensa/xtensa_libgloss_a-clibrary_init.obj `if test -f 'xtensa/clibrary_init.c'; then $(CYGPATH_W) 'xtensa/clibrary_init.c'; else $(CYGPATH_W) '$(srcdir)/xtensa/clibrary_init.c'; fi`
+
 xtensa/xtensa_libgloss_a-syscalls.o: xtensa/syscalls.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(xtensa_libgloss_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xtensa/xtensa_libgloss_a-syscalls.o -MD -MP -MF xtensa/$(DEPDIR)/xtensa_libgloss_a-syscalls.Tpo -c -o xtensa/xtensa_libgloss_a-syscalls.o `test -f 'xtensa/syscalls.c' || echo '$(srcdir)/'`xtensa/syscalls.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) xtensa/$(DEPDIR)/xtensa_libgloss_a-syscalls.Tpo xtensa/$(DEPDIR)/xtensa_libgloss_a-syscalls.Po
@@ -10451,6 +10471,9 @@ maintainer-clean-local: maintainer-clean-multi
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	$(AM_V_GEN)cp $< $@
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@mcore/cmb.specs: mcore/pe-cmb.specs
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	$(AM_V_GEN)cp $< $@
+
+@CONFIG_RISCV_TRUE@riscv/arcv-crt0-no-csr.$(OBJEXT): riscv/crt0.S
+@CONFIG_RISCV_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DCRT0_NO_CSR -o $@ -c $<
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@sparc/cygmon.ld: $(srcdir)/sparc/@SPARC_CYGMONLDSCRIPTTEMPL@ sparc/Makefile.inc
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@	$(AM_V_GEN)sed 's/TARGET_OBJ_FORMAT/$(sparc_$(SPARC_CPU)_OBJ_FORMAT)/g;s/TARGET_RAM_START/$(sparc_$(SPARC_CPU)_RAM_START)/g;' < $< > $@
 

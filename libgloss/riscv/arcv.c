@@ -30,9 +30,9 @@
 
 #include "arcv.h"
 
-void _arcv_cache_enable ()
+void __attribute__((target("arch=+zicsr")))
+_arcv_cache_enable ()
 {
-#if defined (__riscv_zicsr)
   unsigned long mcache = _arcv_csr_read(CSR_NUM_ARCV_MCACHE_CTRL);
   mcache |=
     (1 << ARCV_MCACHE_CTRL_IC_EN_OFFSET) |
@@ -40,5 +40,4 @@ void _arcv_cache_enable ()
     (1 << ARCV_MCACHE_CTRL_DC_L0_EN_OFFSET) |
     (1 << ARCV_MCACHE_CTRL_L2_EN_OFFSET);
   _arcv_csr_write(CSR_NUM_ARCV_MCACHE_CTRL, mcache);
-#endif
 }

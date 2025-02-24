@@ -37,7 +37,7 @@
 #define ARCV_MCACHE_CTRL_DC_L0_EN_OFFSET    0xC
 #define ARCV_MCACHE_CTRL_L2_EN_OFFSET       0x10
 
-inline unsigned long __attribute__((always_inline))
+inline unsigned long __attribute__((always_inline,target("arch=+zicsr")))
 _arcv_csr_read (int csr_num)
 {
   unsigned long result;
@@ -45,7 +45,7 @@ _arcv_csr_read (int csr_num)
   return result;
 }
 
-inline void __attribute__((always_inline))
+inline void __attribute__((always_inline,target("arch=+zicsr")))
 _arcv_csr_write (int csr_num, unsigned long data)
 {
   __asm__ __volatile__("csrw %0, %1" :: "i"(csr_num), "r"(data));
