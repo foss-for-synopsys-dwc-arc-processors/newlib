@@ -53,16 +53,16 @@ _start:
 	# Set mstatus.VS if misa.V is set.
 #ifdef __riscv_zicsr
 	# Check misa.V (misa[21]) for V extension presence.
-	csrr t0, misa
-	srli t0, t0, 21
-	andi t0, t0, 1
-	beqz t0, 1f
+	csrr    t0, misa
+	srli    t0, t0, 21
+	andi    t0, t0, 1
+	beqz    t0, 1f
 
 	# Set mstatus.VS (mstatus[10:9]) if V extension is present.
-	csrr t0, mstatus
-	li t1, 1536
-	or t0, t1, t0
-	csrw mstatus, t0
+	csrr    t0, mstatus
+	li      t1, 512
+	or      t0, t1, t0
+	csrw    mstatus, t0
 #endif
 
 1:
