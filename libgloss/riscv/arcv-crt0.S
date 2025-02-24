@@ -50,8 +50,11 @@ _start:
 	csrwi   fcsr, 0
 #endif
 
+#ifndef CRT0_NO_CSR
 	# Set mstatus.VS if misa.V is set.
-#ifdef __riscv_zicsr
+.option push
+.option norelax
+.option arch, +zicsr
 	# Check misa.V (misa[21]) for V extension presence.
 	csrr    t0, misa
 	srli    t0, t0, 21
@@ -63,6 +66,7 @@ _start:
 	li      t1, 512
 	or      t0, t1, t0
 	csrw    mstatus, t0
+.option pop
 #endif
 
 1:
@@ -88,10 +92,8 @@ _start:
 #endif
 	call    __libc_init_array       # Run global initialization functions
 
-#if defined (__riscv_zicsr)
 	# ARC-V specific initialization
 	call    _arcv_cache_enable       # Enable caches
-#endif
 
 	# Get arguments from custom symbols if they are defined. Otherwise,
 	# get them from the stack.
