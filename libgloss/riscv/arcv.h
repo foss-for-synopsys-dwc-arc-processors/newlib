@@ -31,11 +31,19 @@
 #ifndef _ARCV_H
 #define _ARCV_H
 
+#define CSR_NUM_MSTATUS                     0x300
+#define MSTATUS_VS_OFFSET                   0x9
+#define MSTATUS_VS_MASK                     0x3
+
 #define CSR_NUM_ARCV_MCACHE_CTRL            0x7C8
 #define ARCV_MCACHE_CTRL_IC_EN_OFFSET       0x0
 #define ARCV_MCACHE_CTRL_DC_EN_OFFSET       0x8
 #define ARCV_MCACHE_CTRL_DC_L0_EN_OFFSET    0xC
 #define ARCV_MCACHE_CTRL_L2_EN_OFFSET       0x10
+
+#define CSR_NUM_ARCV_RVV_BUILD              0xFC4
+#define ARCV_RVV_BUILD_V_OPTION_OFFSET      0x0
+#define ARCV_RVV_BUILD_V_OPTION_MASK        0x7
 
 inline unsigned long __attribute__((always_inline,target("arch=+zicsr")))
 _arcv_csr_read (int csr_num)
@@ -52,5 +60,6 @@ _arcv_csr_write (int csr_num, unsigned long data)
 }
 
 void _arcv_cache_enable ();
+void _arcv_vector_enable ();
 
 #endif

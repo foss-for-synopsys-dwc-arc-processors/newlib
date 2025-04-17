@@ -41,3 +41,18 @@ _arcv_cache_enable ()
     (1 << ARCV_MCACHE_CTRL_L2_EN_OFFSET);
   _arcv_csr_write(CSR_NUM_ARCV_MCACHE_CTRL, mcache);
 }
+
+void __attribute__((target("arch=+zicsr")))
+_arcv_vector_enable ()
+{
+  unsigned long rvv_build = _arcv_csr_read(CSR_NUM_ARCV_RVV_BUILD);
+  unsigned long v_option = (rvv_build >> ARCV_RVV_BUILD_V_OPTION_OFFSET) &
+    ARCV_RVV_BUILD_V_OPTION_MASK;
+
+  if (v_option != 0)
+    {
+      unsigned long mstatus = _arcv_csr_read(CSR_NUM_MSTATUS);
+      mstatus |= (1 << MSTATUS_VS_OFFSET);
+      _arcv_csr_write(CSR_NUM_MSTATUS, mstatus);
+    }
+}
