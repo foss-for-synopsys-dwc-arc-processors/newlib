@@ -50,25 +50,6 @@ _start:
 	csrwi   fcsr, 0
 #endif
 
-#ifndef CRT0_NO_CSR
-	# Set mstatus.VS if misa.V is set.
-.option push
-.option norelax
-.option arch, +zicsr
-	# Check misa.V (misa[21]) for V extension presence.
-	csrr    t0, misa
-	srli    t0, t0, 21
-	andi    t0, t0, 1
-	beqz    t0, 1f
-
-	# Set mstatus.VS (mstatus[10:9]) if V extension is present.
-	csrr    t0, mstatus
-	li      t1, 512
-	or      t0, t1, t0
-	csrw    mstatus, t0
-.option pop
-#endif
-
 1:
 	# Clear the bss segment
 	la      a0, __bss_start
@@ -95,6 +76,7 @@ _start:
 #ifndef CRT0_NO_CSR
 	# ARC-V specific initialization
 	call    _arcv_cache_enable       # Enable caches
+	call    _arcv_vector_enable      # Set mstatus.VS
 #endif
 
 	# Get arguments from custom symbols if they are defined. Otherwise,
