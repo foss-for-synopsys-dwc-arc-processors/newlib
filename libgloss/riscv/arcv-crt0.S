@@ -92,8 +92,10 @@ _start:
 #endif
 	call    __libc_init_array       # Run global initialization functions
 
+#ifndef CRT0_NO_CSR
 	# ARC-V specific initialization
 	call    _arcv_cache_enable       # Enable caches
+#endif
 
 	# Get arguments from custom symbols if they are defined. Otherwise,
 	# get them from the stack.
