@@ -10472,7 +10472,7 @@ maintainer-clean-local: maintainer-clean-multi
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@mcore/cmb.specs: mcore/pe-cmb.specs
 @CONFIG_MCORE_TRUE@@MCORE_BUILD_PE_TRUE@	$(AM_V_GEN)cp $< $@
 
-@CONFIG_RISCV_TRUE@riscv/arcv-crt0-no-csr.$(OBJEXT): riscv/crt0.S
+@CONFIG_RISCV_TRUE@riscv/arcv-crt0-no-csr.$(OBJEXT): riscv/arcv-crt0.S
 @CONFIG_RISCV_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DCRT0_NO_CSR -o $@ -c $<
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@sparc/cygmon.ld: $(srcdir)/sparc/@SPARC_CYGMONLDSCRIPTTEMPL@ sparc/Makefile.inc
 @CONFIG_SPARC_TRUE@@SPARC_BUILD_CYGMON_TRUE@	$(AM_V_GEN)sed 's/TARGET_OBJ_FORMAT/$(sparc_$(SPARC_CPU)_OBJ_FORMAT)/g;s/TARGET_RAM_START/$(sparc_$(SPARC_CPU)_RAM_START)/g;' < $< > $@

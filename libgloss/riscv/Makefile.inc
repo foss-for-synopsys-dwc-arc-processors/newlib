@@ -9,7 +9,7 @@ multilibtool_DATA += \
 	%D%/arcv.o \
 	%D%/crt0.o
 
-%D%/arcv-crt0-no-csr.$(OBJEXT): %D%/crt0.S
+%D%/arcv-crt0-no-csr.$(OBJEXT): %D%/arcv-crt0.S
 	$(AM_V_CPPAS)$(CPPASCOMPILE) -DCRT0_NO_CSR -o $@ -c $<
 
 multilibtool_LIBRARIES += %D%/libgloss.a
