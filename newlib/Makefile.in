@@ -692,10 +692,6 @@ check_PROGRAMS =
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strcpy-bs.S \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strcpy-bs-arc600.S \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strcpy-stub.c \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strlen.S \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strlen-bs.S \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strlen-bs-norm.S \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strlen-stub.c \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strncpy.S \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strncpy-stub.c \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/strncpy-bs.S
@@ -1965,10 +1961,6 @@ am__objects_51 = libc/ssp/libc_a-chk_fail.$(OBJEXT) \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strcpy-bs.$(OBJEXT) \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strcpy-bs-arc600.$(OBJEXT) \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strcpy-stub.$(OBJEXT) \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strlen.$(OBJEXT) \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strlen-bs.$(OBJEXT) \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strlen-bs-norm.$(OBJEXT) \
-@HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strlen-stub.$(OBJEXT) \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strncpy.$(OBJEXT) \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strncpy-stub.$(OBJEXT) \
 @HAVE_LIBC_MACHINE_ARC_TRUE@	libc/machine/arc/libc_a-strncpy-bs.$(OBJEXT)
@@ -4001,7 +3993,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
@@ -8282,18 +8273,6 @@ libc/machine/arc/libc_a-strcpy-bs-arc600.$(OBJEXT):  \
 	libc/machine/arc/$(am__dirstamp) \
 	libc/machine/arc/$(DEPDIR)/$(am__dirstamp)
 libc/machine/arc/libc_a-strcpy-stub.$(OBJEXT):  \
-	libc/machine/arc/$(am__dirstamp) \
-	libc/machine/arc/$(DEPDIR)/$(am__dirstamp)
-libc/machine/arc/libc_a-strlen.$(OBJEXT):  \
-	libc/machine/arc/$(am__dirstamp) \
-	libc/machine/arc/$(DEPDIR)/$(am__dirstamp)
-libc/machine/arc/libc_a-strlen-bs.$(OBJEXT):  \
-	libc/machine/arc/$(am__dirstamp) \
-	libc/machine/arc/$(DEPDIR)/$(am__dirstamp)
-libc/machine/arc/libc_a-strlen-bs-norm.$(OBJEXT):  \
-	libc/machine/arc/$(am__dirstamp) \
-	libc/machine/arc/$(DEPDIR)/$(am__dirstamp)
-libc/machine/arc/libc_a-strlen-stub.$(OBJEXT):  \
 	libc/machine/arc/$(am__dirstamp) \
 	libc/machine/arc/$(DEPDIR)/$(am__dirstamp)
 libc/machine/arc/libc_a-strncpy.$(OBJEXT):  \
@@ -12926,10 +12905,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strcpy-bs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strcpy-stub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strcpy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strlen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strncpy-bs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strncpy-stub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libc/machine/arc/$(DEPDIR)/libc_a-strncpy.Po@am__quote@
@@ -17283,48 +17258,6 @@ libc/machine/arc/libc_a-strcpy-bs-arc600.obj: libc/machine/arc/strcpy-bs-arc600.
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strcpy-bs-arc600.S' object='libc/machine/arc/libc_a-strcpy-bs-arc600.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strcpy-bs-arc600.obj `if test -f 'libc/machine/arc/strcpy-bs-arc600.S'; then $(CYGPATH_W) 'libc/machine/arc/strcpy-bs-arc600.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strcpy-bs-arc600.S'; fi`
-
-libc/machine/arc/libc_a-strlen.o: libc/machine/arc/strlen.S
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strlen.o -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen.Tpo -c -o libc/machine/arc/libc_a-strlen.o `test -f 'libc/machine/arc/strlen.S' || echo '$(srcdir)/'`libc/machine/arc/strlen.S
-@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strlen.S' object='libc/machine/arc/libc_a-strlen.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strlen.o `test -f 'libc/machine/arc/strlen.S' || echo '$(srcdir)/'`libc/machine/arc/strlen.S
-
-libc/machine/arc/libc_a-strlen.obj: libc/machine/arc/strlen.S
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strlen.obj -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen.Tpo -c -o libc/machine/arc/libc_a-strlen.obj `if test -f 'libc/machine/arc/strlen.S'; then $(CYGPATH_W) 'libc/machine/arc/strlen.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen.S'; fi`
-@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strlen.S' object='libc/machine/arc/libc_a-strlen.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strlen.obj `if test -f 'libc/machine/arc/strlen.S'; then $(CYGPATH_W) 'libc/machine/arc/strlen.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen.S'; fi`
-
-libc/machine/arc/libc_a-strlen-bs.o: libc/machine/arc/strlen-bs.S
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strlen-bs.o -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Tpo -c -o libc/machine/arc/libc_a-strlen-bs.o `test -f 'libc/machine/arc/strlen-bs.S' || echo '$(srcdir)/'`libc/machine/arc/strlen-bs.S
-@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strlen-bs.S' object='libc/machine/arc/libc_a-strlen-bs.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strlen-bs.o `test -f 'libc/machine/arc/strlen-bs.S' || echo '$(srcdir)/'`libc/machine/arc/strlen-bs.S
-
-libc/machine/arc/libc_a-strlen-bs.obj: libc/machine/arc/strlen-bs.S
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strlen-bs.obj -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Tpo -c -o libc/machine/arc/libc_a-strlen-bs.obj `if test -f 'libc/machine/arc/strlen-bs.S'; then $(CYGPATH_W) 'libc/machine/arc/strlen-bs.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen-bs.S'; fi`
-@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strlen-bs.S' object='libc/machine/arc/libc_a-strlen-bs.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strlen-bs.obj `if test -f 'libc/machine/arc/strlen-bs.S'; then $(CYGPATH_W) 'libc/machine/arc/strlen-bs.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen-bs.S'; fi`
-
-libc/machine/arc/libc_a-strlen-bs-norm.o: libc/machine/arc/strlen-bs-norm.S
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strlen-bs-norm.o -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Tpo -c -o libc/machine/arc/libc_a-strlen-bs-norm.o `test -f 'libc/machine/arc/strlen-bs-norm.S' || echo '$(srcdir)/'`libc/machine/arc/strlen-bs-norm.S
-@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strlen-bs-norm.S' object='libc/machine/arc/libc_a-strlen-bs-norm.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strlen-bs-norm.o `test -f 'libc/machine/arc/strlen-bs-norm.S' || echo '$(srcdir)/'`libc/machine/arc/strlen-bs-norm.S
-
-libc/machine/arc/libc_a-strlen-bs-norm.obj: libc/machine/arc/strlen-bs-norm.S
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strlen-bs-norm.obj -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Tpo -c -o libc/machine/arc/libc_a-strlen-bs-norm.obj `if test -f 'libc/machine/arc/strlen-bs-norm.S'; then $(CYGPATH_W) 'libc/machine/arc/strlen-bs-norm.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen-bs-norm.S'; fi`
-@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen-bs-norm.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='libc/machine/arc/strlen-bs-norm.S' object='libc/machine/arc/libc_a-strlen-bs-norm.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -c -o libc/machine/arc/libc_a-strlen-bs-norm.obj `if test -f 'libc/machine/arc/strlen-bs-norm.S'; then $(CYGPATH_W) 'libc/machine/arc/strlen-bs-norm.S'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen-bs-norm.S'; fi`
 
 libc/machine/arc/libc_a-strncpy.o: libc/machine/arc/strncpy.S
 @am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CCASFLAGS) $(CCASFLAGS) -MT libc/machine/arc/libc_a-strncpy.o -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strncpy.Tpo -c -o libc/machine/arc/libc_a-strncpy.o `test -f 'libc/machine/arc/strncpy.S' || echo '$(srcdir)/'`libc/machine/arc/strncpy.S
@@ -33721,20 +33654,6 @@ libc/machine/arc/libc_a-strcpy-stub.obj: libc/machine/arc/strcpy-stub.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libc/machine/arc/strcpy-stub.c' object='libc/machine/arc/libc_a-strcpy-stub.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc/machine/arc/libc_a-strcpy-stub.obj `if test -f 'libc/machine/arc/strcpy-stub.c'; then $(CYGPATH_W) 'libc/machine/arc/strcpy-stub.c'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strcpy-stub.c'; fi`
-
-libc/machine/arc/libc_a-strlen-stub.o: libc/machine/arc/strlen-stub.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -MT libc/machine/arc/libc_a-strlen-stub.o -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Tpo -c -o libc/machine/arc/libc_a-strlen-stub.o `test -f 'libc/machine/arc/strlen-stub.c' || echo '$(srcdir)/'`libc/machine/arc/strlen-stub.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libc/machine/arc/strlen-stub.c' object='libc/machine/arc/libc_a-strlen-stub.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc/machine/arc/libc_a-strlen-stub.o `test -f 'libc/machine/arc/strlen-stub.c' || echo '$(srcdir)/'`libc/machine/arc/strlen-stub.c
-
-libc/machine/arc/libc_a-strlen-stub.obj: libc/machine/arc/strlen-stub.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -MT libc/machine/arc/libc_a-strlen-stub.obj -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Tpo -c -o libc/machine/arc/libc_a-strlen-stub.obj `if test -f 'libc/machine/arc/strlen-stub.c'; then $(CYGPATH_W) 'libc/machine/arc/strlen-stub.c'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen-stub.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Tpo libc/machine/arc/$(DEPDIR)/libc_a-strlen-stub.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libc/machine/arc/strlen-stub.c' object='libc/machine/arc/libc_a-strlen-stub.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc/machine/arc/libc_a-strlen-stub.obj `if test -f 'libc/machine/arc/strlen-stub.c'; then $(CYGPATH_W) 'libc/machine/arc/strlen-stub.c'; else $(CYGPATH_W) '$(srcdir)/libc/machine/arc/strlen-stub.c'; fi`
 
 libc/machine/arc/libc_a-strncpy-stub.o: libc/machine/arc/strncpy-stub.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libc_a_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -MT libc/machine/arc/libc_a-strncpy-stub.o -MD -MP -MF libc/machine/arc/$(DEPDIR)/libc_a-strncpy-stub.Tpo -c -o libc/machine/arc/libc_a-strncpy-stub.o `test -f 'libc/machine/arc/strncpy-stub.c' || echo '$(srcdir)/'`libc/machine/arc/strncpy-stub.c
