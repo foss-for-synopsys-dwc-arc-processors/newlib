@@ -3,7 +3,7 @@
  * This function uses _argc(), _argvlen(), _argv() and _setup_low_level().
  * Description for these functions can be found below in this file.
  *
- * Copyright (c) 2024 Synopsys Inc.
+ * Copyright (c) 2024 - 2026 MIPS Holding, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided

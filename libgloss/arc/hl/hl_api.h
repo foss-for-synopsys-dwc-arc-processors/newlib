@@ -1,7 +1,7 @@
 /*
  * hl_api.h -- provide high-level API for Hostlink IO.
  *
- * Copyright (c) 2024 Synopsys Inc.
+ * Copyright (c) 2024 - 2026 MIPS Holding, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided

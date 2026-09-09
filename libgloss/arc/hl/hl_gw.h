@@ -2,7 +2,7 @@
  * hl_gw.h -- Hostlink gateway, low-level hostlink functions.
  * This header should not be used directly, please use hl_api.h instead.
  *
- * Copyright (c) 2024 Synopsys Inc.
+ * Copyright (c) 2024 - 2026 MIPS Holding, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided

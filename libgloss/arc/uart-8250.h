@@ -2,7 +2,7 @@
  * uart-8250.h -- polling driver for 32-bit 8250 UART.
  * Header defines _uart_8250_setup().
  *
- * Copyright (c) 2024 Synopsys Inc.
+ * Copyright (c) 2024 - 2026 MIPS Holding, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided

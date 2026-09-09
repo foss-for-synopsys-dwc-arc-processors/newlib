@@ -578,7 +578,7 @@ class BinutilsCopyright (Copyright):
         self.add_external_author ('The Regents of the University of California.')
         self.add_external_author ('Third Eye Software, Inc.')
         self.add_external_author ('Ulrich Drepper')
-        self.add_external_author ('Synopsys Inc.')
+        self.add_external_author ('MIPS Holding, Inc.')
 
 class BinutilsCmdLine (CmdLine):
     def __init__ (self):
